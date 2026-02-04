@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import io.github.kdroidfilter.darwinui.components.text.DarwinText
@@ -1395,7 +1396,7 @@ private fun RevealPage() {
 @Composable
 fun DateSelectDefaultExample() {
     var selectedConfig by remember { mutableStateOf<DateConfig?>(null) }
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.widthIn(max = 384.dp).fillMaxWidth()) {
         DarwinDateSelect(
             label = "Select a date",
             onChange = { selectedConfig = it },
