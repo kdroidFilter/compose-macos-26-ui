@@ -2,6 +2,7 @@ package io.github.kdroidfilter.darwinui.sample
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -147,43 +148,76 @@ import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import io.github.kdroidfilter.darwinui.theme.glassEffect
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
+import com.composables.icons.lucide.TextAlignStart
+import com.composables.icons.lucide.AppWindow
+import com.composables.icons.lucide.Bell
+import com.composables.icons.lucide.Calendar
+import com.composables.icons.lucide.ChevronsUpDown
+import com.composables.icons.lucide.CircleUser
+import com.composables.icons.lucide.Columns3
+import com.composables.icons.lucide.CreditCard
+import com.composables.icons.lucide.Eye
+import com.composables.icons.lucide.ListChecks
+import com.composables.icons.lucide.Loader
+import com.composables.icons.lucide.Lucide
+import com.composables.icons.lucide.Menu
+import com.composables.icons.lucide.MessageCircle
+import com.composables.icons.lucide.MessageSquare
+import com.composables.icons.lucide.Ellipsis
+import com.composables.icons.lucide.MousePointerClick
+import com.composables.icons.lucide.PanelLeft
+import com.composables.icons.lucide.PanelTop
+import com.composables.icons.lucide.PanelTopOpen
+import com.composables.icons.lucide.Scan
+import com.composables.icons.lucide.Search
+import com.composables.icons.lucide.SlidersHorizontal
+import com.composables.icons.lucide.SquareCheck
+import com.composables.icons.lucide.Table
+import com.composables.icons.lucide.Tag
+import com.composables.icons.lucide.TextCursorInput
+import com.composables.icons.lucide.ToggleLeft
+import com.composables.icons.lucide.TriangleAlert
+import com.composables.icons.lucide.Upload
+import com.composables.icons.lucide.X
 
 // Navigation data
-private data class SidebarEntry(val id: String, val label: String, val group: String)
+private data class SidebarEntry(val id: String, val label: String, val group: String, val icon: ImageVector)
 
 private val sidebarEntries = listOf(
-    SidebarEntry("button", "Button", "FORM CONTROLS"),
-    SidebarEntry("input", "Input", "FORM CONTROLS"),
-    SidebarEntry("textarea", "Textarea", "FORM CONTROLS"),
-    SidebarEntry("checkbox", "Checkbox", "FORM CONTROLS"),
-    SidebarEntry("switch", "Switch", "FORM CONTROLS"),
-    SidebarEntry("select", "Select", "FORM CONTROLS"),
-    SidebarEntry("multiselect", "Multi Select", "FORM CONTROLS"),
-    SidebarEntry("searchinput", "Search Input", "FORM CONTROLS"),
-    SidebarEntry("slider", "Slider", "FORM CONTROLS"),
-    SidebarEntry("dateselect", "Date Select", "FORM CONTROLS"),
-    SidebarEntry("upload", "Upload", "FORM CONTROLS"),
-    SidebarEntry("badge", "Badge", "DATA DISPLAY"),
-    SidebarEntry("avatar", "Avatar", "DATA DISPLAY"),
-    SidebarEntry("card", "Card", "DATA DISPLAY"),
-    SidebarEntry("table", "Table", "DATA DISPLAY"),
-    SidebarEntry("progress", "Progress", "DATA DISPLAY"),
-    SidebarEntry("skeleton", "Skeleton", "DATA DISPLAY"),
-    SidebarEntry("alert", "Alert", "FEEDBACK"),
-    SidebarEntry("toast", "Toast", "FEEDBACK"),
-    SidebarEntry("dialog", "Dialog", "OVERLAYS"),
-    SidebarEntry("tooltip", "Tooltip", "OVERLAYS"),
-    SidebarEntry("popover", "Popover", "OVERLAYS"),
-    SidebarEntry("dropdown", "Dropdown Menu", "OVERLAYS"),
-    SidebarEntry("contextmenu", "Context Menu", "OVERLAYS"),
-    SidebarEntry("tabs", "Tabs", "NAVIGATION"),
-    SidebarEntry("accordion", "Accordion", "NAVIGATION"),
-    SidebarEntry("sidebar", "Sidebar", "NAVIGATION"),
-    SidebarEntry("window", "Window", "LAYOUT"),
-    SidebarEntry("topbar", "Top Bar", "LAYOUT"),
-    SidebarEntry("closebutton", "Close Button", "LAYOUT"),
-    SidebarEntry("reveal", "Reveal", "EFFECTS"),
+    SidebarEntry("button", "Button", "FORM CONTROLS", Lucide.MousePointerClick),
+    SidebarEntry("input", "Input", "FORM CONTROLS", Lucide.TextCursorInput),
+    SidebarEntry("textarea", "Textarea", "FORM CONTROLS", Lucide.TextAlignStart),
+    SidebarEntry("checkbox", "Checkbox", "FORM CONTROLS", Lucide.SquareCheck),
+    SidebarEntry("switch", "Switch", "FORM CONTROLS", Lucide.ToggleLeft),
+    SidebarEntry("select", "Select", "FORM CONTROLS", Lucide.ChevronsUpDown),
+    SidebarEntry("multiselect", "Multi Select", "FORM CONTROLS", Lucide.ListChecks),
+    SidebarEntry("searchinput", "Search Input", "FORM CONTROLS", Lucide.Search),
+    SidebarEntry("slider", "Slider", "FORM CONTROLS", Lucide.SlidersHorizontal),
+    SidebarEntry("dateselect", "Date Select", "FORM CONTROLS", Lucide.Calendar),
+    SidebarEntry("upload", "Upload", "FORM CONTROLS", Lucide.Upload),
+    SidebarEntry("badge", "Badge", "DATA DISPLAY", Lucide.Tag),
+    SidebarEntry("avatar", "Avatar", "DATA DISPLAY", Lucide.CircleUser),
+    SidebarEntry("card", "Card", "DATA DISPLAY", Lucide.CreditCard),
+    SidebarEntry("table", "Table", "DATA DISPLAY", Lucide.Table),
+    SidebarEntry("progress", "Progress", "DATA DISPLAY", Lucide.Loader),
+    SidebarEntry("skeleton", "Skeleton", "DATA DISPLAY", Lucide.Scan),
+    SidebarEntry("alert", "Alert", "FEEDBACK", Lucide.TriangleAlert),
+    SidebarEntry("toast", "Toast", "FEEDBACK", Lucide.Bell),
+    SidebarEntry("dialog", "Dialog", "OVERLAYS", Lucide.MessageSquare),
+    SidebarEntry("tooltip", "Tooltip", "OVERLAYS", Lucide.MessageCircle),
+    SidebarEntry("popover", "Popover", "OVERLAYS", Lucide.PanelTopOpen),
+    SidebarEntry("dropdown", "Dropdown Menu", "OVERLAYS", Lucide.Menu),
+    SidebarEntry("contextmenu", "Context Menu", "OVERLAYS", Lucide.Ellipsis),
+    SidebarEntry("tabs", "Tabs", "NAVIGATION", Lucide.Columns3),
+    SidebarEntry("accordion", "Accordion", "NAVIGATION", Lucide.ChevronsUpDown),
+    SidebarEntry("sidebar", "Sidebar", "NAVIGATION", Lucide.PanelLeft),
+    SidebarEntry("window", "Window", "LAYOUT", Lucide.AppWindow),
+    SidebarEntry("topbar", "Top Bar", "LAYOUT", Lucide.PanelTop),
+    SidebarEntry("closebutton", "Close Button", "LAYOUT", Lucide.X),
+    SidebarEntry("reveal", "Reveal", "EFFECTS", Lucide.Eye),
 )
 
 @Composable
@@ -234,7 +268,18 @@ fun App() {
                                             .hoverable(navInteractionSource).clickable(interactionSource = navInteractionSource, indication = null, role = Role.Tab, onClick = { selectedPage = entry.id })
                                             .padding(horizontal = 12.dp),
                                         contentAlignment = Alignment.CenterStart,
-                                    ) { DarwinText(text = entry.label, style = DarwinTheme.typography.bodyMedium, color = navTextColor) }
+                                    ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Image(
+                                                entry.icon,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(16.dp),
+                                                colorFilter = ColorFilter.tint(navTextColor)
+                                            )
+                                            Spacer(Modifier.width(10.dp))
+                                            DarwinText(text = entry.label, style = DarwinTheme.typography.bodyMedium, color = navTextColor)
+                                        }
+                                    }
                                 }
                             }
                             if (filtered.isEmpty()) {
