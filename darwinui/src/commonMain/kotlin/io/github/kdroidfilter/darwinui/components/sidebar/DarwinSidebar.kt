@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -55,8 +56,18 @@ import io.github.kdroidfilter.darwinui.theme.Zinc500
 import io.github.kdroidfilter.darwinui.theme.Zinc600
 import io.github.kdroidfilter.darwinui.theme.Zinc700
 import io.github.kdroidfilter.darwinui.theme.Zinc900
-import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import io.github.kdroidfilter.darwinui.theme.darwinTween
+
+// =============================================================================
+// Animation helper — critically damped spring (no overshoot) with Smooth stiffness
+// =============================================================================
+
+/** Sidebar spring: same stiffness as [DarwinSpringPreset.Smooth] but critically
+ *  damped (ratio=1.0) so animations settle progressively without any bounce. */
+private fun <T> sidebarSpring() = spring<T>(
+    dampingRatio = 1.0f,
+    stiffness = DarwinSpringPreset.Smooth.stiffness,
+)
 
 // =============================================================================
 // Data
@@ -139,13 +150,13 @@ fun DarwinSidebar(
     // Animated width: collapsed=56dp, expanded=200dp
     val animatedWidth by animateDpAsState(
         targetValue = if (collapsed) 56.dp else 200.dp,
-        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+        animationSpec = sidebarSpring(),
     )
 
     // Animated padding: collapsed=8dp(p-2), expanded=12dp(p-3)
     val animatedPadding by animateDpAsState(
         targetValue = if (collapsed) 8.dp else 12.dp,
-        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+        animationSpec = sidebarSpring(),
     )
 
     // Glass colours
@@ -173,9 +184,15 @@ fun DarwinSidebar(
                 )
                 .padding(animatedPadding),
         ) {
-            // ---- Pinned header ----
+            // ---- Pinned header (fades + shrinks with same spring as width) ----
             if (header != null) {
-                header()
+                AnimatedVisibility(
+                    visible = !collapsed,
+                    enter = expandVertically(sidebarSpring()) + fadeIn(sidebarSpring()),
+                    exit = shrinkVertically(sidebarSpring()) + fadeOut(sidebarSpring()),
+                ) {
+                    header()
+                }
             }
 
             // ---- Scrollable items (flex-1, space-y-1) ----
@@ -289,7 +306,7 @@ private fun SidebarItemWithVisibility(
         AnimatedVisibility(
             visible = !collapsed,
             enter = EnterTransition.None,
-            exit = shrinkVertically(darwinSpring(DarwinSpringPreset.Smooth)) + fadeOut(darwinTween(DarwinDuration.Fast)),
+            exit = shrinkVertically(sidebarSpring()) + fadeOut(darwinTween(DarwinDuration.Fast)),
         ) {
             SidebarItemRow(
                 label = item.label,
@@ -314,7 +331,7 @@ private fun GroupHeader(text: String, isCollapsed: Boolean) {
     AnimatedVisibility(
         visible = !isCollapsed,
         enter = expandVertically() + fadeIn(),
-        exit = shrinkVertically(darwinSpring(DarwinSpringPreset.Smooth)) + fadeOut(darwinTween(DarwinDuration.Fast)),
+        exit = shrinkVertically(sidebarSpring()) + fadeOut(darwinTween(DarwinDuration.Fast)),
     ) {
         DarwinText(
             text = text,
@@ -368,29 +385,26 @@ private fun SidebarItemRow(
         else -> if (isDark) Zinc400 else Zinc500
     }
 
-    // Animated icon size: 16dp expanded → 20dp collapsed
+    // All item animations use the same Smooth spring as the sidebar width
+    // so everything moves in one unified, progressive motion.
     val iconSize by animateDpAsState(
         targetValue = if (isCollapsed) 20.dp else 16.dp,
-        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+        animationSpec = sidebarSpring(),
     )
 
-    // Animated horizontal padding: 12dp expanded → 10dp collapsed
-    // At 10dp collapsed: item internal width = 40dp - 20dp = 20dp = icon size → centered
     val hPadding by animateDpAsState(
         targetValue = if (isCollapsed) 10.dp else 12.dp,
-        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+        animationSpec = sidebarSpring(),
     )
 
-    // Animated gap between icon and label: 12dp → 0dp
     val iconLabelGap by animateDpAsState(
         targetValue = if (isCollapsed) 0.dp else 12.dp,
-        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+        animationSpec = sidebarSpring(),
     )
 
-    // Animated label opacity: fade out when collapsed
     val labelAlpha by animateFloatAsState(
         targetValue = if (isCollapsed) 0f else 1f,
-        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+        animationSpec = sidebarSpring(),
     )
 
     Row(
@@ -463,24 +477,23 @@ private fun CollapseToggle(
         animationSpec = darwinTween(DarwinDuration.Slow),
     )
 
-    // Animated icon size and padding (same as SidebarItemRow)
     val iconSize by animateDpAsState(
         targetValue = if (isCollapsed) 20.dp else 16.dp,
-        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+        animationSpec = sidebarSpring(),
     )
     val hPadding by animateDpAsState(
         targetValue = if (isCollapsed) 10.dp else 12.dp,
-        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+        animationSpec = sidebarSpring(),
     )
 
     val iconLabelGap by animateDpAsState(
         targetValue = if (isCollapsed) 0.dp else 12.dp,
-        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+        animationSpec = sidebarSpring(),
     )
 
     val labelAlpha by animateFloatAsState(
         targetValue = if (isCollapsed) 0f else 1f,
-        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+        animationSpec = sidebarSpring(),
     )
 
     Row(

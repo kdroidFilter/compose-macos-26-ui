@@ -1,7 +1,6 @@
 package io.github.kdroidfilter.darwinui.sample
 
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -41,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import io.github.kdroidfilter.darwinui.icons.DarwinIcon
@@ -145,9 +143,7 @@ import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.CodeBlock
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 import io.github.kdroidfilter.darwinui.theme.Blue500
-import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import io.github.kdroidfilter.darwinui.theme.glassEffect
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
@@ -254,33 +250,18 @@ fun App() {
                         collapsed = sidebarCollapsed,
                         onCollapsedChange = { sidebarCollapsed = it },
                         header = {
-                            val headerAlpha by animateFloatAsState(
-                                targetValue = if (sidebarCollapsed) 0f else 1f,
-                                animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
-                            )
-                            val headerHeight by animateDpAsState(
-                                targetValue = if (sidebarCollapsed) 0.dp else 140.dp,
-                                animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(headerHeight)
-                                    .graphicsLayer { alpha = headerAlpha },
-                            ) {
-                                Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                            Column {
-                                                DarwinText(text = "Darwin UI", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = DarwinTheme.colors.textPrimary)
-                                                DarwinText(text = "Component Docs", style = DarwinTheme.typography.bodySmall, color = DarwinTheme.colors.textTertiary)
-                                            }
-                                            DarwinButton(onClick = { isDark = !isDark }, variant = DarwinButtonVariant.Ghost, size = DarwinButtonSize.Icon) { DarwinIcon(if (isDark) LucideSun else LucideMoon) }
+                            Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                        Column {
+                                            DarwinText(text = "Darwin UI", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = DarwinTheme.colors.textPrimary)
+                                            DarwinText(text = "Component Docs", style = DarwinTheme.typography.bodySmall, color = DarwinTheme.colors.textTertiary)
                                         }
-                                        DarwinSearchField(value = searchQuery, onValueChange = { searchQuery = it }, placeholder = "Search components...", modifier = Modifier.fillMaxWidth())
-                                        if (filteredDefs.isEmpty()) {
-                                            DarwinText(text = "No results found", style = DarwinTheme.typography.bodySmall, color = DarwinTheme.colors.textTertiary, modifier = Modifier.padding(top = 8.dp))
-                                        }
+                                        DarwinButton(onClick = { isDark = !isDark }, variant = DarwinButtonVariant.Ghost, size = DarwinButtonSize.Icon) { DarwinIcon(if (isDark) LucideSun else LucideMoon) }
+                                    }
+                                    DarwinSearchField(value = searchQuery, onValueChange = { searchQuery = it }, placeholder = "Search components...", modifier = Modifier.fillMaxWidth())
+                                    if (filteredDefs.isEmpty()) {
+                                        DarwinText(text = "No results found", style = DarwinTheme.typography.bodySmall, color = DarwinTheme.colors.textTertiary, modifier = Modifier.padding(top = 8.dp))
                                     }
                                 }
                             }
