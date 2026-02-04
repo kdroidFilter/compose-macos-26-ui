@@ -1,8 +1,8 @@
 package io.github.kdroidfilter.darwinui.sample
 
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import io.github.kdroidfilter.darwinui.icons.DarwinIcon
@@ -148,7 +149,6 @@ import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import io.github.kdroidfilter.darwinui.theme.glassEffect
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import com.composables.icons.lucide.TextAlignStart
@@ -183,46 +183,46 @@ import com.composables.icons.lucide.TriangleAlert
 import com.composables.icons.lucide.Upload
 import com.composables.icons.lucide.X
 
-// Navigation data
-private data class SidebarEntry(val id: String, val label: String, val group: String, val icon: ImageVector)
+// Navigation data — static tuples (id, label, group, icon)
+private data class SidebarEntryDef(val id: String, val label: String, val group: String, val icon: ImageVector)
 
-private val sidebarEntries = listOf(
-    SidebarEntry("button", "Button", "FORM CONTROLS", Lucide.MousePointerClick),
-    SidebarEntry("input", "Input", "FORM CONTROLS", Lucide.TextCursorInput),
-    SidebarEntry("textarea", "Textarea", "FORM CONTROLS", Lucide.TextAlignStart),
-    SidebarEntry("checkbox", "Checkbox", "FORM CONTROLS", Lucide.SquareCheck),
-    SidebarEntry("switch", "Switch", "FORM CONTROLS", Lucide.ToggleLeft),
-    SidebarEntry("select", "Select", "FORM CONTROLS", Lucide.ChevronsUpDown),
-    SidebarEntry("multiselect", "Multi Select", "FORM CONTROLS", Lucide.ListChecks),
-    SidebarEntry("searchinput", "Search Input", "FORM CONTROLS", Lucide.Search),
-    SidebarEntry("slider", "Slider", "FORM CONTROLS", Lucide.SlidersHorizontal),
-    SidebarEntry("dateselect", "Date Select", "FORM CONTROLS", Lucide.Calendar),
-    SidebarEntry("upload", "Upload", "FORM CONTROLS", Lucide.Upload),
-    SidebarEntry("badge", "Badge", "DATA DISPLAY", Lucide.Tag),
-    SidebarEntry("avatar", "Avatar", "DATA DISPLAY", Lucide.CircleUser),
-    SidebarEntry("card", "Card", "DATA DISPLAY", Lucide.CreditCard),
-    SidebarEntry("table", "Table", "DATA DISPLAY", Lucide.Table),
-    SidebarEntry("progress", "Progress", "DATA DISPLAY", Lucide.Loader),
-    SidebarEntry("skeleton", "Skeleton", "DATA DISPLAY", Lucide.Scan),
-    SidebarEntry("alert", "Alert", "FEEDBACK", Lucide.TriangleAlert),
-    SidebarEntry("toast", "Toast", "FEEDBACK", Lucide.Bell),
-    SidebarEntry("dialog", "Dialog", "OVERLAYS", Lucide.MessageSquare),
-    SidebarEntry("tooltip", "Tooltip", "OVERLAYS", Lucide.MessageCircle),
-    SidebarEntry("popover", "Popover", "OVERLAYS", Lucide.PanelTopOpen),
-    SidebarEntry("dropdown", "Dropdown Menu", "OVERLAYS", Lucide.Menu),
-    SidebarEntry("contextmenu", "Context Menu", "OVERLAYS", Lucide.Ellipsis),
-    SidebarEntry("tabs", "Tabs", "NAVIGATION", Lucide.Columns3),
-    SidebarEntry("accordion", "Accordion", "NAVIGATION", Lucide.ChevronsUpDown),
-    SidebarEntry("sidebar", "Sidebar", "NAVIGATION", Lucide.PanelLeft),
-    SidebarEntry("window", "Window", "LAYOUT", Lucide.AppWindow),
-    SidebarEntry("topbar", "Top Bar", "LAYOUT", Lucide.PanelTop),
-    SidebarEntry("closebutton", "Close Button", "LAYOUT", Lucide.X),
-    SidebarEntry("reveal", "Reveal", "EFFECTS", Lucide.Eye),
+private val sidebarEntryDefs = listOf(
+    SidebarEntryDef("button", "Button", "FORM CONTROLS", Lucide.MousePointerClick),
+    SidebarEntryDef("input", "Input", "FORM CONTROLS", Lucide.TextCursorInput),
+    SidebarEntryDef("textarea", "Textarea", "FORM CONTROLS", Lucide.TextAlignStart),
+    SidebarEntryDef("checkbox", "Checkbox", "FORM CONTROLS", Lucide.SquareCheck),
+    SidebarEntryDef("switch", "Switch", "FORM CONTROLS", Lucide.ToggleLeft),
+    SidebarEntryDef("select", "Select", "FORM CONTROLS", Lucide.ChevronsUpDown),
+    SidebarEntryDef("multiselect", "Multi Select", "FORM CONTROLS", Lucide.ListChecks),
+    SidebarEntryDef("searchinput", "Search Input", "FORM CONTROLS", Lucide.Search),
+    SidebarEntryDef("slider", "Slider", "FORM CONTROLS", Lucide.SlidersHorizontal),
+    SidebarEntryDef("dateselect", "Date Select", "FORM CONTROLS", Lucide.Calendar),
+    SidebarEntryDef("upload", "Upload", "FORM CONTROLS", Lucide.Upload),
+    SidebarEntryDef("badge", "Badge", "DATA DISPLAY", Lucide.Tag),
+    SidebarEntryDef("avatar", "Avatar", "DATA DISPLAY", Lucide.CircleUser),
+    SidebarEntryDef("card", "Card", "DATA DISPLAY", Lucide.CreditCard),
+    SidebarEntryDef("table", "Table", "DATA DISPLAY", Lucide.Table),
+    SidebarEntryDef("progress", "Progress", "DATA DISPLAY", Lucide.Loader),
+    SidebarEntryDef("skeleton", "Skeleton", "DATA DISPLAY", Lucide.Scan),
+    SidebarEntryDef("alert", "Alert", "FEEDBACK", Lucide.TriangleAlert),
+    SidebarEntryDef("toast", "Toast", "FEEDBACK", Lucide.Bell),
+    SidebarEntryDef("dialog", "Dialog", "OVERLAYS", Lucide.MessageSquare),
+    SidebarEntryDef("tooltip", "Tooltip", "OVERLAYS", Lucide.MessageCircle),
+    SidebarEntryDef("popover", "Popover", "OVERLAYS", Lucide.PanelTopOpen),
+    SidebarEntryDef("dropdown", "Dropdown Menu", "OVERLAYS", Lucide.Menu),
+    SidebarEntryDef("contextmenu", "Context Menu", "OVERLAYS", Lucide.Ellipsis),
+    SidebarEntryDef("tabs", "Tabs", "NAVIGATION", Lucide.Columns3),
+    SidebarEntryDef("accordion", "Accordion", "NAVIGATION", Lucide.ChevronsUpDown),
+    SidebarEntryDef("sidebar", "Sidebar", "NAVIGATION", Lucide.PanelLeft),
+    SidebarEntryDef("window", "Window", "LAYOUT", Lucide.AppWindow),
+    SidebarEntryDef("topbar", "Top Bar", "LAYOUT", Lucide.PanelTop),
+    SidebarEntryDef("closebutton", "Close Button", "LAYOUT", Lucide.X),
+    SidebarEntryDef("reveal", "Reveal", "EFFECTS", Lucide.Eye),
 )
 
 @Composable
 fun App() {
-    var isDark by remember { mutableStateOf(true) }
+    var isDark by remember { mutableStateOf(false) }
 
     DarwinTheme(darkTheme = isDark) {
         val toastState = rememberDarwinToastState()
@@ -230,65 +230,62 @@ fun App() {
         Box(modifier = Modifier.fillMaxSize().background(DarwinTheme.colors.background)) {
             var selectedPage by remember { mutableStateOf("button") }
             var searchQuery by remember { mutableStateOf("") }
+            var sidebarCollapsed by remember { mutableStateOf(false) }
 
             Row(modifier = Modifier.fillMaxSize()) {
-                // Gallery navigation sidebar (custom layout, not the DarwinSidebar component)
-                Box(modifier = Modifier.width(240.dp).fillMaxHeight().background(DarwinTheme.colors.backgroundElevated)) {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        // Header
-                        Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                    Column {
-                                        DarwinText(text = "Darwin UI", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = DarwinTheme.colors.textPrimary)
-                                        DarwinText(text = "Component Docs", style = DarwinTheme.typography.bodySmall, color = DarwinTheme.colors.textTertiary)
-                                    }
-                                    DarwinButton(onClick = { isDark = !isDark }, variant = DarwinButtonVariant.Ghost, size = DarwinButtonSize.Icon) { DarwinIcon(if (isDark) LucideSun else LucideMoon) }
-                                }
-                                DarwinSearchField(value = searchQuery, onValueChange = { searchQuery = it }, placeholder = "Search components...", modifier = Modifier.fillMaxWidth())
-                            }
-                        }
+                // Gallery navigation sidebar using DarwinSidebar
+                val query = searchQuery.lowercase().trim()
+                val filteredDefs = if (query.isEmpty()) sidebarEntryDefs else sidebarEntryDefs.filter { it.label.lowercase().contains(query) }
+                val sidebarItems = filteredDefs.map { def ->
+                    DarwinSidebarItem(
+                        label = def.label,
+                        onClick = { selectedPage = def.id },
+                        icon = def.icon,
+                        group = def.group,
+                        id = def.id,
+                    )
+                }
 
-                        // Scrollable navigation items
-                        Column(modifier = Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())) {
-                            val query = searchQuery.lowercase().trim()
-                            val filtered = if (query.isEmpty()) sidebarEntries else sidebarEntries.filter { it.label.lowercase().contains(query) }
-                            val groups = filtered.groupBy { it.group }
-                            for ((group, entries) in groups) {
-                                DarwinText(text = group, style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary, modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 4.dp))
-                                for (entry in entries) {
-                                    val isSelected = selectedPage == entry.id
-                                    val navInteractionSource = remember { MutableInteractionSource() }
-                                    val navHovered by navInteractionSource.collectIsHoveredAsState()
-                                    val navBg = when { isSelected -> DarwinTheme.colors.accent.copy(alpha = 0.10f); navHovered -> DarwinTheme.colors.surfaceVariant; else -> Color.Transparent }
-                                    val navTextColor = if (isSelected) DarwinTheme.colors.accent else DarwinTheme.colors.textPrimary
-                                    Box(
-                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 2.dp).height(36.dp)
-                                            .clip(DarwinTheme.shapes.medium).background(navBg, DarwinTheme.shapes.medium)
-                                            .hoverable(navInteractionSource).clickable(interactionSource = navInteractionSource, indication = null, role = Role.Tab, onClick = { selectedPage = entry.id })
-                                            .padding(horizontal = 12.dp),
-                                        contentAlignment = Alignment.CenterStart,
-                                    ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Image(
-                                                entry.icon,
-                                                contentDescription = null,
-                                                modifier = Modifier.size(16.dp),
-                                                colorFilter = ColorFilter.tint(navTextColor)
-                                            )
-                                            Spacer(Modifier.width(10.dp))
-                                            DarwinText(text = entry.label, style = DarwinTheme.typography.bodyMedium, color = navTextColor)
+                Box(modifier = Modifier.fillMaxHeight().background(DarwinTheme.colors.backgroundElevated)) {
+                    DarwinSidebar(
+                        items = sidebarItems,
+                        activeItem = selectedPage,
+                        showBorder = true,
+                        collapsed = sidebarCollapsed,
+                        onCollapsedChange = { sidebarCollapsed = it },
+                        header = {
+                            val headerAlpha by animateFloatAsState(
+                                targetValue = if (sidebarCollapsed) 0f else 1f,
+                                animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+                            )
+                            val headerHeight by animateDpAsState(
+                                targetValue = if (sidebarCollapsed) 0.dp else 140.dp,
+                                animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(headerHeight)
+                                    .graphicsLayer { alpha = headerAlpha },
+                            ) {
+                                Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                            Column {
+                                                DarwinText(text = "Darwin UI", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = DarwinTheme.colors.textPrimary)
+                                                DarwinText(text = "Component Docs", style = DarwinTheme.typography.bodySmall, color = DarwinTheme.colors.textTertiary)
+                                            }
+                                            DarwinButton(onClick = { isDark = !isDark }, variant = DarwinButtonVariant.Ghost, size = DarwinButtonSize.Icon) { DarwinIcon(if (isDark) LucideSun else LucideMoon) }
+                                        }
+                                        DarwinSearchField(value = searchQuery, onValueChange = { searchQuery = it }, placeholder = "Search components...", modifier = Modifier.fillMaxWidth())
+                                        if (filteredDefs.isEmpty()) {
+                                            DarwinText(text = "No results found", style = DarwinTheme.typography.bodySmall, color = DarwinTheme.colors.textTertiary, modifier = Modifier.padding(top = 8.dp))
                                         }
                                     }
                                 }
                             }
-                            if (filtered.isEmpty()) {
-                                DarwinText(text = "No results found", style = DarwinTheme.typography.bodySmall, color = DarwinTheme.colors.textTertiary, modifier = Modifier.padding(16.dp))
-                            }
-                        }
-                    }
-                    // Right border
-                    Box(modifier = Modifier.align(Alignment.CenterEnd).width(1.dp).fillMaxHeight().background(DarwinTheme.colors.border))
+                        },
+                    )
                 }
 
                 // Main content area

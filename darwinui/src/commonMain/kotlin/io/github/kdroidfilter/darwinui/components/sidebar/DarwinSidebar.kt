@@ -4,6 +4,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
@@ -21,6 +23,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -61,14 +65,19 @@ import io.github.kdroidfilter.darwinui.theme.darwinTween
 /**
  * Data for a single sidebar navigation item.
  *
- * @param label Display text and unique identifier for the item.
+ * @param label Display text for the item.
  * @param onClick Callback invoked when this item is clicked.
  * @param icon Optional Lucide-style [ImageVector] rendered before the label.
+ * @param group Optional group header text. When any item has a non-null group,
+ *   items are rendered in groups with a header label above each group.
+ * @param id Unique identifier used for active-item matching. Defaults to [label].
  */
 data class DarwinSidebarItem(
     val label: String,
     val onClick: () -> Unit,
     val icon: ImageVector? = null,
+    val group: String? = null,
+    val id: String = label,
 )
 
 // =============================================================================
@@ -79,8 +88,12 @@ data class DarwinSidebarItem(
  * macOS-style navigation sidebar matching the React darwin-ui `Sidebar` component.
  *
  * Renders a vertical panel with navigation items, an optional collapse toggle,
- * and a logout button at the bottom. Automatically separates "Settings" from
- * other items, placing it in the bottom section (matching React behaviour).
+ * and an optional logout button at the bottom. Automatically separates "Settings"
+ * from other items, placing it in the bottom section (matching React behaviour).
+ *
+ * When items use [DarwinSidebarItem.group], items are rendered in groups with
+ * a label header above each group. Groups are displayed in the order they first
+ * appear in the list.
  *
  * Desktop width animates between 200dp (expanded) and 56dp (collapsed) using
  * a spring animation. Labels are revealed naturally by the growing width
@@ -88,33 +101,40 @@ data class DarwinSidebarItem(
  *
  * @param items List of navigation items. The "Settings" item is automatically
  *   moved to the bottom section.
- * @param activeItem The label of the currently active item.
- * @param onLogout Callback invoked when the logout button is clicked.
+ * @param activeItem The [DarwinSidebarItem.id] of the currently active item.
  * @param modifier Modifier applied to the sidebar root.
+ * @param onLogout Optional callback for the logout button. When null, the
+ *   logout button is hidden.
  * @param collapsed Whether the sidebar is in collapsed (icon-only) mode.
  * @param onCollapsedChange Callback invoked when the collapse toggle is clicked.
  *   When non-null, the collapse toggle button is shown by default.
  * @param collapsible Whether to show the collapse toggle button. Defaults to
  *   `true` when [onCollapsedChange] is provided.
  * @param glass When true, applies frosted-glass background and right border.
+ * @param showBorder When true, renders a 1dp right border. Defaults to [glass].
+ * @param header Optional composable pinned above the scrollable items.
  */
 @Composable
 fun DarwinSidebar(
     items: List<DarwinSidebarItem>,
     activeItem: String,
-    onLogout: () -> Unit,
     modifier: Modifier = Modifier,
+    onLogout: (() -> Unit)? = null,
     collapsed: Boolean = false,
     onCollapsedChange: ((Boolean) -> Unit)? = null,
     collapsible: Boolean = onCollapsedChange != null,
     glass: Boolean = false,
+    showBorder: Boolean = glass,
+    header: (@Composable () -> Unit)? = null,
 ) {
     val colors = DarwinTheme.colors
+    val typography = DarwinTheme.typography
     val isDark = colors.isDark
 
     // Separate Settings from top items (like React)
     val topItems = items.filter { it.label != "Settings" }
     val settingsItem = items.find { it.label == "Settings" }
+    val hasGroups = items.any { it.group != null }
 
     // Animated width: collapsed=56dp, expanded=200dp
     val animatedWidth by animateDpAsState(
@@ -135,6 +155,8 @@ fun DarwinSidebar(
     // Bottom section border
     val bottomBorderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Zinc200
 
+    val hasBottomSection = collapsible || settingsItem != null || onLogout != null
+
     Box(
         modifier = modifier
             .width(animatedWidth)
@@ -151,108 +173,155 @@ fun DarwinSidebar(
                 )
                 .padding(animatedPadding),
         ) {
-            // ---- Top items (flex-1, space-y-1) ----
+            // ---- Pinned header ----
+            if (header != null) {
+                header()
+            }
+
+            // ---- Scrollable items (flex-1, space-y-1) ----
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                topItems.forEach { item ->
-                    if (item.icon != null) {
-                        // Items with icons: always present, label revealed by width
-                        SidebarItemRow(
-                            label = item.label,
-                            onClick = item.onClick,
-                            active = activeItem == item.label,
-                            icon = item.icon,
-                            isCollapsed = collapsed,
-                        )
-                    } else {
-                        // Items without icons: smooth exit, instant enter
-                        AnimatedVisibility(
-                            visible = !collapsed,
-                            enter = EnterTransition.None,
-                            exit = shrinkVertically(darwinSpring(DarwinSpringPreset.Smooth)) + fadeOut(darwinTween(DarwinDuration.Fast)),
-                        ) {
-                            SidebarItemRow(
-                                label = item.label,
-                                onClick = item.onClick,
-                                active = activeItem == item.label,
-                                icon = null,
-                                isCollapsed = false,
+                if (hasGroups) {
+                    // Grouped rendering: preserve insertion order
+                    val groups = topItems.groupBy { it.group }
+                    for ((group, groupItems) in groups) {
+                        if (group != null) {
+                            GroupHeader(text = group, isCollapsed = collapsed)
+                        }
+                        groupItems.forEach { item ->
+                            SidebarItemWithVisibility(
+                                item = item,
+                                activeItem = activeItem,
+                                collapsed = collapsed,
                             )
                         }
+                    }
+                } else {
+                    topItems.forEach { item ->
+                        SidebarItemWithVisibility(
+                            item = item,
+                            activeItem = activeItem,
+                            collapsed = collapsed,
+                        )
                     }
                 }
             }
 
             // ---- Bottom section: border-t + pt-3, space-y-1 ----
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(bottomBorderColor),
-            )
+            if (hasBottomSection) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(bottomBorderColor),
+                )
 
-            Column(
-                modifier = Modifier.padding(top = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                // Collapse toggle
-                if (collapsible) {
-                    CollapseToggle(
-                        isCollapsed = collapsed,
-                        onClick = { onCollapsedChange?.invoke(!collapsed) },
-                    )
-                }
+                Column(
+                    modifier = Modifier.padding(top = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    // Collapse toggle
+                    if (collapsible) {
+                        CollapseToggle(
+                            isCollapsed = collapsed,
+                            onClick = { onCollapsedChange?.invoke(!collapsed) },
+                        )
+                    }
 
-                // Settings item (fade out if no icon)
-                if (settingsItem != null) {
-                    if (settingsItem.icon != null) {
+                    // Settings item (fade out if no icon)
+                    if (settingsItem != null) {
+                        SidebarItemWithVisibility(
+                            item = settingsItem,
+                            activeItem = activeItem,
+                            collapsed = collapsed,
+                        )
+                    }
+
+                    // Logout (always has icon)
+                    if (onLogout != null) {
                         SidebarItemRow(
-                            label = settingsItem.label,
-                            onClick = settingsItem.onClick,
-                            active = activeItem == settingsItem.label,
-                            icon = settingsItem.icon,
+                            label = "Logout",
+                            onClick = onLogout,
+                            active = false,
+                            icon = LucideLogOut,
                             isCollapsed = collapsed,
                         )
-                    } else {
-                        AnimatedVisibility(
-                            visible = !collapsed,
-                            enter = EnterTransition.None,
-                            exit = shrinkVertically(darwinSpring(DarwinSpringPreset.Smooth)) + fadeOut(darwinTween(DarwinDuration.Fast)),
-                        ) {
-                            SidebarItemRow(
-                                label = settingsItem.label,
-                                onClick = settingsItem.onClick,
-                                active = activeItem == settingsItem.label,
-                                icon = null,
-                                isCollapsed = false,
-                            )
-                        }
                     }
                 }
-
-                // Logout (always has icon)
-                SidebarItemRow(
-                    label = "Logout",
-                    onClick = onLogout,
-                    active = false,
-                    icon = LucideLogOut,
-                    isCollapsed = collapsed,
-                )
             }
         }
 
-        // Right border (glass mode only)
-        if (glass) {
+        // Right border
+        if (showBorder) {
+            val borderColor = if (glass) glassBorderColor else colors.border
             Box(
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .width(1.dp)
                     .fillMaxHeight()
-                    .background(glassBorderColor),
+                    .background(borderColor),
             )
         }
+    }
+}
+
+/**
+ * Renders a single sidebar item with appropriate animated visibility
+ * based on whether the item has an icon or not.
+ */
+@Composable
+private fun SidebarItemWithVisibility(
+    item: DarwinSidebarItem,
+    activeItem: String,
+    collapsed: Boolean,
+) {
+    if (item.icon != null) {
+        SidebarItemRow(
+            label = item.label,
+            onClick = item.onClick,
+            active = activeItem == item.id,
+            icon = item.icon,
+            isCollapsed = collapsed,
+        )
+    } else {
+        AnimatedVisibility(
+            visible = !collapsed,
+            enter = EnterTransition.None,
+            exit = shrinkVertically(darwinSpring(DarwinSpringPreset.Smooth)) + fadeOut(darwinTween(DarwinDuration.Fast)),
+        ) {
+            SidebarItemRow(
+                label = item.label,
+                onClick = item.onClick,
+                active = activeItem == item.id,
+                icon = null,
+                isCollapsed = false,
+            )
+        }
+    }
+}
+
+/**
+ * Group header label displayed above a group of sidebar items.
+ * Hides with animation when the sidebar is collapsed.
+ */
+@Composable
+private fun GroupHeader(text: String, isCollapsed: Boolean) {
+    val typography = DarwinTheme.typography
+    val colors = DarwinTheme.colors
+
+    AnimatedVisibility(
+        visible = !isCollapsed,
+        enter = expandVertically() + fadeIn(),
+        exit = shrinkVertically(darwinSpring(DarwinSpringPreset.Smooth)) + fadeOut(darwinTween(DarwinDuration.Fast)),
+    ) {
+        DarwinText(
+            text = text,
+            style = typography.labelSmall,
+            color = colors.textTertiary,
+            modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 4.dp),
+        )
     }
 }
 
