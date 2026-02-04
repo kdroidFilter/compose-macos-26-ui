@@ -65,7 +65,15 @@ internal fun BadgePage() {
         PreviewContainer { BadgePreview() }
 
         SectionHeader("Examples")
-        ExampleCard(title = "Variants", description = "Core badge variants", sourceCode = GallerySources.BadgeVariantsExample) { BadgeVariantsExample() }
-        ExampleCard(title = "Semantic Variants", description = "Status and category badges", sourceCode = GallerySources.BadgeSemanticVariantsExample) { BadgeSemanticVariantsExample() }
+        ExampleCard(
+            title = "Variants",
+            description = "Core badge variants",
+            sourceCode = GallerySources.BadgeVariantsExample,
+        ) { BadgeVariantsExample() }
+        ExampleCard(
+            title = "Semantic Variants",
+            description = "Status and category badges",
+            sourceCode = GallerySources.BadgeSemanticVariantsExample,
+        ) { BadgeSemanticVariantsExample() }
     }
 }

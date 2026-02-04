@@ -18,17 +18,39 @@ import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 @GalleryExample("Select", "Default")
 @Composable
 fun SelectDefaultExample() {
-    val options = listOf(DarwinSelectOption("react", "React"), DarwinSelectOption("vue", "Vue"), DarwinSelectOption("angular", "Angular"), DarwinSelectOption("svelte", "Svelte"))
+    val options = listOf(
+        DarwinSelectOption("react", "React"),
+        DarwinSelectOption("vue", "Vue"),
+        DarwinSelectOption("angular", "Angular"),
+        DarwinSelectOption("svelte", "Svelte"),
+    )
     var selected by remember { mutableStateOf<String?>(null) }
-    DarwinSelect(options = options, selectedValue = selected, onValueChange = { selected = it }, label = "Framework", modifier = Modifier.fillMaxWidth(0.5f))
+    DarwinSelect(
+        options = options,
+        selectedValue = selected,
+        onValueChange = { selected = it },
+        label = "Framework",
+        modifier = Modifier.fillMaxWidth(0.5f),
+    )
 }
 
 @GalleryExample("Select", "Pre-selected")
 @Composable
 fun SelectPreselectedExample() {
-    val options = listOf(DarwinSelectOption("react", "React"), DarwinSelectOption("vue", "Vue"), DarwinSelectOption("angular", "Angular"), DarwinSelectOption("svelte", "Svelte"))
+    val options = listOf(
+        DarwinSelectOption("react", "React"),
+        DarwinSelectOption("vue", "Vue"),
+        DarwinSelectOption("angular", "Angular"),
+        DarwinSelectOption("svelte", "Svelte"),
+    )
     var selected by remember { mutableStateOf<String?>("react") }
-    DarwinSelect(options = options, selectedValue = selected, onValueChange = { selected = it }, label = "Default Framework", modifier = Modifier.fillMaxWidth(0.5f))
+    DarwinSelect(
+        options = options,
+        selectedValue = selected,
+        onValueChange = { selected = it },
+        label = "Default Framework",
+        modifier = Modifier.fillMaxWidth(0.5f),
+    )
 }
 
 @Composable

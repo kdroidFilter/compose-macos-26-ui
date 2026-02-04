@@ -23,12 +23,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.darwinTween
-import io.github.kdroidfilter.darwinui.theme.DarwinDuration
-import androidx.compose.ui.tooling.preview.Preview
 
 /**
  * Size variants for [DarwinTextField].
@@ -211,8 +211,22 @@ fun DarwinTextField(
                         }
 
                         val autoTrailingIcon: @Composable (() -> Unit)? = when {
-                            isError -> {{ io.github.kdroidfilter.darwinui.icons.DarwinIcon(io.github.kdroidfilter.darwinui.icons.LucideX, tint = colors.destructive) }}
-                            isSuccess -> {{ io.github.kdroidfilter.darwinui.icons.DarwinIcon(io.github.kdroidfilter.darwinui.icons.LucideCheck, tint = colors.success) }}
+                            isError -> {
+                                {
+                                    io.github.kdroidfilter.darwinui.icons.DarwinIcon(
+                                        io.github.kdroidfilter.darwinui.icons.LucideX,
+                                        tint = colors.destructive,
+                                    )
+                                }
+                            }
+                            isSuccess -> {
+                                {
+                                    io.github.kdroidfilter.darwinui.icons.DarwinIcon(
+                                        io.github.kdroidfilter.darwinui.icons.LucideCheck,
+                                        tint = colors.success,
+                                    )
+                                }
+                            }
                             else -> trailingIcon
                         }
                         if (autoTrailingIcon != null) {

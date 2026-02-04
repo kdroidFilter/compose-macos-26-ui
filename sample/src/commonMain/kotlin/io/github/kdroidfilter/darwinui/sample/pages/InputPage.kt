@@ -11,7 +11,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.input.DarwinTextField
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.CodeBlock
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
@@ -19,7 +18,6 @@ import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.PreviewContainer
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
-import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
 @Composable
 private fun InputPreview() {
@@ -37,35 +35,70 @@ private fun InputPreview() {
 @Composable
 fun InputDefaultExample() {
     var text by remember { mutableStateOf("") }
-    DarwinTextField(value = text, onValueChange = { text = it }, placeholder = "Enter your name...", label = "Name", modifier = Modifier.fillMaxWidth(0.5f))
+    DarwinTextField(
+        value = text,
+        onValueChange = { text = it },
+        placeholder = "Enter your name...",
+        label = "Name",
+        modifier = Modifier.fillMaxWidth(0.5f),
+    )
 }
 
 @GalleryExample("Input", "Error State")
 @Composable
 fun InputErrorExample() {
     var text by remember { mutableStateOf("") }
-    DarwinTextField(value = text, onValueChange = { text = it }, placeholder = "Required field", label = "Email", isError = true, supportingText = "This field is required", modifier = Modifier.fillMaxWidth(0.5f))
+    DarwinTextField(
+        value = text,
+        onValueChange = { text = it },
+        placeholder = "Required field",
+        label = "Email",
+        isError = true,
+        supportingText = "This field is required",
+        modifier = Modifier.fillMaxWidth(0.5f),
+    )
 }
 
 @GalleryExample("Input", "Success State")
 @Composable
 fun InputSuccessExample() {
     var text by remember { mutableStateOf("valid@email.com") }
-    DarwinTextField(value = text, onValueChange = { text = it }, label = "Verified email", isSuccess = true, supportingText = "Email verified", modifier = Modifier.fillMaxWidth(0.5f))
+    DarwinTextField(
+        value = text,
+        onValueChange = { text = it },
+        label = "Verified email",
+        isSuccess = true,
+        supportingText = "Email verified",
+        modifier = Modifier.fillMaxWidth(0.5f),
+    )
 }
 
 @GalleryExample("Input", "With Label")
 @Composable
 fun InputWithLabelExample() {
     var text by remember { mutableStateOf("") }
-    DarwinTextField(value = text, onValueChange = { text = it }, placeholder = "you@example.com", label = "Email address", supportingText = "We'll never share your email.", modifier = Modifier.fillMaxWidth(0.5f))
+    DarwinTextField(
+        value = text,
+        onValueChange = { text = it },
+        placeholder = "you@example.com",
+        label = "Email address",
+        supportingText = "We'll never share your email.",
+        modifier = Modifier.fillMaxWidth(0.5f),
+    )
 }
 
 @GalleryExample("Input", "Password")
 @Composable
 fun InputPasswordExample() {
     var password by remember { mutableStateOf("") }
-    DarwinTextField(value = password, onValueChange = { password = it }, placeholder = "Password", label = "Password", password = true, modifier = Modifier.fillMaxWidth(0.5f))
+    DarwinTextField(
+        value = password,
+        onValueChange = { password = it },
+        placeholder = "Password",
+        label = "Password",
+        password = true,
+        modifier = Modifier.fillMaxWidth(0.5f),
+    )
 }
 
 @Composable
@@ -83,10 +116,29 @@ DarwinTextField(
 )""")
 
         SectionHeader("Examples")
-        ExampleCard(title = "With Label", description = "Input with label and helper text", sourceCode = GallerySources.InputWithLabelExample) { InputWithLabelExample() }
-        ExampleCard(title = "Default", sourceCode = GallerySources.InputDefaultExample) { InputDefaultExample() }
-        ExampleCard(title = "Error State", description = "Input with error validation", sourceCode = GallerySources.InputErrorExample) { InputErrorExample() }
-        ExampleCard(title = "Success State", description = "Input with success validation", sourceCode = GallerySources.InputSuccessExample) { InputSuccessExample() }
-        ExampleCard(title = "Password", description = "Password input with visibility toggle", sourceCode = GallerySources.InputPasswordExample) { InputPasswordExample() }
+        ExampleCard(
+            title = "With Label",
+            description = "Input with label and helper text",
+            sourceCode = GallerySources.InputWithLabelExample,
+        ) { InputWithLabelExample() }
+        ExampleCard(
+            title = "Default",
+            sourceCode = GallerySources.InputDefaultExample,
+        ) { InputDefaultExample() }
+        ExampleCard(
+            title = "Error State",
+            description = "Input with error validation",
+            sourceCode = GallerySources.InputErrorExample,
+        ) { InputErrorExample() }
+        ExampleCard(
+            title = "Success State",
+            description = "Input with success validation",
+            sourceCode = GallerySources.InputSuccessExample,
+        ) { InputSuccessExample() }
+        ExampleCard(
+            title = "Password",
+            description = "Password input with visibility toggle",
+            sourceCode = GallerySources.InputPasswordExample,
+        ) { InputPasswordExample() }
     }
 }

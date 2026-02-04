@@ -26,7 +26,13 @@ fun SearchInputDefaultExample() {
 @Composable
 fun SearchInputWithLabelExample() {
     var query by remember { mutableStateOf("") }
-    DarwinSearchField(value = query, onValueChange = { query = it }, placeholder = "Search components...", label = "Search", modifier = Modifier.fillMaxWidth(0.5f))
+    DarwinSearchField(
+        value = query,
+        onValueChange = { query = it },
+        placeholder = "Search components...",
+        label = "Search",
+        modifier = Modifier.fillMaxWidth(0.5f),
+    )
 }
 
 @Composable

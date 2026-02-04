@@ -10,7 +10,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,12 +34,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import androidx.compose.ui.tooling.preview.Preview
 import kotlin.math.round
 import kotlin.math.roundToInt
 
@@ -66,7 +65,6 @@ fun DarwinSlider(
     modifier: Modifier = Modifier,
 ) {
     val colors = DarwinTheme.colors
-    val disabledAlpha = if (enabled) 1f else 0.5f
 
     val trackColor = if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 

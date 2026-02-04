@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,32 +23,19 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.kdroidfilter.darwinui.components.button.DarwinButton
-import io.github.kdroidfilter.darwinui.components.button.DarwinButtonSize
-import io.github.kdroidfilter.darwinui.components.button.DarwinButtonVariant
-import io.github.kdroidfilter.darwinui.components.input.DarwinSearchField
-import io.github.kdroidfilter.darwinui.components.sidebar.DarwinSidebar
-import io.github.kdroidfilter.darwinui.components.sidebar.DarwinSidebarItem
-import io.github.kdroidfilter.darwinui.components.toast.DarwinToastHost
-import io.github.kdroidfilter.darwinui.components.toast.rememberDarwinToastState
-import io.github.kdroidfilter.darwinui.icons.DarwinIcon
-import io.github.kdroidfilter.darwinui.icons.LucideMoon
-import io.github.kdroidfilter.darwinui.icons.LucideSun
-import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import com.composables.icons.lucide.TextAlignStart
 import com.composables.icons.lucide.Bell
 import com.composables.icons.lucide.Calendar
 import com.composables.icons.lucide.ChevronsUpDown
 import com.composables.icons.lucide.CircleUser
 import com.composables.icons.lucide.Columns3
 import com.composables.icons.lucide.CreditCard
+import com.composables.icons.lucide.Ellipsis
 import com.composables.icons.lucide.ListChecks
 import com.composables.icons.lucide.Loader
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Menu
 import com.composables.icons.lucide.MessageCircle
 import com.composables.icons.lucide.MessageSquare
-import com.composables.icons.lucide.Ellipsis
 import com.composables.icons.lucide.MousePointerClick
 import com.composables.icons.lucide.PanelLeft
 import com.composables.icons.lucide.PanelTopOpen
@@ -59,10 +45,23 @@ import com.composables.icons.lucide.SlidersHorizontal
 import com.composables.icons.lucide.SquareCheck
 import com.composables.icons.lucide.Table
 import com.composables.icons.lucide.Tag
+import com.composables.icons.lucide.TextAlignStart
 import com.composables.icons.lucide.TextCursorInput
 import com.composables.icons.lucide.ToggleLeft
 import com.composables.icons.lucide.TriangleAlert
 import com.composables.icons.lucide.Upload
+import io.github.kdroidfilter.darwinui.components.button.DarwinButton
+import io.github.kdroidfilter.darwinui.components.button.DarwinButtonSize
+import io.github.kdroidfilter.darwinui.components.button.DarwinButtonVariant
+import io.github.kdroidfilter.darwinui.components.input.DarwinSearchField
+import io.github.kdroidfilter.darwinui.components.sidebar.DarwinSidebar
+import io.github.kdroidfilter.darwinui.components.sidebar.DarwinSidebarItem
+import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.components.toast.DarwinToastHost
+import io.github.kdroidfilter.darwinui.components.toast.rememberDarwinToastState
+import io.github.kdroidfilter.darwinui.icons.DarwinIcon
+import io.github.kdroidfilter.darwinui.icons.LucideMoon
+import io.github.kdroidfilter.darwinui.icons.LucideSun
 import io.github.kdroidfilter.darwinui.sample.pages.AccordionPage
 import io.github.kdroidfilter.darwinui.sample.pages.AlertPage
 import io.github.kdroidfilter.darwinui.sample.pages.AvatarPage
@@ -90,6 +89,7 @@ import io.github.kdroidfilter.darwinui.sample.pages.TextAreaPage
 import io.github.kdroidfilter.darwinui.sample.pages.ToastPage
 import io.github.kdroidfilter.darwinui.sample.pages.TooltipPage
 import io.github.kdroidfilter.darwinui.sample.pages.UploadPage
+import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
 // Navigation data — static tuples (id, label, group, icon)
 private data class SidebarEntryDef(val id: String, val label: String, val group: String, val icon: ImageVector)
@@ -139,7 +139,11 @@ fun App() {
             Row(modifier = Modifier.fillMaxSize()) {
                 // Gallery navigation sidebar using DarwinSidebar
                 val query = searchQuery.lowercase().trim()
-                val filteredDefs = if (query.isEmpty()) sidebarEntryDefs else sidebarEntryDefs.filter { it.label.lowercase().contains(query) }
+                val filteredDefs = if (query.isEmpty()) {
+                    sidebarEntryDefs
+                } else {
+                    sidebarEntryDefs.filter { it.label.lowercase().contains(query) }
+                }
                 val sidebarItems = filteredDefs.map { def ->
                     DarwinSidebarItem(
                         label = def.label,
@@ -162,14 +166,39 @@ fun App() {
                                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                         Column {
-                                            DarwinText(text = "Darwin UI", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = DarwinTheme.colors.textPrimary)
-                                            DarwinText(text = "Component Docs", style = DarwinTheme.typography.bodySmall, color = DarwinTheme.colors.textTertiary)
+                                            DarwinText(
+                                                text = "Darwin UI",
+                                                fontSize = 18.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = DarwinTheme.colors.textPrimary,
+                                            )
+                                            DarwinText(
+                                                text = "Component Docs",
+                                                style = DarwinTheme.typography.bodySmall,
+                                                color = DarwinTheme.colors.textTertiary,
+                                            )
                                         }
-                                        DarwinButton(onClick = { isDark = !isDark }, variant = DarwinButtonVariant.Ghost, size = DarwinButtonSize.Icon) { DarwinIcon(if (isDark) LucideSun else LucideMoon) }
+                                        DarwinButton(
+                                            onClick = { isDark = !isDark },
+                                            variant = DarwinButtonVariant.Ghost,
+                                            size = DarwinButtonSize.Icon,
+                                        ) {
+                                            DarwinIcon(if (isDark) LucideSun else LucideMoon)
+                                        }
                                     }
-                                    DarwinSearchField(value = searchQuery, onValueChange = { searchQuery = it }, placeholder = "Search components...", modifier = Modifier.fillMaxWidth())
+                                    DarwinSearchField(
+                                        value = searchQuery,
+                                        onValueChange = { searchQuery = it },
+                                        placeholder = "Search components...",
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
                                     if (filteredDefs.isEmpty()) {
-                                        DarwinText(text = "No results found", style = DarwinTheme.typography.bodySmall, color = DarwinTheme.colors.textTertiary, modifier = Modifier.padding(top = 8.dp))
+                                        DarwinText(
+                                            text = "No results found",
+                                            style = DarwinTheme.typography.bodySmall,
+                                            color = DarwinTheme.colors.textTertiary,
+                                            modifier = Modifier.padding(top = 8.dp),
+                                        )
                                     }
                                 }
                             }

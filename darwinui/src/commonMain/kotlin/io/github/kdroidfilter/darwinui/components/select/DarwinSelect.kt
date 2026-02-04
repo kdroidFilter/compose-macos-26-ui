@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,13 +37,14 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import io.github.kdroidfilter.darwinui.icons.DarwinIcon
 import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import androidx.compose.ui.tooling.preview.Preview
 
 /**
  * Option model for DarwinSelect and DarwinMultiSelect.
@@ -259,7 +259,9 @@ fun DarwinSelect(
                         // Compose renders alpha slightly heavier than CSS, so values are lowered
                         val itemBackgroundColor = when {
                             isSelected -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.06f)
-                            isHighlighted || isItemHovered -> if (colors.isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.035f)
+                            isHighlighted || isItemHovered ->
+                                if (colors.isDark) Color.White.copy(alpha = 0.05f)
+                                else Color.Black.copy(alpha = 0.035f)
                             else -> Color.Transparent
                         }
 

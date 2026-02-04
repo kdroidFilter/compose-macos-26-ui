@@ -38,9 +38,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
@@ -52,9 +54,7 @@ import io.github.kdroidfilter.darwinui.theme.Zinc800
 import io.github.kdroidfilter.darwinui.theme.Zinc900
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import io.github.kdroidfilter.darwinui.theme.darwinTween
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import kotlinx.coroutines.launch
-import androidx.compose.ui.tooling.preview.Preview
 
 // =============================================================================
 // State

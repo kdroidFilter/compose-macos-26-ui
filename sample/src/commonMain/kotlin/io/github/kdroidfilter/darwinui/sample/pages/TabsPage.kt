@@ -36,9 +36,36 @@ fun TabsDefaultExample() {
             DarwinTabsTrigger(value = "settings") { DarwinText("Settings") }
             DarwinTabsTrigger(value = "notifications") { DarwinText("Notifications") }
         }
-        DarwinTabsContent(value = "account") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Account settings and profile information.", color = DarwinTheme.colors.textSecondary) } } }
-        DarwinTabsContent(value = "settings") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Application preferences and configuration.", color = DarwinTheme.colors.textSecondary) } } }
-        DarwinTabsContent(value = "notifications") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Notification preferences and history.", color = DarwinTheme.colors.textSecondary) } } }
+        DarwinTabsContent(value = "account") {
+            DarwinCard {
+                DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) {
+                    DarwinText(
+                        "Account settings and profile information.",
+                        color = DarwinTheme.colors.textSecondary,
+                    )
+                }
+            }
+        }
+        DarwinTabsContent(value = "settings") {
+            DarwinCard {
+                DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) {
+                    DarwinText(
+                        "Application preferences and configuration.",
+                        color = DarwinTheme.colors.textSecondary,
+                    )
+                }
+            }
+        }
+        DarwinTabsContent(value = "notifications") {
+            DarwinCard {
+                DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) {
+                    DarwinText(
+                        "Notification preferences and history.",
+                        color = DarwinTheme.colors.textSecondary,
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -52,9 +79,36 @@ fun TabsWithIconsExample() {
             DarwinTabsTrigger(value = "favorites", icon = { DarwinIcon(LucideStar) }) { DarwinText("Favorites") }
             DarwinTabsTrigger(value = "settings", icon = { DarwinIcon(LucideSettings) }) { DarwinText("Settings") }
         }
-        DarwinTabsContent(value = "search") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Search across all your content.", color = DarwinTheme.colors.textSecondary) } } }
-        DarwinTabsContent(value = "favorites") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Your starred and bookmarked items.", color = DarwinTheme.colors.textSecondary) } } }
-        DarwinTabsContent(value = "settings") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Manage your preferences.", color = DarwinTheme.colors.textSecondary) } } }
+        DarwinTabsContent(value = "search") {
+            DarwinCard {
+                DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) {
+                    DarwinText(
+                        "Search across all your content.",
+                        color = DarwinTheme.colors.textSecondary,
+                    )
+                }
+            }
+        }
+        DarwinTabsContent(value = "favorites") {
+            DarwinCard {
+                DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) {
+                    DarwinText(
+                        "Your starred and bookmarked items.",
+                        color = DarwinTheme.colors.textSecondary,
+                    )
+                }
+            }
+        }
+        DarwinTabsContent(value = "settings") {
+            DarwinCard {
+                DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) {
+                    DarwinText(
+                        "Manage your preferences.",
+                        color = DarwinTheme.colors.textSecondary,
+                    )
+                }
+            }
+        }
     }
 }
 

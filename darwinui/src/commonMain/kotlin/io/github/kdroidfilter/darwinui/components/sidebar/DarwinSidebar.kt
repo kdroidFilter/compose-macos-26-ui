@@ -31,13 +31,13 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlin.math.roundToInt
 import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import io.github.kdroidfilter.darwinui.icons.DarwinIcon
 import io.github.kdroidfilter.darwinui.icons.LucideChevronsLeft
@@ -54,7 +54,7 @@ import io.github.kdroidfilter.darwinui.theme.Zinc600
 import io.github.kdroidfilter.darwinui.theme.Zinc700
 import io.github.kdroidfilter.darwinui.theme.Zinc900
 import io.github.kdroidfilter.darwinui.theme.darwinTween
-import androidx.compose.ui.tooling.preview.Preview
+import kotlin.math.roundToInt
 
 // =============================================================================
 // Animation helper — critically damped spring (no overshoot) with Smooth stiffness

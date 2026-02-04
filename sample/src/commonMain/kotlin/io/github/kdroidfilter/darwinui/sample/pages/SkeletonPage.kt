@@ -61,6 +61,10 @@ internal fun SkeletonPage() {
 DarwinSkeletonCircle(size = 48.dp)""")
 
         SectionHeader("Examples")
-        ExampleCard(title = "Card Skeleton", description = "Avatar, text lines, content block, and button placeholders", sourceCode = GallerySources.SkeletonCardExample) { SkeletonCardExample() }
+        ExampleCard(
+            title = "Card Skeleton",
+            description = "Avatar, text lines, content block, and button placeholders",
+            sourceCode = GallerySources.SkeletonCardExample,
+        ) { SkeletonCardExample() }
     }
 }

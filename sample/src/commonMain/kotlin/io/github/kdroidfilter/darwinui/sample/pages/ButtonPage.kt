@@ -1,9 +1,9 @@
 package io.github.kdroidfilter.darwinui.sample.pages
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.delay
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.button.DarwinButton
@@ -33,6 +32,7 @@ import io.github.kdroidfilter.darwinui.sample.gallery.PreviewContainer
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -69,19 +69,50 @@ private fun ButtonPreview() {
             DarwinText("ICON BUTTONS", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 DarwinButton(onClick = {}, variant = DarwinButtonVariant.Primary, size = DarwinButtonSize.Icon) { DarwinIcon(LucidePlus) }
-                DarwinButton(onClick = {}, variant = DarwinButtonVariant.Secondary, size = DarwinButtonSize.Icon) { DarwinIcon(LucideSettings) }
-                DarwinButton(onClick = {}, variant = DarwinButtonVariant.Outline, size = DarwinButtonSize.Icon) { DarwinIcon(LucideHeart) }
-                DarwinButton(onClick = {}, variant = DarwinButtonVariant.Ghost, size = DarwinButtonSize.Icon) { DarwinIcon(LucideShare2) }
-                DarwinButton(onClick = {}, variant = DarwinButtonVariant.Destructive, size = DarwinButtonSize.Icon) { DarwinIcon(LucideTrash2) }
+                DarwinButton(
+                    onClick = {},
+                    variant = DarwinButtonVariant.Secondary,
+                    size = DarwinButtonSize.Icon,
+                ) { DarwinIcon(LucideSettings) }
+                DarwinButton(
+                    onClick = {},
+                    variant = DarwinButtonVariant.Outline,
+                    size = DarwinButtonSize.Icon,
+                ) { DarwinIcon(LucideHeart) }
+                DarwinButton(
+                    onClick = {},
+                    variant = DarwinButtonVariant.Ghost,
+                    size = DarwinButtonSize.Icon,
+                ) { DarwinIcon(LucideShare2) }
+                DarwinButton(
+                    onClick = {},
+                    variant = DarwinButtonVariant.Destructive,
+                    size = DarwinButtonSize.Icon,
+                ) { DarwinIcon(LucideTrash2) }
             }
         }
         // With Icons
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             DarwinText("WITH ICONS", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                DarwinButton(text = "Create New", onClick = {}, variant = DarwinButtonVariant.Primary, leftIcon = { DarwinIcon(LucidePlus, modifier = Modifier.padding(end = 4.dp)) })
-                DarwinButton(text = "Download", onClick = {}, variant = DarwinButtonVariant.Secondary, leftIcon = { DarwinIcon(LucideDownload, modifier = Modifier.padding(end = 4.dp)) })
-                DarwinButton(text = "Share", onClick = {}, variant = DarwinButtonVariant.Outline, leftIcon = { DarwinIcon(LucideShare2, modifier = Modifier.padding(end = 4.dp)) })
+                DarwinButton(
+                    text = "Create New",
+                    onClick = {},
+                    variant = DarwinButtonVariant.Primary,
+                    leftIcon = { DarwinIcon(LucidePlus, modifier = Modifier.padding(end = 4.dp)) },
+                )
+                DarwinButton(
+                    text = "Download",
+                    onClick = {},
+                    variant = DarwinButtonVariant.Secondary,
+                    leftIcon = { DarwinIcon(LucideDownload, modifier = Modifier.padding(end = 4.dp)) },
+                )
+                DarwinButton(
+                    text = "Share",
+                    onClick = {},
+                    variant = DarwinButtonVariant.Outline,
+                    leftIcon = { DarwinIcon(LucideShare2, modifier = Modifier.padding(end = 4.dp)) },
+                )
             }
         }
     }
@@ -149,8 +180,20 @@ DarwinButton(text = "Secondary", onClick = {}, variant = DarwinButtonVariant.Sec
 DarwinButton(text = "Destructive", onClick = {}, variant = DarwinButtonVariant.Destructive)""")
 
         SectionHeader("Examples")
-        ExampleCard(title = "Variants", description = "All available button variants", sourceCode = GallerySources.ButtonVariantsExample) { ButtonVariantsExample() }
-        ExampleCard(title = "Sizes", description = "Small, default, and large button sizes", sourceCode = GallerySources.ButtonSizesExample) { ButtonSizesExample() }
-        ExampleCard(title = "States", description = "Disabled and loading states", sourceCode = GallerySources.ButtonStatesExample) { ButtonStatesExample() }
+        ExampleCard(
+            title = "Variants",
+            description = "All available button variants",
+            sourceCode = GallerySources.ButtonVariantsExample,
+        ) { ButtonVariantsExample() }
+        ExampleCard(
+            title = "Sizes",
+            description = "Small, default, and large button sizes",
+            sourceCode = GallerySources.ButtonSizesExample,
+        ) { ButtonSizesExample() }
+        ExampleCard(
+            title = "States",
+            description = "Disabled and loading states",
+            sourceCode = GallerySources.ButtonStatesExample,
+        ) { ButtonStatesExample() }
     }
 }

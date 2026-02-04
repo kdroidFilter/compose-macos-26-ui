@@ -18,7 +18,9 @@ import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 fun TooltipDefaultExample() {
     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
         DarwinTooltip(text = "This is a tooltip!") { DarwinButton(text = "Hover me", onClick = {}, variant = DarwinButtonVariant.Outline) }
-        DarwinTooltip(text = "Another tooltip with more info") { DarwinButton(text = "More info", onClick = {}, variant = DarwinButtonVariant.Secondary) }
+        DarwinTooltip(text = "Another tooltip with more info") {
+            DarwinButton(text = "More info", onClick = {}, variant = DarwinButtonVariant.Secondary)
+        }
     }
 }
 

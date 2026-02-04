@@ -51,6 +51,10 @@ internal fun DateSelectPage() {
 )""")
 
         SectionHeader("Examples")
-        ExampleCard(title = "Default", description = "Date select with label and change callback", sourceCode = GallerySources.DateSelectDefaultExample) { DateSelectDefaultExample() }
+        ExampleCard(
+            title = "Default",
+            description = "Date select with label and change callback",
+            sourceCode = GallerySources.DateSelectDefaultExample,
+        ) { DateSelectDefaultExample() }
     }
 }

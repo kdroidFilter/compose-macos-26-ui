@@ -48,11 +48,13 @@ import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import io.github.kdroidfilter.darwinui.icons.LucideCheck
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
@@ -63,8 +65,6 @@ import io.github.kdroidfilter.darwinui.theme.Zinc400
 import io.github.kdroidfilter.darwinui.theme.Zinc500
 import io.github.kdroidfilter.darwinui.theme.Zinc700
 import io.github.kdroidfilter.darwinui.theme.Zinc900
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
-import androidx.compose.ui.tooling.preview.Preview
 
 // CompositionLocal to allow items to auto-close the menu
 internal val LocalContextMenuClose = staticCompositionLocalOf<() -> Unit> { {} }

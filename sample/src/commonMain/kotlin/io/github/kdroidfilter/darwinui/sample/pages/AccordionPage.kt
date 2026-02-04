@@ -21,9 +21,42 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 fun AccordionSingleModeExample() {
     var expandedItem by remember { mutableStateOf<String?>("item1") }
     DarwinAccordion(type = DarwinAccordionType.Single) {
-        DarwinAccordionItem(value = "item1", expanded = expandedItem == "item1", onToggle = { expandedItem = if (expandedItem == "item1") null else "item1" }, trigger = { DarwinText("What is Darwin UI?") }, content = { DarwinText("Darwin UI is a macOS-inspired design system for Compose Multiplatform.", color = DarwinTheme.colors.textSecondary) })
-        DarwinAccordionItem(value = "item2", expanded = expandedItem == "item2", onToggle = { expandedItem = if (expandedItem == "item2") null else "item2" }, trigger = { DarwinText("Which platforms are supported?") }, content = { DarwinText("Android, iOS, Desktop (JVM), Web (JS), and WASM are all supported through Compose Multiplatform.", color = DarwinTheme.colors.textSecondary) })
-        DarwinAccordionItem(value = "item3", expanded = expandedItem == "item3", onToggle = { expandedItem = if (expandedItem == "item3") null else "item3" }, trigger = { DarwinText("Is dark mode supported?") }, content = { DarwinText("Yes! Dark mode is the default theme.", color = DarwinTheme.colors.textSecondary) })
+        DarwinAccordionItem(
+            value = "item1",
+            expanded = expandedItem == "item1",
+            onToggle = { expandedItem = if (expandedItem == "item1") null else "item1" },
+            trigger = { DarwinText("What is Darwin UI?") },
+            content = {
+                DarwinText(
+                    "Darwin UI is a macOS-inspired design system for Compose Multiplatform.",
+                    color = DarwinTheme.colors.textSecondary,
+                )
+            },
+        )
+        DarwinAccordionItem(
+            value = "item2",
+            expanded = expandedItem == "item2",
+            onToggle = { expandedItem = if (expandedItem == "item2") null else "item2" },
+            trigger = { DarwinText("Which platforms are supported?") },
+            content = {
+                DarwinText(
+                    "Android, iOS, Desktop (JVM), Web (JS), and WASM are all supported through Compose Multiplatform.",
+                    color = DarwinTheme.colors.textSecondary,
+                )
+            },
+        )
+        DarwinAccordionItem(
+            value = "item3",
+            expanded = expandedItem == "item3",
+            onToggle = { expandedItem = if (expandedItem == "item3") null else "item3" },
+            trigger = { DarwinText("Is dark mode supported?") },
+            content = {
+                DarwinText(
+                    "Yes! Dark mode is the default theme.",
+                    color = DarwinTheme.colors.textSecondary,
+                )
+            },
+        )
     }
 }
 

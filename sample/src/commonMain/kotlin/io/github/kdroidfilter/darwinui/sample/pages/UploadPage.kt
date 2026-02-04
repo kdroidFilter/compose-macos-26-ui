@@ -90,8 +90,20 @@ internal fun UploadPage() {
 )""")
 
         SectionHeader("Examples")
-        ExampleCard(title = "Default", description = "Full grid with image cards, cover selection, and reordering", sourceCode = GallerySources.UploadDefaultExample) { UploadDefaultExample() }
-        ExampleCard(title = "Compact", description = "Smaller dropzone with 2-column grid", sourceCode = GallerySources.UploadCompactExample) { UploadCompactExample() }
-        ExampleCard(title = "Inline", description = "Single-row inline upload bar", sourceCode = GallerySources.UploadInlineExample) { UploadInlineExample() }
+        ExampleCard(
+            title = "Default",
+            description = "Full grid with image cards, cover selection, and reordering",
+            sourceCode = GallerySources.UploadDefaultExample,
+        ) { UploadDefaultExample() }
+        ExampleCard(
+            title = "Compact",
+            description = "Smaller dropzone with 2-column grid",
+            sourceCode = GallerySources.UploadCompactExample,
+        ) { UploadCompactExample() }
+        ExampleCard(
+            title = "Inline",
+            description = "Single-row inline upload bar",
+            sourceCode = GallerySources.UploadInlineExample,
+        ) { UploadInlineExample() }
     }
 }

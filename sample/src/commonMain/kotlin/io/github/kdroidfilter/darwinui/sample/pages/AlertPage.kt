@@ -32,26 +32,63 @@ private fun AlertPreview() {
 
 @GalleryExample("Alert", "Info")
 @Composable
-fun AlertInfoExample() { DarwinAlertBanner(message = "This is an informational alert.", title = "Information", type = DarwinAlertType.Info) }
+fun AlertInfoExample() {
+    DarwinAlertBanner(
+        message = "This is an informational alert.",
+        title = "Information",
+        type = DarwinAlertType.Info,
+    )
+}
 
 @GalleryExample("Alert", "Success")
 @Composable
-fun AlertSuccessExample() { DarwinAlertBanner(message = "Operation completed successfully!", title = "Success", type = DarwinAlertType.Success) }
+fun AlertSuccessExample() {
+    DarwinAlertBanner(
+        message = "Operation completed successfully!",
+        title = "Success",
+        type = DarwinAlertType.Success,
+    )
+}
 
 @GalleryExample("Alert", "Warning")
 @Composable
-fun AlertWarningExample() { DarwinAlertBanner(message = "Please review before proceeding.", title = "Warning", type = DarwinAlertType.Warning) }
+fun AlertWarningExample() {
+    DarwinAlertBanner(
+        message = "Please review before proceeding.",
+        title = "Warning",
+        type = DarwinAlertType.Warning,
+    )
+}
 
 @GalleryExample("Alert", "Error")
 @Composable
-fun AlertErrorExample() { DarwinAlertBanner(message = "An error occurred while processing.", title = "Error", type = DarwinAlertType.Error, onDismiss = {}) }
+fun AlertErrorExample() {
+    DarwinAlertBanner(
+        message = "An error occurred while processing.",
+        title = "Error",
+        type = DarwinAlertType.Error,
+        onDismiss = {},
+    )
+}
 
 @GalleryExample("Alert", "Alert Dialog")
 @Composable
 fun AlertDialogExample() {
     var showAlertDialog by remember { mutableStateOf(false) }
     DarwinButton(text = "Show Alert Dialog", onClick = { showAlertDialog = true }, variant = DarwinButtonVariant.Destructive)
-    if (showAlertDialog) { DarwinAlertDialog(open = true, onDismissRequest = { showAlertDialog = false }, title = "Delete item?", message = "This action cannot be undone. Are you sure you want to delete this item?", type = DarwinAlertType.Error, confirmText = "Delete", cancelText = "Cancel", onConfirm = { showAlertDialog = false }, onCancel = { showAlertDialog = false }) }
+    if (showAlertDialog) {
+        DarwinAlertDialog(
+            open = true,
+            onDismissRequest = { showAlertDialog = false },
+            title = "Delete item?",
+            message = "This action cannot be undone. Are you sure you want to delete this item?",
+            type = DarwinAlertType.Error,
+            confirmText = "Delete",
+            cancelText = "Cancel",
+            onConfirm = { showAlertDialog = false },
+            onCancel = { showAlertDialog = false },
+        )
+    }
 }
 
 @Composable
@@ -64,6 +101,10 @@ internal fun AlertPage() {
         ExampleCard(title = "Success", sourceCode = GallerySources.AlertSuccessExample) { AlertSuccessExample() }
         ExampleCard(title = "Warning", sourceCode = GallerySources.AlertWarningExample) { AlertWarningExample() }
         ExampleCard(title = "Error", sourceCode = GallerySources.AlertErrorExample) { AlertErrorExample() }
-        ExampleCard(title = "Alert Dialog", description = "Modal confirmation dialog", sourceCode = GallerySources.AlertDialogExample) { AlertDialogExample() }
+        ExampleCard(
+            title = "Alert Dialog",
+            description = "Modal confirmation dialog",
+            sourceCode = GallerySources.AlertDialogExample,
+        ) { AlertDialogExample() }
     }
 }

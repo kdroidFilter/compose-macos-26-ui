@@ -26,11 +26,34 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 @Composable
 fun PopoverDefaultExample() {
     var popoverExpanded by remember { mutableStateOf(false) }
-    DarwinPopover(expanded = popoverExpanded, onDismissRequest = { popoverExpanded = false }, trigger = { DarwinButton(text = "Toggle Popover", onClick = { popoverExpanded = !popoverExpanded }, variant = DarwinButtonVariant.Outline) }) {
+    DarwinPopover(
+        expanded = popoverExpanded,
+        onDismissRequest = { popoverExpanded = false },
+        trigger = {
+            DarwinButton(
+                text = "Toggle Popover",
+                onClick = { popoverExpanded = !popoverExpanded },
+                variant = DarwinButtonVariant.Outline,
+            )
+        },
+    ) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             DarwinText("Popover Content", fontWeight = FontWeight.SemiBold, color = DarwinTheme.colors.textPrimary)
             DarwinText("This is a popover panel with rich content.", color = DarwinTheme.colors.textSecondary)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { DarwinButton(text = "Edit", onClick = { popoverExpanded = false }, variant = DarwinButtonVariant.Secondary, size = DarwinButtonSize.Small); DarwinButton(text = "Copy", onClick = { popoverExpanded = false }, variant = DarwinButtonVariant.Ghost, size = DarwinButtonSize.Small) }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                DarwinButton(
+                    text = "Edit",
+                    onClick = { popoverExpanded = false },
+                    variant = DarwinButtonVariant.Secondary,
+                    size = DarwinButtonSize.Small,
+                )
+                DarwinButton(
+                    text = "Copy",
+                    onClick = { popoverExpanded = false },
+                    variant = DarwinButtonVariant.Ghost,
+                    size = DarwinButtonSize.Small,
+                )
+            }
         }
     }
 }

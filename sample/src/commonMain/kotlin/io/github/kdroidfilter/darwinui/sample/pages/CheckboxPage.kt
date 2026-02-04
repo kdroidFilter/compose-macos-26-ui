@@ -80,7 +80,15 @@ internal fun CheckboxPage() {
         PreviewContainer { CheckboxPreview() }
 
         SectionHeader("Examples")
-        ExampleCard(title = "States", description = "Checked, unchecked, indeterminate, and disabled", sourceCode = GallerySources.CheckboxStatesExample) { CheckboxStatesExample() }
-        ExampleCard(title = "Select All", description = "Parent checkbox with indeterminate state", sourceCode = GallerySources.CheckboxSelectAllExample) { CheckboxSelectAllExample() }
+        ExampleCard(
+            title = "States",
+            description = "Checked, unchecked, indeterminate, and disabled",
+            sourceCode = GallerySources.CheckboxStatesExample,
+        ) { CheckboxStatesExample() }
+        ExampleCard(
+            title = "Select All",
+            description = "Parent checkbox with indeterminate state",
+            sourceCode = GallerySources.CheckboxSelectAllExample,
+        ) { CheckboxSelectAllExample() }
     }
 }

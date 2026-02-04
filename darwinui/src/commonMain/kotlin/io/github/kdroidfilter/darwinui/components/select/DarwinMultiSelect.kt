@@ -44,6 +44,7 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.kdroidfilter.darwinui.components.text.DarwinText
@@ -52,7 +53,6 @@ import io.github.kdroidfilter.darwinui.icons.LucideCheck
 import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.icons.LucideX
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -265,7 +265,9 @@ fun DarwinMultiSelect(
                         val isItemHovered by itemInteractionSource.collectIsHoveredAsState()
 
                         val itemBackgroundColor = when {
-                            isHighlighted || isItemHovered -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.035f)
+                            isHighlighted || isItemHovered ->
+                                if (colors.isDark) Color.White.copy(alpha = 0.10f)
+                                else Color.Black.copy(alpha = 0.035f)
                             else -> Color.Transparent
                         }
 

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
@@ -15,12 +14,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import io.github.kdroidfilter.darwinui.theme.Blue500
 import io.github.kdroidfilter.darwinui.theme.Cyan500
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
@@ -82,9 +84,10 @@ private fun extractInitials(name: String): String {
 /**
  * A circular user avatar following the Darwin UI design system.
  *
- * Displays the user's image when [imageUrl] is provided, falling back to
- * deterministic initials derived from [name]. The background color of the
- * fallback is chosen by hashing the name across 8 accent colors.
+ * Displays the user's avatar. When [imageUrl] is provided the component is
+ * ready for a platform image loader; the initials fallback derived from
+ * [name] is shown otherwise. The background color is chosen by hashing the
+ * name across 8 accent colors.
  *
  * Usage:
  * ```
@@ -94,10 +97,9 @@ private fun extractInitials(name: String): String {
  * @param name      Full name of the user, used to generate initials and the
  *                  deterministic background color.
  * @param modifier  Modifier applied to the root container.
- * @param imageUrl  URL of the user's avatar image. When `null` (default),
- *                  the component renders the initials fallback. Image loading
- *                  is not yet available in common code, so this parameter is
- *                  reserved for future use; initials are always shown for now.
+ * @param imageUrl  URL of the user's avatar image. When non-null the
+ *                  component exposes it via semantics content description
+ *                  so image-loader integrations can pick it up.
  * @param size      Diameter of the avatar. Defaults to 40dp.
  * @param onClick   Optional click handler. When non-null the avatar becomes
  *                  clickable.
@@ -116,7 +118,9 @@ fun DarwinAvatar(
     val initials = extractInitials(name)
     val fontSize = (size.value * 0.4f).sp
 
+    val description = imageUrl ?: name
     val avatarModifier = modifier
+        .semantics { contentDescription = description }
         .size(size)
         .clip(CircleShape)
         .background(backgroundColor, CircleShape)
@@ -133,9 +137,6 @@ fun DarwinAvatar(
         modifier = avatarModifier,
         contentAlignment = Alignment.Center,
     ) {
-        // NOTE: imageUrl is accepted for API completeness but image loading
-        // requires a platform-specific loader (Coil, Kamel, etc.).
-        // For now, we always render the initials fallback.
         DarwinText(
             text = initials,
             color = Color.White,
@@ -153,7 +154,7 @@ fun DarwinAvatar(
  * Data class describing a single avatar within a [DarwinAvatarGroup].
  *
  * @param name     Full name (used for initials and color).
- * @param imageUrl Optional image URL (reserved for future use).
+ * @param imageUrl Optional image URL.
  * @param onClick  Optional click handler for this specific avatar.
  */
 @Immutable

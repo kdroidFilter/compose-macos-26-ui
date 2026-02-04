@@ -24,7 +24,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,19 +39,18 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
 import io.github.kdroidfilter.darwinui.theme.darwinTween
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.tooling.preview.Preview
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
 
 // =============================================================================
 // Accordion type
@@ -132,7 +133,7 @@ fun DarwinAccordion(
  * Draws a 1 dp bottom border in the theme's border color to visually separate
  * items.
  *
- * @param value Unique identifier for this item.
+ * @param value Unique identifier for this item, used as test tag.
  * @param expanded Whether this item is currently expanded.
  * @param onToggle Callback invoked when the trigger is clicked.
  * @param modifier Modifier applied to the item container.
@@ -155,6 +156,7 @@ fun DarwinAccordionItem(
 
     Column(
         modifier = modifier
+            .testTag(value)
             .fillMaxWidth()
             .background(backgroundColor)
             .drawBehind {

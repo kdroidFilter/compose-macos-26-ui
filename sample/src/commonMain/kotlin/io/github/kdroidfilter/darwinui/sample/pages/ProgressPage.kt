@@ -101,8 +101,14 @@ DarwinCircularProgress(value = 75f, max = 100f, showValue = true)""")
         SectionHeader("Examples")
         ExampleCard(title = "Linear - Default", sourceCode = GallerySources.ProgressLinearDefaultExample) { ProgressLinearDefaultExample() }
         ExampleCard(title = "Linear - Success", sourceCode = GallerySources.ProgressLinearSuccessExample) { ProgressLinearSuccessExample() }
-        ExampleCard(title = "Linear - Gradient", sourceCode = GallerySources.ProgressLinearGradientExample) { ProgressLinearGradientExample() }
-        ExampleCard(title = "Linear - Indeterminate", sourceCode = GallerySources.ProgressLinearIndeterminateExample) { ProgressLinearIndeterminateExample() }
+        ExampleCard(
+            title = "Linear - Gradient",
+            sourceCode = GallerySources.ProgressLinearGradientExample,
+        ) { ProgressLinearGradientExample() }
+        ExampleCard(
+            title = "Linear - Indeterminate",
+            sourceCode = GallerySources.ProgressLinearIndeterminateExample,
+        ) { ProgressLinearIndeterminateExample() }
         ExampleCard(title = "Circular", sourceCode = GallerySources.ProgressCircularExample) { ProgressCircularExample() }
     }
 }

@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,6 +45,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import kotlinx.coroutines.delay
 
@@ -332,7 +332,6 @@ fun DarwinAlertDialog(
                         onCancel = {
                             (onCancel ?: onDismissRequest).invoke()
                         },
-                        onDismissRequest = onDismissRequest,
                     )
                 }
             }
@@ -353,7 +352,6 @@ private fun DarwinAlertDialogContent(
     cancelText: String?,
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
-    onDismissRequest: () -> Unit,
 ) {
     val colors = DarwinTheme.colors
     val typography = DarwinTheme.typography

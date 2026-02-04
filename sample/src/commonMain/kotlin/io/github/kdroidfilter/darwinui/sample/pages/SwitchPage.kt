@@ -36,7 +36,6 @@ private fun SwitchPreview() {
     }
 }
 
-
 @Composable
 internal fun HoverOffsetItem(content: @Composable () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }

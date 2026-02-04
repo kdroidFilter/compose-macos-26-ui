@@ -37,14 +37,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
-import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
 import io.github.kdroidfilter.darwinui.theme.darwinTween
-import androidx.compose.ui.tooling.preview.Preview
 
 // ==================== DarwinTable ====================
 
@@ -302,14 +302,11 @@ fun RowScope.DarwinTableHeaderCell(
  * tertiary color style.
  *
  * @param message The message to display. Defaults to "No data available".
- * @param columnCount The number of columns the empty row should span visually.
- *                    Not used for layout in Compose but kept for API consistency.
  * @param modifier Modifier applied to the row.
  */
 @Composable
 fun DarwinTableEmptyRow(
     message: String = "No data available",
-    columnCount: Int = 1,
     modifier: Modifier = Modifier,
 ) {
     Row(

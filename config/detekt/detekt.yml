@@ -1,0 +1,94 @@
+# Detekt configuration for DarwinUI (Compose Multiplatform UI library)
+# Builds upon the default config — only overrides are listed here.
+
+complexity:
+  CyclomaticComplexMethod:
+    threshold: 60
+  LargeClass:
+    threshold: 800
+  LongMethod:
+    threshold: 300
+  LongParameterList:
+    functionThreshold: 45
+    constructorThreshold: 45
+  TooManyFunctions:
+    thresholdInFiles: 50
+    thresholdInClasses: 30
+    thresholdInInterfaces: 20
+    thresholdInObjects: 30
+    thresholdInEnums: 15
+  ComplexCondition:
+    threshold: 6
+  CognitiveComplexMethod:
+    threshold: 50
+  NestedBlockDepth:
+    threshold: 6
+
+style:
+  LoopWithTooManyJumpStatements:
+    maxJumpCount: 6
+  MagicNumber:
+    active: false
+  ReturnCount:
+    max: 5
+  WildcardImport:
+    active: true
+    excludeImports:
+      - 'androidx.compose.foundation.*'
+      - 'androidx.compose.foundation.layout.*'
+      - 'androidx.compose.material.*'
+      - 'androidx.compose.runtime.*'
+      - 'androidx.compose.ui.*'
+      - 'androidx.compose.ui.graphics.*'
+      - 'androidx.compose.ui.unit.*'
+      - 'androidx.compose.ui.text.*'
+      - 'androidx.compose.animation.*'
+      - 'io.github.kdroidfilter.darwinui.theme.*'
+  MaxLineLength:
+    maxLineLength: 140
+    excludeRawStrings: true
+    excludeCommentStatements: true
+    excludePackageStatements: true
+    excludeImportStatements: true
+    excludes:
+      - '**/icons/**'
+  UnusedPrivateMember:
+    ignoreAnnotated:
+      - 'Composable'
+      - 'Preview'
+
+naming:
+  MatchingDeclarationName:
+    active: false
+  FunctionNaming:
+    ignoreAnnotated:
+      - 'Composable'
+  TopLevelPropertyNaming:
+    constantPattern: '[A-Z][A-Za-z0-9]*'
+
+# ktlint rules via detekt-formatting plugin
+formatting:
+  ArgumentListWrapping:
+    active: false
+  ParameterListWrapping:
+    active: false
+  Wrapping:
+    active: false
+  Indentation:
+    active: false
+  MultiLineIfElse:
+    active: false
+  NoMultipleSpaces:
+    active: false
+  NoEmptyFirstLineInMethodBlock:
+    active: false
+  PropertyWrapping:
+    active: false
+  SpacingBetweenDeclarationsWithComments:
+    active: false
+  MaximumLineLength:
+    maxLineLength: 140
+    excludes:
+      - '**/icons/**'
+  NoWildcardImports:
+    active: false

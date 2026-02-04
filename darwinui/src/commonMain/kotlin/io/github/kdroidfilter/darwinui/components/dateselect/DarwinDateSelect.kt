@@ -12,10 +12,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -35,15 +35,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,7 +68,6 @@ import io.github.kdroidfilter.darwinui.icons.LucideChevronLeft
 import io.github.kdroidfilter.darwinui.icons.LucideChevronRight
 import io.github.kdroidfilter.darwinui.theme.Blue500
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -846,7 +846,11 @@ private fun formatSummary(config: DateConfig): String {
     } ?: "Not set"
 
     val timePart = when {
-        config.eventType == EventType.Single && (config.dateMode == DateMode.MonthOnly || config.dateMode == DateMode.YearOnly || config.dateMode == DateMode.DateOnly) -> ""
+        config.eventType == EventType.Single && (
+            config.dateMode == DateMode.MonthOnly ||
+                config.dateMode == DateMode.YearOnly ||
+                config.dateMode == DateMode.DateOnly
+            ) -> ""
         config.timeMode == TimeMode.AllDay -> " (All day)"
         else -> " at ${config.hour.toString().padStart(2, '0')}:${config.minute.toString().padStart(2, '0')}"
     }

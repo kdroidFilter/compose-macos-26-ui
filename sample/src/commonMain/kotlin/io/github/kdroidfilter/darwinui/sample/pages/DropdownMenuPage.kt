@@ -24,7 +24,17 @@ import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 @Composable
 fun DropdownMenuDefaultExample() {
     var dropdownExpanded by remember { mutableStateOf(false) }
-    DarwinDropdownMenu(expanded = dropdownExpanded, onDismissRequest = { dropdownExpanded = false }, trigger = { DarwinButton(text = "Open Menu", onClick = { dropdownExpanded = !dropdownExpanded }, variant = DarwinButtonVariant.Outline) }) {
+    DarwinDropdownMenu(
+        expanded = dropdownExpanded,
+        onDismissRequest = { dropdownExpanded = false },
+        trigger = {
+            DarwinButton(
+                text = "Open Menu",
+                onClick = { dropdownExpanded = !dropdownExpanded },
+                variant = DarwinButtonVariant.Outline,
+            )
+        },
+    ) {
         DarwinDropdownMenuItem(onClick = { dropdownExpanded = false }) { DarwinText("Profile") }
         DarwinDropdownMenuItem(onClick = { dropdownExpanded = false }) { DarwinText("Settings") }
         DarwinDropdownMenuItem(onClick = { dropdownExpanded = false }) { DarwinText("Preferences") }
@@ -36,11 +46,28 @@ fun DropdownMenuDefaultExample() {
 @GalleryExample("DropdownMenu", "With Labels & Shortcuts")
 @Composable
 fun DropdownMenuLabelsExample() {
-    var dropdownExpanded by remember { mutableStateOf(false) }; var checkboxState by remember { mutableStateOf(false) }
-    DarwinDropdownMenu(expanded = dropdownExpanded, onDismissRequest = { dropdownExpanded = false }, trigger = { DarwinButton(text = "Actions", onClick = { dropdownExpanded = !dropdownExpanded }, variant = DarwinButtonVariant.Outline) }) {
+    var dropdownExpanded by remember { mutableStateOf(false) }
+    var checkboxState by remember { mutableStateOf(false) }
+    DarwinDropdownMenu(
+        expanded = dropdownExpanded,
+        onDismissRequest = { dropdownExpanded = false },
+        trigger = {
+            DarwinButton(
+                text = "Actions",
+                onClick = { dropdownExpanded = !dropdownExpanded },
+                variant = DarwinButtonVariant.Outline,
+            )
+        },
+    ) {
         DarwinDropdownMenuLabel(text = "Actions")
-        DarwinDropdownMenuItem(onClick = { dropdownExpanded = false }, trailingContent = { DarwinDropdownMenuShortcut(text = "Cmd+N") }) { DarwinText("New File") }
-        DarwinDropdownMenuItem(onClick = { dropdownExpanded = false }, trailingContent = { DarwinDropdownMenuShortcut(text = "Cmd+O") }) { DarwinText("Open") }
+        DarwinDropdownMenuItem(
+            onClick = { dropdownExpanded = false },
+            trailingContent = { DarwinDropdownMenuShortcut(text = "Cmd+N") },
+        ) { DarwinText("New File") }
+        DarwinDropdownMenuItem(
+            onClick = { dropdownExpanded = false },
+            trailingContent = { DarwinDropdownMenuShortcut(text = "Cmd+O") },
+        ) { DarwinText("Open") }
         DarwinDropdownMenuSeparator()
         DarwinDropdownMenuLabel(text = "Options")
         DarwinDropdownMenuCheckboxItem(checked = checkboxState, onCheckedChange = { checkboxState = it }) { DarwinText("Auto-save") }
@@ -54,6 +81,9 @@ internal fun DropdownMenuPage() {
     GalleryPage("Dropdown Menu", "Displays a menu to the user with a list of actions.") {
         SectionHeader("Examples")
         ExampleCard(title = "Default", sourceCode = GallerySources.DropdownMenuDefaultExample) { DropdownMenuDefaultExample() }
-        ExampleCard(title = "With Labels & Shortcuts", sourceCode = GallerySources.DropdownMenuLabelsExample) { DropdownMenuLabelsExample() }
+        ExampleCard(
+            title = "With Labels & Shortcuts",
+            sourceCode = GallerySources.DropdownMenuLabelsExample,
+        ) { DropdownMenuLabelsExample() }
     }
 }

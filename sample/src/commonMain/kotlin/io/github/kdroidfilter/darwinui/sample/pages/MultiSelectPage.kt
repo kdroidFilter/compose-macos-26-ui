@@ -18,17 +18,41 @@ import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 @GalleryExample("MultiSelect", "Default")
 @Composable
 fun MultiSelectDefaultExample() {
-    val options = listOf(DarwinSelectOption("react", "React"), DarwinSelectOption("vue", "Vue"), DarwinSelectOption("angular", "Angular"), DarwinSelectOption("svelte", "Svelte"), DarwinSelectOption("solid", "SolidJS"))
+    val options = listOf(
+        DarwinSelectOption("react", "React"),
+        DarwinSelectOption("vue", "Vue"),
+        DarwinSelectOption("angular", "Angular"),
+        DarwinSelectOption("svelte", "Svelte"),
+        DarwinSelectOption("solid", "SolidJS"),
+    )
     var selected by remember { mutableStateOf(listOf<String>()) }
-    DarwinMultiSelect(options = options, selectedValues = selected, onValuesChange = { selected = it }, label = "Technologies", modifier = Modifier.fillMaxWidth(0.5f))
+    DarwinMultiSelect(
+        options = options,
+        selectedValues = selected,
+        onValuesChange = { selected = it },
+        label = "Technologies",
+        modifier = Modifier.fillMaxWidth(0.5f),
+    )
 }
 
 @GalleryExample("MultiSelect", "Pre-selected")
 @Composable
 fun MultiSelectPreselectedExample() {
-    val options = listOf(DarwinSelectOption("react", "React"), DarwinSelectOption("vue", "Vue"), DarwinSelectOption("angular", "Angular"), DarwinSelectOption("svelte", "Svelte"), DarwinSelectOption("solid", "SolidJS"))
+    val options = listOf(
+        DarwinSelectOption("react", "React"),
+        DarwinSelectOption("vue", "Vue"),
+        DarwinSelectOption("angular", "Angular"),
+        DarwinSelectOption("svelte", "Svelte"),
+        DarwinSelectOption("solid", "SolidJS"),
+    )
     var selected by remember { mutableStateOf(listOf("react", "vue")) }
-    DarwinMultiSelect(options = options, selectedValues = selected, onValuesChange = { selected = it }, label = "Favorites", modifier = Modifier.fillMaxWidth(0.5f))
+    DarwinMultiSelect(
+        options = options,
+        selectedValues = selected,
+        onValuesChange = { selected = it },
+        label = "Favorites",
+        modifier = Modifier.fillMaxWidth(0.5f),
+    )
 }
 
 @Composable

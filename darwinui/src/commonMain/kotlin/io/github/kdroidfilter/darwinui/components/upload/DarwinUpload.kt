@@ -12,7 +12,6 @@ import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,8 +19,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import io.github.kdroidfilter.darwinui.icons.DarwinIcon
 import io.github.kdroidfilter.darwinui.icons.LucideArrowLeftRight
 import io.github.kdroidfilter.darwinui.icons.LucideImage
@@ -33,7 +34,6 @@ import io.github.kdroidfilter.darwinui.icons.LucideX
 import io.github.kdroidfilter.darwinui.theme.Amber500
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.Red500
-import androidx.compose.ui.tooling.preview.Preview
 
 enum class DarwinUploadVariant {
     /** Large dropzone with icon, text, image grid, and upload button */
@@ -369,7 +369,6 @@ private fun DefaultWithFiles(
                             DefaultImageCard(
                                 file = file,
                                 index = globalIndex,
-                                totalFiles = files.size,
                                 onRemove = if (onRemoveFile != null) {
                                     { onRemoveFile(globalIndex) }
                                 } else null,
@@ -396,7 +395,6 @@ private fun DefaultWithFiles(
 private fun DefaultImageCard(
     file: DarwinUploadFile,
     index: Int,
-    totalFiles: Int,
     onRemove: (() -> Unit)?,
     onSetCover: (() -> Unit)?,
     onSwap: (() -> Unit)?,
