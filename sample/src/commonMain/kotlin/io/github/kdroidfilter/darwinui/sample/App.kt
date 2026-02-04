@@ -356,11 +356,11 @@ private fun InputPreview() {
 private fun CheckboxPreview() {
     var c1 by remember { mutableStateOf(false) }
     var c2 by remember { mutableStateOf(true) }
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    var c3 by remember { mutableStateOf(false) }
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         DarwinCheckbox(checked = c1, onCheckedChange = { c1 = it }, label = "Unchecked option")
         DarwinCheckbox(checked = c2, onCheckedChange = { c2 = it }, label = "Checked option")
-        DarwinCheckbox(checked = false, onCheckedChange = {}, indeterminate = true, label = "Indeterminate")
-        DarwinCheckbox(checked = false, onCheckedChange = {}, label = "Disabled", enabled = false)
+        DarwinCheckbox(checked = c3, onCheckedChange = { c3 = it }, indeterminate = !c3, label = "Indeterminate")
     }
 }
 
@@ -544,6 +544,37 @@ fun CheckboxStatesExample() {
         DarwinCheckbox(checked = checked2, onCheckedChange = { checked2 = it }, label = "Enabled and checked")
         DarwinCheckbox(checked = false, onCheckedChange = {}, label = "Disabled", enabled = false)
         DarwinCheckbox(checked = true, onCheckedChange = {}, indeterminate = true, label = "Indeterminate")
+    }
+}
+
+@GalleryExample("Checkbox", "Select All")
+@Composable
+fun CheckboxSelectAllExample() {
+    var items by remember { mutableStateOf(listOf(true, false, true)) }
+    val allChecked = items.all { it }
+    val someChecked = items.any { it } && !allChecked
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        DarwinCheckbox(
+            checked = allChecked,
+            onCheckedChange = { checked -> items = List(3) { checked } },
+            indeterminate = someChecked,
+            label = "Select all",
+        )
+        Column(
+            modifier = Modifier.padding(start = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            items.forEachIndexed { i, checked ->
+                DarwinCheckbox(
+                    checked = checked,
+                    onCheckedChange = { newVal ->
+                        items = items.toMutableList().also { it[i] = newVal }
+                    },
+                    label = "Item ${i + 1}",
+                )
+            }
+        }
     }
 }
 
@@ -1029,6 +1060,7 @@ private fun CheckboxPage() {
 
         SectionHeader("Examples")
         ExampleCard(title = "States", description = "Checked, unchecked, indeterminate, and disabled", sourceCode = GallerySources.CheckboxStatesExample) { CheckboxStatesExample() }
+        ExampleCard(title = "Select All", description = "Parent checkbox with indeterminate state", sourceCode = GallerySources.CheckboxSelectAllExample) { CheckboxSelectAllExample() }
     }
 }
 
