@@ -80,6 +80,7 @@ import io.github.kdroidfilter.darwinui.components.dropdown.DarwinDropdownMenuIte
 import io.github.kdroidfilter.darwinui.components.dropdown.DarwinDropdownMenuLabel
 import io.github.kdroidfilter.darwinui.components.dropdown.DarwinDropdownMenuSeparator
 import io.github.kdroidfilter.darwinui.components.dropdown.DarwinDropdownMenuShortcut
+import io.github.kdroidfilter.darwinui.components.input.DarwinSearchField
 import io.github.kdroidfilter.darwinui.components.input.DarwinTextArea
 import io.github.kdroidfilter.darwinui.components.input.DarwinTextField
 import io.github.kdroidfilter.darwinui.components.popover.DarwinPopover
@@ -140,6 +141,7 @@ private val sidebarEntries = listOf(
     SidebarEntry("switch", "Switch", "FORM CONTROLS"),
     SidebarEntry("select", "Select", "FORM CONTROLS"),
     SidebarEntry("multiselect", "Multi Select", "FORM CONTROLS"),
+    SidebarEntry("searchinput", "Search Input", "FORM CONTROLS"),
     SidebarEntry("slider", "Slider", "FORM CONTROLS"),
     SidebarEntry("upload", "Upload", "FORM CONTROLS"),
     SidebarEntry("badge", "Badge", "DATA DISPLAY"),
@@ -207,7 +209,7 @@ fun App() {
                                 }
                             }
                             // Search
-                            DarwinTextField(
+                            DarwinSearchField(
                                 value = searchQuery,
                                 onValueChange = { searchQuery = it },
                                 placeholder = "Search components...",
@@ -255,6 +257,7 @@ fun App() {
                     when (selectedPage) {
                         "button" -> ButtonPage()
                         "input" -> InputPage()
+                        "searchinput" -> SearchInputPage()
                         "textarea" -> TextAreaPage()
                         "checkbox" -> CheckboxPage()
                         "switch" -> SwitchPage()
@@ -503,6 +506,20 @@ fun InputWithLabelExample() {
 fun InputPasswordExample() {
     var password by remember { mutableStateOf("") }
     DarwinTextField(value = password, onValueChange = { password = it }, placeholder = "Password", label = "Password", password = true, modifier = Modifier.fillMaxWidth(0.5f))
+}
+
+@GalleryExample("SearchInput", "Default")
+@Composable
+fun SearchInputDefaultExample() {
+    var query by remember { mutableStateOf("") }
+    DarwinSearchField(value = query, onValueChange = { query = it }, placeholder = "Search...", modifier = Modifier.fillMaxWidth(0.5f))
+}
+
+@GalleryExample("SearchInput", "With Label")
+@Composable
+fun SearchInputWithLabelExample() {
+    var query by remember { mutableStateOf("") }
+    DarwinSearchField(value = query, onValueChange = { query = it }, placeholder = "Search components...", label = "Search", modifier = Modifier.fillMaxWidth(0.5f))
 }
 
 @GalleryExample("TextArea", "Default")
@@ -1049,6 +1066,23 @@ DarwinTextField(
         ExampleCard(title = "Error State", description = "Input with error validation", sourceCode = GallerySources.InputErrorExample) { InputErrorExample() }
         ExampleCard(title = "Success State", description = "Input with success validation", sourceCode = GallerySources.InputSuccessExample) { InputSuccessExample() }
         ExampleCard(title = "Password", description = "Password input with visibility toggle", sourceCode = GallerySources.InputPasswordExample) { InputPasswordExample() }
+    }
+}
+
+@Composable
+private fun SearchInputPage() {
+    GalleryPage("Search Input", "A text input with a built-in search icon.") {
+        SectionHeader("Usage")
+        CodeBlock("""var query by remember { mutableStateOf("") }
+DarwinSearchField(
+    value = query,
+    onValueChange = { query = it },
+    placeholder = "Search...",
+)""")
+
+        SectionHeader("Examples")
+        ExampleCard(title = "Default", sourceCode = GallerySources.SearchInputDefaultExample) { SearchInputDefaultExample() }
+        ExampleCard(title = "With Label", sourceCode = GallerySources.SearchInputWithLabelExample) { SearchInputWithLabelExample() }
     }
 }
 

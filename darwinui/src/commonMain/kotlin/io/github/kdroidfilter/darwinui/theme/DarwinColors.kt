@@ -205,7 +205,7 @@ fun darkDarwinColors(): DarwinColors = DarwinColors(
     borderStrong = Color(0x33FFFFFF),      // white/20
 
     inputBackground = Color(0x0DFFFFFF),         // white/5
-    inputFocusBackground = Color(0x1AFFFFFF),    // white/10 — compensates for missing backdrop-blur-md
+    inputFocusBackground = Color(0xE618181B),    // zinc-900/90 (dark:focus:bg-zinc-900/90)
     inputBorder = Color(0x1AFFFFFF),
     inputFocusBorder = Blue500,
 
