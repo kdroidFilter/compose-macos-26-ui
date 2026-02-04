@@ -43,8 +43,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import io.github.kdroidfilter.darwinui.icons.DarwinIcon
+import io.github.kdroidfilter.darwinui.icons.LucideBarChart3
 import io.github.kdroidfilter.darwinui.icons.LucideDownload
+import io.github.kdroidfilter.darwinui.icons.LucideFolder
 import io.github.kdroidfilter.darwinui.icons.LucideHeart
+import io.github.kdroidfilter.darwinui.icons.LucideHome
 import io.github.kdroidfilter.darwinui.icons.LucideMoon
 import io.github.kdroidfilter.darwinui.icons.LucidePlus
 import io.github.kdroidfilter.darwinui.icons.LucideSearch
@@ -1116,10 +1119,10 @@ fun SidebarPreviewExample() {
     var isCollapsed by remember { mutableStateOf(false) }
     val sidebarItems = remember {
         listOf(
-            DarwinSidebarItem("Dashboard", onClick = { activeItem = "Dashboard" }),
-            DarwinSidebarItem("Projects", onClick = { activeItem = "Projects" }),
-            DarwinSidebarItem("Analytics", onClick = { activeItem = "Analytics" }),
-            DarwinSidebarItem("Settings", onClick = { activeItem = "Settings" }),
+            DarwinSidebarItem("Dashboard", onClick = { activeItem = "Dashboard" }, icon = LucideHome),
+            DarwinSidebarItem("Projects", onClick = { activeItem = "Projects" }, icon = LucideFolder),
+            DarwinSidebarItem("Analytics", onClick = { activeItem = "Analytics" }, icon = LucideBarChart3),
+            DarwinSidebarItem("Settings", onClick = { activeItem = "Settings" }, icon = LucideSettings),
         )
     }
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -1152,9 +1155,9 @@ fun SidebarCollapsibleExample() {
     var collapsed by remember { mutableStateOf(false) }
     val items = remember {
         listOf(
-            DarwinSidebarItem("Dashboard", onClick = { active = "Dashboard" }),
-            DarwinSidebarItem("Projects", onClick = { active = "Projects" }),
-            DarwinSidebarItem("Settings", onClick = { active = "Settings" }),
+            DarwinSidebarItem("Dashboard", onClick = { active = "Dashboard" }, icon = LucideHome),
+            DarwinSidebarItem("Projects", onClick = { active = "Projects" }, icon = LucideFolder),
+            DarwinSidebarItem("Settings", onClick = { active = "Settings" }, icon = LucideSettings),
         )
     }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1176,9 +1179,9 @@ fun SidebarGlassExample() {
     var active by remember { mutableStateOf("Dashboard") }
     val items = remember {
         listOf(
-            DarwinSidebarItem("Dashboard", onClick = { active = "Dashboard" }),
-            DarwinSidebarItem("Projects", onClick = { active = "Projects" }),
-            DarwinSidebarItem("Settings", onClick = { active = "Settings" }),
+            DarwinSidebarItem("Dashboard", onClick = { active = "Dashboard" }, icon = LucideHome),
+            DarwinSidebarItem("Projects", onClick = { active = "Projects" }, icon = LucideFolder),
+            DarwinSidebarItem("Settings", onClick = { active = "Settings" }, icon = LucideSettings),
         )
     }
     Box(modifier = Modifier.fillMaxWidth().height(192.dp).clip(DarwinTheme.shapes.large).glassEffect()) {

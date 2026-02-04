@@ -312,6 +312,18 @@ private fun SidebarItemRow(
         animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
     )
 
+    // Animated gap between icon and label: 12dp → 0dp
+    val iconLabelGap by animateDpAsState(
+        targetValue = if (isCollapsed) 0.dp else 12.dp,
+        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+    )
+
+    // Animated label opacity: fade out when collapsed
+    val labelAlpha by animateFloatAsState(
+        targetValue = if (isCollapsed) 0f else 1f,
+        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+    )
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -334,8 +346,7 @@ private fun SidebarItemRow(
                 size = iconSize,
                 tint = iconColor,
             )
-            // gap-3 spacer between icon and label
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(iconLabelGap))
         }
 
         DarwinText(
@@ -346,6 +357,7 @@ private fun SidebarItemRow(
             color = textColor,
             maxLines = 1,
             overflow = TextOverflow.Clip,
+            modifier = Modifier.graphicsLayer { alpha = labelAlpha },
         )
     }
 }
@@ -392,6 +404,16 @@ private fun CollapseToggle(
         animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
     )
 
+    val iconLabelGap by animateDpAsState(
+        targetValue = if (isCollapsed) 0.dp else 12.dp,
+        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+    )
+
+    val labelAlpha by animateFloatAsState(
+        targetValue = if (isCollapsed) 0f else 1f,
+        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+    )
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -414,7 +436,7 @@ private fun CollapseToggle(
             modifier = Modifier.graphicsLayer { rotationZ = iconRotation },
         )
 
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(iconLabelGap))
 
         DarwinText(
             text = "Collapse",
@@ -424,6 +446,7 @@ private fun CollapseToggle(
             color = textColor,
             maxLines = 1,
             overflow = TextOverflow.Clip,
+            modifier = Modifier.graphicsLayer { alpha = labelAlpha },
         )
     }
 }

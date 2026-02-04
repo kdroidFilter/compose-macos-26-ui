@@ -714,3 +714,72 @@ val LucideLogOut: ImageVector
         return _LucideLogOut!!
     }
 private var _LucideLogOut: ImageVector? = null
+
+// =============================================================================
+// Home
+// =============================================================================
+
+val LucideHome: ImageVector
+    get() {
+        if (_LucideHome != null) return _LucideHome!!
+        _LucideHome = ImageVector.Builder(
+            name = "home", defaultWidth = 24.dp, defaultHeight = 24.dp,
+            viewportWidth = 24f, viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(15f, 21f); verticalLineToRelative(-8f); arcToRelative(1f, 1f, 0f, false, false, -1f, -1f); horizontalLineToRelative(-4f); arcToRelative(1f, 1f, 0f, false, false, -1f, 1f); verticalLineToRelative(8f)
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(3f, 10f); arcToRelative(2f, 2f, 0f, false, true, 0.709f, -1.528f); lineToRelative(7f, -5.999f); arcToRelative(2f, 2f, 0f, false, true, 2.582f, 0f); lineToRelative(7f, 5.999f); arcTo(2f, 2f, 0f, false, true, 21f, 10f); verticalLineToRelative(9f); arcToRelative(2f, 2f, 0f, false, true, -2f, 2f); horizontalLineTo(5f); arcToRelative(2f, 2f, 0f, false, true, -2f, -2f); close()
+            }
+        }.build()
+        return _LucideHome!!
+    }
+private var _LucideHome: ImageVector? = null
+
+// =============================================================================
+// Folder
+// =============================================================================
+
+val LucideFolder: ImageVector
+    get() {
+        if (_LucideFolder != null) return _LucideFolder!!
+        _LucideFolder = ImageVector.Builder(
+            name = "folder", defaultWidth = 24.dp, defaultHeight = 24.dp,
+            viewportWidth = 24f, viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(20f, 20f); arcToRelative(2f, 2f, 0f, false, false, 2f, -2f); verticalLineTo(8f); arcToRelative(2f, 2f, 0f, false, false, -2f, -2f); horizontalLineToRelative(-7.9f); arcToRelative(2f, 2f, 0f, false, true, -1.69f, -0.9f); lineTo(9.6f, 3.9f); arcTo(2f, 2f, 0f, false, false, 7.93f, 3f); horizontalLineTo(4f); arcToRelative(2f, 2f, 0f, false, false, -2f, 2f); verticalLineToRelative(13f); arcToRelative(2f, 2f, 0f, false, false, 2f, 2f); close()
+            }
+        }.build()
+        return _LucideFolder!!
+    }
+private var _LucideFolder: ImageVector? = null
+
+// =============================================================================
+// BarChart3
+// =============================================================================
+
+val LucideBarChart3: ImageVector
+    get() {
+        if (_LucideBarChart3 != null) return _LucideBarChart3!!
+        _LucideBarChart3 = ImageVector.Builder(
+            name = "bar-chart-3", defaultWidth = 24.dp, defaultHeight = 24.dp,
+            viewportWidth = 24f, viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(3f, 3f); verticalLineToRelative(16f); arcToRelative(2f, 2f, 0f, false, false, 2f, 2f); horizontalLineToRelative(16f)
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(18f, 17f); verticalLineTo(9f)
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(13f, 17f); verticalLineTo(5f)
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(8f, 17f); verticalLineToRelative(-3f)
+            }
+        }.build()
+        return _LucideBarChart3!!
+    }
+private var _LucideBarChart3: ImageVector? = null
