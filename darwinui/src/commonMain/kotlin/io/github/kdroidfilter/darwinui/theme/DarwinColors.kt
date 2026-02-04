@@ -107,10 +107,6 @@ class DarwinColors(
     val overlay: Color,
     val scrim: Color,
 
-    // Glass effect
-    val glassBackground: Color,
-    val glassBorder: Color,
-
     // Miscellaneous
     val ring: Color,
     val muted: Color,
@@ -157,8 +153,6 @@ class DarwinColors(
         cardForeground: Color = this.cardForeground,
         overlay: Color = this.overlay,
         scrim: Color = this.scrim,
-        glassBackground: Color = this.glassBackground,
-        glassBorder: Color = this.glassBorder,
         ring: Color = this.ring,
         muted: Color = this.muted,
         mutedForeground: Color = this.mutedForeground,
@@ -171,7 +165,7 @@ class DarwinColors(
         primary, onPrimary, accent, onAccent, secondary, onSecondary,
         destructive, onDestructive, success, onSuccess, warning, onWarning, info, onInfo,
         border, borderSubtle, borderStrong, inputBackground, inputFocusBackground, inputBorder, inputFocusBorder,
-        card, cardForeground, overlay, scrim, glassBackground, glassBorder,
+        card, cardForeground, overlay, scrim,
         ring, muted, mutedForeground, popover, popoverForeground, isDark,
     )
 }
@@ -224,9 +218,6 @@ fun darkDarwinColors(): DarwinColors = DarwinColors(
 
     overlay = Color(0x80000000),
     scrim = Color(0xCC000000),
-
-    glassBackground = Color(0xCC18181B),   // zinc-900/80
-    glassBorder = Color(0x1AFFFFFF),       // white/10
 
     ring = Blue500,
     muted = Color(0xFF27272A),
@@ -285,9 +276,6 @@ fun lightDarwinColors(): DarwinColors = DarwinColors(
 
     overlay = Color(0x40000000),
     scrim = Color(0x99000000),
-
-    glassBackground = Color(0xCCFFFFFF),   // white/80
-    glassBorder = Color(0x33FFFFFF),       // white/20
 
     ring = Blue500,
     muted = Color(0xFFF4F4F5),

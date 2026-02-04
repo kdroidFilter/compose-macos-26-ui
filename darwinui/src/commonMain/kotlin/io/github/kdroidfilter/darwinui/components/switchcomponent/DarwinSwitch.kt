@@ -39,7 +39,6 @@ fun DarwinSwitch(
     modifier: Modifier = Modifier,
     label: String? = null,
     enabled: Boolean = true,
-    glass: Boolean = false,
 ) {
     val colors = DarwinTheme.colors
     val shapes = DarwinTheme.shapes
@@ -63,13 +62,8 @@ fun DarwinSwitch(
     val disabledAlpha = if (enabled) 1f else 0.5f
 
     // checked: bg-emerald-500
-    // glass unchecked: bg-white/60 dark:bg-zinc-900/60
     // default unchecked: bg-zinc-600 (same for light and dark)
-    val trackColor = when {
-        checked -> Emerald500
-        glass -> if (colors.isDark) Color(0x99181818) else Color(0x99FFFFFF)
-        else -> Zinc600
-    }
+    val trackColor = if (checked) Emerald500 else Zinc600
 
     Row(
         verticalAlignment = Alignment.CenterVertically,

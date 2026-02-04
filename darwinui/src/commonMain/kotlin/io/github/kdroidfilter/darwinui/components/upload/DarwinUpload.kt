@@ -66,7 +66,6 @@ fun DarwinUpload(
     label: String? = null,
     variant: DarwinUploadVariant = DarwinUploadVariant.Default,
     enabled: Boolean = true,
-    glass: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     when (variant) {
@@ -80,7 +79,6 @@ fun DarwinUpload(
             maxFiles = maxFiles,
             label = label,
             enabled = enabled,
-            glass = glass,
             modifier = modifier,
         )
         DarwinUploadVariant.Compact -> CompactVariant(
@@ -155,20 +153,11 @@ private fun DefaultVariant(
     maxFiles: Int,
     label: String?,
     enabled: Boolean,
-    glass: Boolean,
     modifier: Modifier,
 ) {
     val colors = DarwinTheme.colors
-    val borderColor = if (glass) {
-        if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.White.copy(alpha = 0.20f)
-    } else {
-        dashedBorderColor()
-    }
-    val bgColor = if (glass) {
-        if (colors.isDark) Color(0xFF18181B).copy(alpha = 0.60f) else Color.White.copy(alpha = 0.60f)
-    } else {
-        Color.Transparent
-    }
+    val borderColor = dashedBorderColor()
+    val bgColor = Color.Transparent
 
     Column(
         modifier = modifier.animateContentSize(),

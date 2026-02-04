@@ -64,8 +64,6 @@ import io.github.kdroidfilter.darwinui.theme.Zinc400
 import io.github.kdroidfilter.darwinui.theme.Zinc500
 import io.github.kdroidfilter.darwinui.theme.Zinc700
 import io.github.kdroidfilter.darwinui.theme.Zinc900
-import io.github.kdroidfilter.darwinui.theme.glassBorderOrDefault
-import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 
 // =============================================================================
 // DarwinDropdownMenu — main component
@@ -80,7 +78,6 @@ import io.github.kdroidfilter.darwinui.theme.glassOrDefault
  *
  * @param expanded Whether the dropdown menu is currently visible.
  * @param onDismissRequest Callback invoked when the user clicks outside the menu.
- * @param glass When true, applies a glass-morphism background and border.
  * @param modifier Modifier applied to the root container.
  * @param trigger The composable element that acts as the menu anchor.
  * @param content The menu content.
@@ -89,7 +86,6 @@ import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 fun DarwinDropdownMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
-    glass: Boolean = false,
     modifier: Modifier = Modifier,
     trigger: @Composable () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
@@ -98,11 +94,8 @@ fun DarwinDropdownMenu(
     val isDark = colors.isDark
     val shapes = DarwinTheme.shapes
 
-    val nonGlassBg = if (isDark) Zinc900.copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
-    val nonGlassBorder = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
-
-    val backgroundColor = if (glass) glassOrDefault(true, nonGlassBg) else nonGlassBg
-    val borderColor = if (glass) glassBorderOrDefault(true, nonGlassBorder) else nonGlassBorder
+    val backgroundColor = if (isDark) Zinc900.copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
+    val borderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 
     val density = LocalDensity.current
     var triggerHeightPx by remember { mutableStateOf(0) }

@@ -59,7 +59,6 @@ fun DarwinTextField(
     password: Boolean = false,
     singleLine: Boolean = true,
     size: DarwinInputSize = DarwinInputSize.Md,
-    glass: Boolean = false,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
@@ -86,7 +85,7 @@ fun DarwinTextField(
             isError -> colors.destructive
             isSuccess -> colors.success
             isFocused -> colors.inputFocusBorder
-            else -> if (glass) colors.glassBorder else colors.inputBorder
+            else -> colors.inputBorder
         },
         animationSpec = darwinTween(DarwinDuration.Slow),
         label = "DarwinTextFieldBorderColor",
@@ -119,11 +118,11 @@ fun DarwinTextField(
     // We animate alpha separately to avoid interpolating between two very different colors
     // (e.g. semi-transparent black → near-opaque white) which produces ugly intermediate grays.
     val focusAlpha by animateFloatAsState(
-        targetValue = if (!glass && isFocused) 1f else 0f,
+        targetValue = if (isFocused) 1f else 0f,
         animationSpec = darwinTween(DarwinDuration.Slow),
         label = "DarwinTextFieldFocusBgAlpha",
     )
-    val idleBackground: Color = if (glass) colors.glassBackground else colors.inputBackground
+    val idleBackground: Color = colors.inputBackground
 
     // ---- Visual transformation ----
     val resolvedTransformation = if (password) PasswordVisualTransformation() else visualTransformation

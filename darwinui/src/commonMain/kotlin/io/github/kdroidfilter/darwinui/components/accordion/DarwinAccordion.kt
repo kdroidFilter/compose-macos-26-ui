@@ -46,7 +46,6 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
 import io.github.kdroidfilter.darwinui.theme.darwinTween
-import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 
 // =============================================================================
 // Accordion type
@@ -76,7 +75,6 @@ enum class DarwinAccordionType {
  */
 class DarwinAccordionState(
     val type: DarwinAccordionType,
-    val glass: Boolean,
 )
 
 internal val LocalDarwinAccordionState = staticCompositionLocalOf<DarwinAccordionState> {
@@ -99,19 +97,17 @@ internal val LocalDarwinAccordionState = staticCompositionLocalOf<DarwinAccordio
  * implementing single-expand logic when [type] is [DarwinAccordionType.Single].
  *
  * @param type Whether only a single item or multiple items can be expanded.
- * @param glass When true, accordion items use a glass-morphism background.
  * @param modifier Modifier applied to the outer column.
  * @param content The composable children -- typically several [DarwinAccordionItem]s.
  */
 @Composable
 fun DarwinAccordion(
     type: DarwinAccordionType = DarwinAccordionType.Single,
-    glass: Boolean = false,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    val state = remember(type, glass) {
-        DarwinAccordionState(type = type, glass = glass)
+    val state = remember(type) {
+        DarwinAccordionState(type = type)
     }
 
     CompositionLocalProvider(LocalDarwinAccordionState provides state) {
@@ -135,7 +131,6 @@ fun DarwinAccordion(
  * @param value Unique identifier for this item.
  * @param expanded Whether this item is currently expanded.
  * @param onToggle Callback invoked when the trigger is clicked.
- * @param glass When true, applies a glass-morphism background to the item.
  * @param modifier Modifier applied to the item container.
  * @param trigger The header composable, typically a [DarwinAccordionTrigger].
  * @param content The collapsible body, typically a [DarwinAccordionContent].
@@ -145,7 +140,6 @@ fun DarwinAccordionItem(
     value: String,
     expanded: Boolean,
     onToggle: () -> Unit,
-    glass: Boolean = false,
     modifier: Modifier = Modifier,
     trigger: @Composable () -> Unit,
     content: @Composable () -> Unit,
@@ -153,11 +147,7 @@ fun DarwinAccordionItem(
     val colors = DarwinTheme.colors
     val borderColor = colors.border
 
-    val backgroundColor = if (glass) {
-        glassOrDefault(glass = true, fallback = Color.Transparent)
-    } else {
-        Color.Transparent
-    }
+    val backgroundColor = Color.Transparent
 
     Column(
         modifier = modifier

@@ -44,8 +44,6 @@ import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import io.github.kdroidfilter.darwinui.icons.DarwinIcon
 import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import io.github.kdroidfilter.darwinui.theme.glassOrDefault
-import io.github.kdroidfilter.darwinui.theme.glassBorderOrDefault
 
 /**
  * Option model for DarwinSelect and DarwinMultiSelect.
@@ -63,7 +61,6 @@ fun DarwinSelect(
     onValueChange: (String) -> Unit,
     placeholder: String = "Select...",
     enabled: Boolean = true,
-    glass: Boolean = false,
     label: String? = null,
     modifier: Modifier = Modifier,
 ) {
@@ -87,11 +84,10 @@ fun DarwinSelect(
 
     val borderColor = when {
         isFocused || expanded -> colors.inputFocusBorder
-        else -> glassBorderOrDefault(glass, colors.inputBorder)
+        else -> colors.inputBorder
     }
 
     val backgroundColor = when {
-        glass -> glassOrDefault(glass, colors.inputBackground)
         isTriggerHovered -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.04f)
         else -> colors.inputBackground
     }

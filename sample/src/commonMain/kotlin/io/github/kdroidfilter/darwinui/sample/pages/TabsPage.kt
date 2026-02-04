@@ -58,30 +58,11 @@ fun TabsWithIconsExample() {
     }
 }
 
-@GalleryExample("Tabs", "Glass Effect")
-@Composable
-fun TabsGlassEffectExample() {
-    var selectedTab by remember { mutableStateOf("overview") }
-    DarwinTabs(selectedTab = selectedTab, onTabSelected = { selectedTab = it }, glass = true) {
-        DarwinTabsList {
-            DarwinTabsTrigger(value = "overview") { DarwinText("Overview") }
-            DarwinTabsTrigger(value = "analytics") { DarwinText("Analytics") }
-            DarwinTabsTrigger(value = "reports") { DarwinText("Reports") }
-            DarwinTabsTrigger(value = "export", enabled = false) { DarwinText("Export") }
-        }
-        DarwinTabsContent(value = "overview") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Dashboard overview and key metrics.", color = DarwinTheme.colors.textSecondary) } } }
-        DarwinTabsContent(value = "analytics") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Detailed analytics and insights.", color = DarwinTheme.colors.textSecondary) } } }
-        DarwinTabsContent(value = "reports") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Generated reports and summaries.", color = DarwinTheme.colors.textSecondary) } } }
-        DarwinTabsContent(value = "export") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Export your data.", color = DarwinTheme.colors.textSecondary) } } }
-    }
-}
-
 @Composable
 internal fun TabsPage() {
     GalleryPage("Tabs", "A set of layered sections of content, known as tab panels.") {
         SectionHeader("Examples")
         ExampleCard(title = "Default", sourceCode = GallerySources.TabsDefaultExample) { TabsDefaultExample() }
         ExampleCard(title = "With Icons", sourceCode = GallerySources.TabsWithIconsExample) { TabsWithIconsExample() }
-        ExampleCard(title = "Glass Effect", sourceCode = GallerySources.TabsGlassEffectExample) { TabsGlassEffectExample() }
     }
 }

@@ -18,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,7 +36,6 @@ import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import io.github.kdroidfilter.darwinui.theme.glassEffect
 
 @GalleryExample("Sidebar", "Preview")
 @Composable
@@ -100,33 +98,11 @@ fun SidebarCollapsibleExample() {
     }
 }
 
-@GalleryExample("Sidebar", "Glass")
-@Composable
-fun SidebarGlassExample() {
-    var active by remember { mutableStateOf("Dashboard") }
-    val items = remember {
-        listOf(
-            DarwinSidebarItem("Dashboard", onClick = { active = "Dashboard" }, icon = LucideHome),
-            DarwinSidebarItem("Projects", onClick = { active = "Projects" }, icon = LucideFolder),
-            DarwinSidebarItem("Settings", onClick = { active = "Settings" }, icon = LucideSettings),
-        )
-    }
-    Box(modifier = Modifier.fillMaxWidth().height(192.dp).clip(DarwinTheme.shapes.large).glassEffect()) {
-        Row(modifier = Modifier.fillMaxSize()) {
-            DarwinSidebar(items = items, activeItem = active, onLogout = {})
-            Box(modifier = Modifier.weight(1f).fillMaxHeight().padding(16.dp), contentAlignment = Alignment.Center) {
-                DarwinText(text = "Current: $active", color = DarwinTheme.colors.textSecondary)
-            }
-        }
-    }
-}
-
 @Composable
 internal fun SidebarPage() {
-    GalleryPage("Sidebar", "A macOS-style navigation sidebar with collapsible state and glass effect.") {
+    GalleryPage("Sidebar", "A macOS-style navigation sidebar with collapsible state.") {
         SectionHeader("Examples")
         ExampleCard(title = "Preview", sourceCode = GallerySources.SidebarPreviewExample) { SidebarPreviewExample() }
         ExampleCard(title = "Collapsible", description = "Sidebar with collapse toggle", sourceCode = GallerySources.SidebarCollapsibleExample) { SidebarCollapsibleExample() }
-        ExampleCard(title = "Glass", description = "Sidebar with frosted glass effect", sourceCode = GallerySources.SidebarGlassExample) { SidebarGlassExample() }
     }
 }

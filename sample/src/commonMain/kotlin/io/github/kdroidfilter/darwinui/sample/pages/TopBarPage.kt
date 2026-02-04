@@ -32,22 +32,10 @@ fun TopBarDefaultExample() {
     }
 }
 
-@GalleryExample("TopBar", "Glass")
-@Composable
-fun TopBarGlassExample() {
-    DarwinCard(modifier = Modifier.fillMaxWidth(0.7f)) {
-        Column {
-            DarwinTopbar(title = "Analytics", glass = true, actions = { DarwinButton(text = "Export", onClick = {}, variant = DarwinButtonVariant.Accent, size = DarwinButtonSize.Small) })
-            Box(modifier = Modifier.fillMaxWidth().height(100.dp).padding(16.dp)) { DarwinText("Content with glass topbar", color = DarwinTheme.colors.textSecondary) }
-        }
-    }
-}
-
 @Composable
 internal fun TopBarPage() {
     GalleryPage("Top Bar", "A macOS-style top navigation bar with title and actions.") {
         SectionHeader("Examples")
         ExampleCard(title = "Default", sourceCode = GallerySources.TopBarDefaultExample) { TopBarDefaultExample() }
-        ExampleCard(title = "Glass", description = "Top bar with glass morphism effect", sourceCode = GallerySources.TopBarGlassExample) { TopBarGlassExample() }
     }
 }

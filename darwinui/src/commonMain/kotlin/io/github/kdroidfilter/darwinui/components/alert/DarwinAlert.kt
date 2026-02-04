@@ -47,8 +47,6 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import kotlinx.coroutines.delay
-import io.github.kdroidfilter.darwinui.theme.glassBorderOrDefault
-import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 
 // ===========================================================================
 // Alert Type
@@ -102,7 +100,6 @@ private fun resolveAlertTypeColor(type: DarwinAlertType): Color {
  * - A type-specific icon
  * - Optional [title] displayed in bold above the [message]
  * - Optional dismiss "X" button when [onDismiss] is provided
- * - Glass-morphism support via [glass]
  *
  * Usage:
  * ```
@@ -119,7 +116,6 @@ private fun resolveAlertTypeColor(type: DarwinAlertType): Color {
  * @param type The semantic type determining accent color and icon.
  * @param onDismiss Optional callback invoked when the close button is pressed.
  *                  When null, no close button is shown.
- * @param glass When true, applies a glass-morphism effect to the background.
  * @param modifier Modifier applied to the banner container.
  */
 @Composable
@@ -128,7 +124,6 @@ fun DarwinAlertBanner(
     title: String? = null,
     type: DarwinAlertType = DarwinAlertType.Info,
     onDismiss: (() -> Unit)? = null,
-    glass: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val colors = DarwinTheme.colors
@@ -136,16 +131,8 @@ fun DarwinAlertBanner(
     val shapes = DarwinTheme.shapes
 
     val accentColor = resolveAlertTypeColor(type)
-    val tintedBackground = if (glass) {
-        glassOrDefault(true, colors.card)
-    } else {
-        accentColor.copy(alpha = 0.05f)
-    }
-    val borderColor = if (glass) {
-        glassBorderOrDefault(true, colors.border)
-    } else {
-        colors.border
-    }
+    val tintedBackground = accentColor.copy(alpha = 0.05f)
+    val borderColor = colors.border
 
     val shape = shapes.large
 
@@ -233,7 +220,6 @@ fun DarwinAlertBanner(
  * - Message in bodyMedium with secondary text color
  * - Footer with optional Cancel (outline) and Confirm (filled) buttons
  * - Error type uses destructive red for the confirm button
- * - Glass-morphism support via [glass]
  *
  * Usage:
  * ```
@@ -261,7 +247,6 @@ fun DarwinAlertBanner(
  * @param onConfirm Callback invoked when the confirm button is pressed.
  * @param onCancel Optional callback invoked when the cancel button is pressed.
  *                 Falls back to [onDismissRequest] when null.
- * @param glass When true, applies a glass-morphism effect to the dialog card.
  */
 @Composable
 fun DarwinAlertDialog(
@@ -274,7 +259,6 @@ fun DarwinAlertDialog(
     cancelText: String? = "Cancel",
     onConfirm: () -> Unit = {},
     onCancel: (() -> Unit)? = null,
-    glass: Boolean = false,
 ) {
     // Keep the popup mounted while the exit animation plays
     var showPopup by remember { mutableStateOf(false) }
@@ -348,7 +332,6 @@ fun DarwinAlertDialog(
                             (onCancel ?: onDismissRequest).invoke()
                         },
                         onDismissRequest = onDismissRequest,
-                        glass = glass,
                     )
                 }
             }
@@ -370,15 +353,14 @@ private fun DarwinAlertDialogContent(
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
     onDismissRequest: () -> Unit,
-    glass: Boolean,
 ) {
     val colors = DarwinTheme.colors
     val typography = DarwinTheme.typography
     val shapes = DarwinTheme.shapes
 
     val accentColor = resolveAlertTypeColor(type)
-    val backgroundColor = glassOrDefault(glass, colors.card)
-    val borderColor = glassBorderOrDefault(glass, colors.border)
+    val backgroundColor = colors.card
+    val borderColor = colors.border
 
     val confirmBackgroundColor = when (type) {
         DarwinAlertType.Error -> colors.destructive

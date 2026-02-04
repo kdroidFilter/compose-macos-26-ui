@@ -61,17 +61,12 @@ fun DarwinLinearProgress(
     variant: DarwinProgressVariant = DarwinProgressVariant.Default,
     indeterminate: Boolean = false,
     showValue: Boolean = false,
-    glass: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val isDark = DarwinTheme.colors.isDark
 
-    // Track color: bg-black/10 dark:bg-white/10 | glass: bg-white/40 dark:bg-zinc-900/40
-    val trackColor = if (glass) {
-        if (isDark) Zinc900.copy(alpha = 0.40f) else Color.White.copy(alpha = 0.40f)
-    } else {
-        if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
-    }
+    // Track color: bg-black/10 dark:bg-white/10
+    val trackColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 
     val fillColor = variantColor(variant)
     val useGradient = variant == DarwinProgressVariant.Gradient

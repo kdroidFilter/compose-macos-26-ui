@@ -23,18 +23,15 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
-import io.github.kdroidfilter.darwinui.theme.glassBorderOrDefault
-import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 
 @Composable
 fun DarwinCard(
     modifier: Modifier = Modifier,
-    glass: Boolean = false,
     shape: Shape = DarwinTheme.shapes.extraLarge, // rounded-2xl = 16dp
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val backgroundColor = glassOrDefault(glass, DarwinTheme.colors.card)
-    val borderColor = glassBorderOrDefault(glass, DarwinTheme.colors.border)
+    val backgroundColor = DarwinTheme.colors.card
+    val borderColor = DarwinTheme.colors.border
 
     Column(
         modifier = modifier

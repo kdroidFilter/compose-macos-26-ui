@@ -21,8 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import io.github.kdroidfilter.darwinui.theme.glassBorderOrDefault
-import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 
 /**
  * A click-triggered popover component for Darwin UI.
@@ -30,14 +28,9 @@ import io.github.kdroidfilter.darwinui.theme.glassOrDefault
  * Displays an arbitrary content panel anchored to a trigger element. The popover
  * appears when [expanded] is true and dismisses when the user clicks outside of it.
  *
- * The popover uses the card color scheme by default, or a glass-morphism effect
- * when [glass] is enabled.
- *
  * @param expanded Whether the popover is currently visible.
  * @param onDismissRequest Callback invoked when the user clicks outside the popover
  *   to dismiss it.
- * @param glass When true, applies a glass-morphism background and border instead of
- *   the standard card colors.
  * @param modifier Modifier applied to the root container.
  * @param trigger The composable element that acts as the popover anchor. Typically
  *   a button that toggles [expanded].
@@ -47,7 +40,6 @@ import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 fun DarwinPopover(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
-    glass: Boolean = false,
     modifier: Modifier = Modifier,
     trigger: @Composable () -> Unit,
     content: @Composable () -> Unit,
@@ -55,8 +47,8 @@ fun DarwinPopover(
     val colors = DarwinTheme.colors
     val shapes = DarwinTheme.shapes
 
-    val backgroundColor = glassOrDefault(glass, colors.card)
-    val borderColor = glassBorderOrDefault(glass, colors.border)
+    val backgroundColor = colors.card
+    val borderColor = colors.border
 
     Box(modifier = modifier) {
         trigger()

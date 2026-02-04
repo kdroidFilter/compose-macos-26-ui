@@ -24,7 +24,6 @@ fun DarwinSearchField(
     enabled: Boolean = true,
     singleLine: Boolean = true,
     size: DarwinInputSize = DarwinInputSize.Lg,
-    glass: Boolean = false,
     trailingIcon: @Composable (() -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -45,7 +44,6 @@ fun DarwinSearchField(
         enabled = enabled,
         singleLine = singleLine,
         size = size,
-        glass = glass,
         leadingIcon = {
             DarwinIcon(
                 imageVector = LucideSearch,

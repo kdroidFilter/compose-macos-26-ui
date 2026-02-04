@@ -28,7 +28,6 @@ private fun BadgePreview() {
         DarwinBadge(variant = DarwinBadgeVariant.Info) { DarwinText("Info") }
         DarwinBadge(variant = DarwinBadgeVariant.Published) { DarwinText("Published") }
         DarwinBadge(variant = DarwinBadgeVariant.Draft) { DarwinText("Draft") }
-        DarwinBadge(variant = DarwinBadgeVariant.Glass) { DarwinText("Glass") }
     }
 }
 
@@ -57,7 +56,6 @@ fun BadgeSemanticVariantsExample() {
         DarwinBadge(variant = DarwinBadgeVariant.Archived) { DarwinText("Archived") }
         DarwinBadge(variant = DarwinBadgeVariant.NewBadge) { DarwinText("New") }
         DarwinBadge(variant = DarwinBadgeVariant.Responded) { DarwinText("Responded") }
-        DarwinBadge(variant = DarwinBadgeVariant.Glass) { DarwinText("Glass") }
     }
 }
 

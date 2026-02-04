@@ -69,7 +69,6 @@ internal val LocalContextMenuClose = staticCompositionLocalOf<() -> Unit> { {} }
 
 @Composable
 fun DarwinContextMenu(
-    glass: Boolean = false,
     modifier: Modifier = Modifier,
     trigger: @Composable () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
@@ -80,21 +79,11 @@ fun DarwinContextMenu(
     var isOpen by remember { mutableStateOf(false) }
     var clickOffset by remember { mutableStateOf(IntOffset.Zero) }
 
-    // bg-white/95 dark:bg-zinc-900/95 (default)
-    // bg-white/80 dark:bg-zinc-900/80 (glass)
-    val bgColor = if (glass) {
-        if (colors.isDark) Zinc900.copy(alpha = 0.80f) else Color.White.copy(alpha = 0.80f)
-    } else {
-        if (colors.isDark) Zinc900.copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
-    }
+    // bg-white/95 dark:bg-zinc-900/95
+    val bgColor = if (colors.isDark) Zinc900.copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
 
-    // border-black/10 dark:border-white/10 (default)
-    // border-white/20 dark:border-white/10 (glass)
-    val borderColor = if (glass) {
-        if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.White.copy(alpha = 0.20f)
-    } else {
-        if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
-    }
+    // border-black/10 dark:border-white/10
+    val borderColor = if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 
     val shape = shapes.large // rounded-xl = 12dp
 

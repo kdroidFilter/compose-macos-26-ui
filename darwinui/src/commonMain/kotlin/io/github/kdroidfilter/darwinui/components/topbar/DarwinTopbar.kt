@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 
 /**
  * macOS-style top navigation bar.
@@ -25,7 +24,6 @@ import io.github.kdroidfilter.darwinui.theme.glassOrDefault
  *
  * @param title The text displayed in the topbar. Uses [DarwinTheme.typography.titleMedium]
  *   style with [DarwinTheme.colors.textPrimary] color.
- * @param glass When true, applies a glass-morphism background effect.
  * @param modifier Modifier to be applied to the topbar container.
  * @param navigationIcon Optional composable rendered at the start of the bar
  *   (e.g., a back button or menu icon).
@@ -35,14 +33,13 @@ import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 @Composable
 fun DarwinTopbar(
     title: String = "",
-    glass: Boolean = false,
     modifier: Modifier = Modifier,
     navigationIcon: (@Composable () -> Unit)? = null,
     actions: (@Composable RowScope.() -> Unit)? = null,
 ) {
     val colors = DarwinTheme.colors
     val typography = DarwinTheme.typography
-    val backgroundColor = glassOrDefault(glass, colors.backgroundElevated)
+    val backgroundColor = colors.backgroundElevated
 
     Box(
         modifier = modifier

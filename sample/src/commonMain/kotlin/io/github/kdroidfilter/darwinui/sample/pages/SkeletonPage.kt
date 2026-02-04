@@ -53,30 +53,14 @@ fun SkeletonCardExample() {
     }
 }
 
-@GalleryExample("Skeleton", "Glass Effect")
-@Composable
-fun SkeletonGlassExample() {
-
-    Column(
-        modifier = Modifier.widthIn(max = 384.dp).fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        DarwinSkeletonCircle(size = 48.dp, glass = true)
-        DarwinSkeleton(modifier = Modifier.fillMaxWidth(0.75f).height(16.dp), glass = true)
-        DarwinSkeleton(modifier = Modifier.fillMaxWidth(0.5f).height(16.dp), glass = true)
-    }
-}
-
 @Composable
 internal fun SkeletonPage() {
     GalleryPage("Skeleton", "Used to show a placeholder while content is loading.") {
         SectionHeader("Usage")
         CodeBlock("""DarwinSkeleton(modifier = Modifier.fillMaxWidth().height(16.dp))
-DarwinSkeletonCircle(size = 48.dp)
-DarwinSkeleton(modifier = Modifier.height(96.dp), glass = true)""")
+DarwinSkeletonCircle(size = 48.dp)""")
 
         SectionHeader("Examples")
         ExampleCard(title = "Card Skeleton", description = "Avatar, text lines, content block, and button placeholders", sourceCode = GallerySources.SkeletonCardExample) { SkeletonCardExample() }
-        ExampleCard(title = "Glass Effect", description = "Skeleton with frosted glass morphism", sourceCode = GallerySources.SkeletonGlassExample) { SkeletonGlassExample() }
     }
 }

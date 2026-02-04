@@ -21,8 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.closebutton.DarwinCloseButton
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import io.github.kdroidfilter.darwinui.theme.glassBorderOrDefault
-import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 
 // Traffic light button colors
 private val TrafficLightYellow = Color(0xFFFEBC2E)
@@ -42,8 +40,6 @@ private val TrafficLightGreen = Color(0xFF28C840)
  * @param onClose Callback invoked when the close button is clicked.
  *   When null, no close button action is provided but the traffic
  *   light dots are still displayed.
- * @param glass When true, applies a glass-morphism effect
- *   (semi-transparent background with subtle border).
  * @param modifier Modifier to be applied to the outer window container.
  * @param content The composable content displayed below the title bar.
  */
@@ -51,7 +47,6 @@ private val TrafficLightGreen = Color(0xFF28C840)
 fun DarwinWindow(
     title: String = "",
     onClose: (() -> Unit)? = null,
-    glass: Boolean = false,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
@@ -60,8 +55,8 @@ fun DarwinWindow(
     val typography = DarwinTheme.typography
 
     val shape = shapes.extraLarge
-    val backgroundColor = glassOrDefault(glass, colors.card)
-    val borderColor = glassBorderOrDefault(glass, colors.border)
+    val backgroundColor = colors.card
+    val borderColor = colors.border
 
     Column(
         modifier = modifier

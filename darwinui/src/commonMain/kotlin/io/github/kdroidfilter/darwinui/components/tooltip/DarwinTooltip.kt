@@ -44,8 +44,6 @@ import kotlinx.coroutines.delay
  * @param text The text content to display in the tooltip.
  * @param delayMillis The delay in milliseconds before showing the tooltip after
  *   hover begins. Defaults to 500ms.
- * @param glass When true, applies a glass-morphism background instead of the
- *   standard inverted color scheme.
  * @param modifier Modifier applied to the trigger wrapper.
  * @param content The trigger element that activates the tooltip on hover.
  */
@@ -54,7 +52,6 @@ import kotlinx.coroutines.delay
 fun DarwinTooltip(
     text: String,
     delayMillis: Long = 500L,
-    glass: Boolean = false,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
@@ -83,17 +80,9 @@ fun DarwinTooltip(
     )
 
     // Tooltip colors: inverted from current theme
-    val tooltipBackground = when {
-        glass -> colors.glassBackground
-        colors.isDark -> Zinc100
-        else -> Zinc900
-    }
+    val tooltipBackground = if (colors.isDark) Zinc100 else Zinc900
 
-    val tooltipTextColor = when {
-        glass -> colors.textPrimary
-        colors.isDark -> Zinc900
-        else -> Zinc100
-    }
+    val tooltipTextColor = if (colors.isDark) Zinc900 else Zinc100
 
     Box(
         modifier = modifier

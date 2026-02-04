@@ -49,8 +49,6 @@ import io.github.kdroidfilter.darwinui.icons.DarwinIcon
 import io.github.kdroidfilter.darwinui.icons.LucideX
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import io.github.kdroidfilter.darwinui.theme.glassOrDefault
-import io.github.kdroidfilter.darwinui.theme.glassBorderOrDefault
 import kotlinx.coroutines.delay
 
 // ===========================================================================
@@ -180,25 +178,16 @@ fun DarwinDialog(
 fun DarwinDialogContent(
     modifier: Modifier = Modifier,
     size: DarwinDialogSize = DarwinDialogSize.Md,
-    glass: Boolean = false,
     showCloseButton: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val colors = DarwinTheme.colors
     val shape = RoundedCornerShape(16.dp) // rounded-2xl
 
-    val bgColor = if (glass) {
-        glassOrDefault(true, colors.surface)
-    } else {
-        if (colors.isDark) Color(0xFF18181B).copy(alpha = 0.95f)
+    val bgColor = if (colors.isDark) Color(0xFF18181B).copy(alpha = 0.95f)
         else Color.White.copy(alpha = 0.95f)
-    }
 
-    val borderColor = if (glass) {
-        glassBorderOrDefault(true, colors.borderSubtle)
-    } else {
-        if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
-    }
+    val borderColor = if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 
     Box(
         modifier = modifier

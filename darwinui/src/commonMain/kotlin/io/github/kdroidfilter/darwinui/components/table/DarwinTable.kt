@@ -44,20 +44,17 @@ import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.darwinTween
-import io.github.kdroidfilter.darwinui.theme.glassBorderOrDefault
-import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 
 // ==================== DarwinTable ====================
 
 @Composable
 fun DarwinTable(
-    glass: Boolean = false,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     val shape = DarwinTheme.shapes.large
-    val backgroundColor = glassOrDefault(glass, DarwinTheme.colors.card)
-    val borderColor = glassBorderOrDefault(glass, DarwinTheme.colors.borderSubtle)
+    val backgroundColor = DarwinTheme.colors.card
+    val borderColor = DarwinTheme.colors.borderSubtle
 
     Column(
         modifier = modifier

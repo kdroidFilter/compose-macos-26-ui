@@ -134,7 +134,7 @@ fun ButtonStatesExample() {
         DarwinButton(text = "Disabled", onClick = {}, enabled = false)
         DarwinButton(text = "Loading", onClick = {}, loading = true)
         DarwinButton(text = "Loading + text", onClick = {}, loading = true, loadingText = "Saving...")
-        DarwinButton(text = "Glass", onClick = {}, glass = true)
+        DarwinButton(text = "Default", onClick = {})
     }
 }
 
@@ -151,6 +151,6 @@ DarwinButton(text = "Destructive", onClick = {}, variant = DarwinButtonVariant.D
         SectionHeader("Examples")
         ExampleCard(title = "Variants", description = "All available button variants", sourceCode = GallerySources.ButtonVariantsExample) { ButtonVariantsExample() }
         ExampleCard(title = "Sizes", description = "Small, default, and large button sizes", sourceCode = GallerySources.ButtonSizesExample) { ButtonSizesExample() }
-        ExampleCard(title = "States", description = "Disabled, loading, and glass states", sourceCode = GallerySources.ButtonStatesExample) { ButtonStatesExample() }
+        ExampleCard(title = "States", description = "Disabled and loading states", sourceCode = GallerySources.ButtonStatesExample) { ButtonStatesExample() }
     }
 }

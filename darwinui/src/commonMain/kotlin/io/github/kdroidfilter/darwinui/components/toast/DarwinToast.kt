@@ -41,8 +41,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import io.github.kdroidfilter.darwinui.theme.glassBorderOrDefault
-import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 import kotlinx.coroutines.delay
 
 // ===========================================================================
@@ -78,7 +76,6 @@ enum class DarwinToastType {
  * @param title Optional title displayed above the message.
  * @param type The semantic type determining accent color and icon.
  * @param duration How long (in milliseconds) the toast remains visible before auto-dismissing.
- * @param glass When true, applies a glass-morphism effect to the toast background.
  */
 data class DarwinToastData(
     val id: Long = nextToastId(),
@@ -86,7 +83,6 @@ data class DarwinToastData(
     val title: String? = null,
     val type: DarwinToastType = DarwinToastType.Info,
     val duration: Long = 3000L,
-    val glass: Boolean = false,
 )
 
 /** Simple incrementing counter for generating unique toast IDs. */
@@ -128,14 +124,12 @@ class DarwinToastState {
      * @param title Optional title displayed above the message.
      * @param type The semantic type determining accent color and icon.
      * @param duration How long (in milliseconds) the toast remains visible.
-     * @param glass When true, applies a glass-morphism effect.
      */
     fun show(
         message: String,
         title: String? = null,
         type: DarwinToastType = DarwinToastType.Info,
         duration: Long = 3000L,
-        glass: Boolean = false,
     ) {
         _toasts.add(
             DarwinToastData(
@@ -143,7 +137,6 @@ class DarwinToastState {
                 title = title,
                 type = type,
                 duration = duration,
-                glass = glass,
             )
         )
     }
@@ -209,7 +202,7 @@ fun DarwinToastHost(
  *
  * Features:
  * - 360dp width
- * - Card or glass background with border
+ * - Card background with border
  * - 4dp left accent border colored by [DarwinToastData.type]
  * - Type-specific icon drawn via Canvas
  * - Close button in the top-right corner
@@ -226,8 +219,8 @@ private fun DarwinToastItem(
     val shapes = DarwinTheme.shapes
 
     val accentColor = resolveTypeColor(toast.type)
-    val backgroundColor = glassOrDefault(toast.glass, colors.card)
-    val borderColor = glassBorderOrDefault(toast.glass, colors.border)
+    val backgroundColor = colors.card
+    val borderColor = colors.border
 
     // Auto-dismiss
     LaunchedEffect(toast.id) {

@@ -51,7 +51,6 @@ fun DarwinCheckbox(
     indeterminate: Boolean = false,
     label: String? = null,
     enabled: Boolean = true,
-    glass: Boolean = false,
 ) {
     val colors = DarwinTheme.colors
     val typography = DarwinTheme.typography
@@ -70,19 +69,10 @@ fun DarwinCheckbox(
     val disabledAlpha = if (enabled) 1f else 0.5f
 
     // active:  bg-blue-500 border-blue-500
-    // glass:   bg-white/60 dark:bg-zinc-900/60 border-white/30 dark:border-white/10
     // default: bg-white dark:bg-zinc-800 border-black/20 dark:border-zinc-600
-    val boxBackground = when {
-        isActive -> Blue500
-        glass -> if (colors.isDark) Color(0x99181818) else Color(0x99FFFFFF)
-        else -> if (colors.isDark) Zinc800 else Color.White
-    }
+    val boxBackground = if (isActive) Blue500 else if (colors.isDark) Zinc800 else Color.White
 
-    val borderColor = when {
-        isActive -> Blue500
-        glass -> if (colors.isDark) Color(0x1AFFFFFF) else Color(0x4DFFFFFF)
-        else -> if (colors.isDark) Zinc600 else Color.Black.copy(alpha = 0.20f)
-    }
+    val borderColor = if (isActive) Blue500 else if (colors.isDark) Zinc600 else Color.Black.copy(alpha = 0.20f)
 
     Row(
         verticalAlignment = Alignment.CenterVertically,

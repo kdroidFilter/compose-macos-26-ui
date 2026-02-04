@@ -62,16 +62,12 @@ fun DarwinSlider(
     size: DarwinSliderSize = DarwinSliderSize.Md,
     showValue: Boolean = false,
     enabled: Boolean = true,
-    glass: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val colors = DarwinTheme.colors
     val disabledAlpha = if (enabled) 1f else 0.5f
 
-    val trackColor = when {
-        glass -> if (colors.isDark) Color(0xFF18181B).copy(alpha = 0.40f) else Color.White.copy(alpha = 0.40f)
-        else -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
-    }
+    val trackColor = if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 
     val filledColor = Blue500
 

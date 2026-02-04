@@ -101,8 +101,7 @@ fun DarwinSidebar(
     collapsed: Boolean = false,
     onCollapsedChange: ((Boolean) -> Unit)? = null,
     collapsible: Boolean = onCollapsedChange != null,
-    glass: Boolean = false,
-    showBorder: Boolean = glass,
+    showBorder: Boolean = false,
     header: (@Composable () -> Unit)? = null,
 ) {
     val colors = DarwinTheme.colors
@@ -125,10 +124,6 @@ fun DarwinSidebar(
         animationSpec = sidebarSpring(),
     )
 
-    // Glass colours
-    val glassBackground = if (isDark) Zinc900.copy(alpha = 0.80f) else Color.White.copy(alpha = 0.80f)
-    val glassBorderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.White.copy(alpha = 0.20f)
-
     // Bottom section border
     val bottomBorderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Zinc200
 
@@ -144,10 +139,6 @@ fun DarwinSidebar(
             modifier = Modifier
                 .fillMaxHeight()
                 .width(animatedWidth)
-                .then(
-                    if (glass) Modifier.background(glassBackground)
-                    else Modifier
-                )
                 .padding(animatedPadding),
         ) {
             // ---- Pinned header (height fraction + alpha, stays in tree) ----
@@ -250,7 +241,7 @@ fun DarwinSidebar(
 
         // Right border
         if (showBorder) {
-            val borderColor = if (glass) glassBorderColor else colors.border
+            val borderColor = colors.border
             Box(
                 modifier = Modifier
                     .align(Alignment.CenterEnd)

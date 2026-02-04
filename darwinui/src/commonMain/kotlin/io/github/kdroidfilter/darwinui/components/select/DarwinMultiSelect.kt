@@ -52,8 +52,6 @@ import io.github.kdroidfilter.darwinui.icons.LucideCheck
 import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.icons.LucideX
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import io.github.kdroidfilter.darwinui.theme.glassOrDefault
-import io.github.kdroidfilter.darwinui.theme.glassBorderOrDefault
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -63,7 +61,6 @@ fun DarwinMultiSelect(
     onValuesChange: (List<String>) -> Unit,
     placeholder: String = "Select...",
     enabled: Boolean = true,
-    glass: Boolean = false,
     showTags: Boolean = true,
     label: String? = null,
     modifier: Modifier = Modifier,
@@ -88,11 +85,10 @@ fun DarwinMultiSelect(
 
     val borderColor = when {
         isFocused || expanded -> colors.inputFocusBorder
-        else -> glassBorderOrDefault(glass, colors.inputBorder)
+        else -> colors.inputBorder
     }
 
     val backgroundColor = when {
-        glass -> glassOrDefault(glass, colors.inputBackground)
         isTriggerHovered -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.04f)
         else -> colors.inputBackground
     }

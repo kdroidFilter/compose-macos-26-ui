@@ -27,7 +27,6 @@ import io.github.kdroidfilter.darwinui.theme.Sky500
 import io.github.kdroidfilter.darwinui.theme.Sky600
 import io.github.kdroidfilter.darwinui.theme.Zinc300
 import io.github.kdroidfilter.darwinui.theme.Zinc700
-import io.github.kdroidfilter.darwinui.theme.Zinc900
 
 enum class DarwinBadgeVariant {
     /** Subtle bg (black/5 or white/5), subtle border (black/10 or white/10), zinc text. */
@@ -68,9 +67,6 @@ enum class DarwinBadgeVariant {
 
     /** Same as Success/Published: emerald-500/15 bg, emerald-600 or emerald-400 text. */
     Responded,
-
-    /** Glass-morphism: semi-transparent bg, white border, zinc text. */
-    Glass,
 }
 
 /**
@@ -109,13 +105,6 @@ private fun resolveColors(variant: DarwinBadgeVariant): BadgeColors {
             background = Color.Transparent,
             text = zincText,
             borderColor = if (isDark) Color.White.copy(alpha = 0.20f) else Color.Black.copy(alpha = 0.20f),
-        )
-
-        // glass: bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm border-white/30 dark:border-white/10 text-zinc-700 dark:text-zinc-300
-        DarwinBadgeVariant.Glass -> BadgeColors(
-            background = if (isDark) Zinc900.copy(alpha = 0.60f) else Color.White.copy(alpha = 0.60f),
-            text = zincText,
-            borderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.White.copy(alpha = 0.30f),
         )
 
         // destructive: border-transparent bg-red-500/15 text-red-600 dark:text-red-400

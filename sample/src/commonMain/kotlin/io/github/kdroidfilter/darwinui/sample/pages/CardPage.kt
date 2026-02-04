@@ -46,21 +46,6 @@ fun CardDefaultExample() {
     }
 }
 
-@GalleryExample("Card", "Glass")
-@Composable
-fun CardGlassExample() {
-
-    DarwinCard(modifier = Modifier.widthIn(max = 384.dp).fillMaxWidth(), glass = true) {
-        DarwinCardHeader {
-            DarwinCardTitle { DarwinText("Glass Card") }
-            DarwinCardDescription { DarwinText("Frosted glass effect") }
-        }
-        DarwinCardContent {
-            DarwinText("Content with glassmorphism styling.", color = DarwinTheme.colors.mutedForeground)
-        }
-    }
-}
-
 @Composable
 internal fun CardPage() {
     GalleryPage("Card", "Displays a card with header, content, and footer.") {
@@ -78,6 +63,5 @@ internal fun CardPage() {
 
         SectionHeader("Examples")
         ExampleCard(title = "Default", sourceCode = GallerySources.CardDefaultExample) { CardDefaultExample() }
-        ExampleCard(title = "Glass", description = "Card with glass morphism effect", sourceCode = GallerySources.CardGlassExample) { CardGlassExample() }
     }
 }

@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.darwinTween
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
-import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 
 @Composable
 fun DarwinTextArea(
@@ -40,7 +39,6 @@ fun DarwinTextArea(
     enabled: Boolean = true,
     minLines: Int = 3,
     maxLines: Int = 6,
-    glass: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     focusRequester: FocusRequester = remember { FocusRequester() },
@@ -64,7 +62,7 @@ fun DarwinTextArea(
             isError -> colors.destructive
             isSuccess -> colors.success
             isFocused -> colors.inputFocusBorder
-            else -> if (glass) colors.glassBorder else colors.inputBorder
+            else -> colors.inputBorder
         },
         animationSpec = darwinTween(DarwinDuration.Normal),
         label = "DarwinTextAreaBorderColor",
@@ -94,7 +92,7 @@ fun DarwinTextArea(
     }
 
     // ---- Background color ----
-    val backgroundColor: Color = glassOrDefault(glass, fallback = colors.inputBackground)
+    val backgroundColor: Color = colors.inputBackground
 
     // ---- Layout ----
     Column(modifier = modifier) {

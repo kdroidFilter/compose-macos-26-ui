@@ -54,7 +54,6 @@ import io.github.kdroidfilter.darwinui.theme.Zinc500
 import io.github.kdroidfilter.darwinui.theme.Zinc800
 import io.github.kdroidfilter.darwinui.theme.Zinc900
 import io.github.kdroidfilter.darwinui.theme.darwinTween
-import io.github.kdroidfilter.darwinui.theme.glassEffect
 
 enum class DarwinButtonVariant {
     Default,
@@ -117,7 +116,6 @@ fun DarwinButton(
     enabled: Boolean = true,
     loading: Boolean = false,
     loadingText: String? = null,
-    glass: Boolean = false,
     fullWidth: Boolean = false,
     leftIcon: (@Composable () -> Unit)? = null,
     rightIcon: (@Composable () -> Unit)? = null,
@@ -181,28 +179,18 @@ fun DarwinButton(
     // ---- Link underline on hover ----
     val linkUnderline = variant == DarwinButtonVariant.Link && isHovered && isInteractive
 
-    // ---- Background color (potentially replaced by glass) ----
-    val resolvedBackground = if (glass) colors.glassBackground else buttonColors.background
-
     // ---- Build modifier chain ----
     val buttonModifier = modifier
         .then(if (fullWidth) Modifier.fillMaxWidth() else Modifier)
         .scale(scale)
         .alpha(alpha)
+        .clip(shape)
+        .background(buttonColors.background, shape)
         .then(
-            if (glass) {
-                Modifier.glassEffect(enabled = true, shape = shape)
+            if (buttonColors.borderColor != null) {
+                Modifier.border(buttonColors.borderWidth, buttonColors.borderColor, shape)
             } else {
                 Modifier
-                    .clip(shape)
-                    .background(resolvedBackground, shape)
-                    .then(
-                        if (buttonColors.borderColor != null) {
-                            Modifier.border(buttonColors.borderWidth, buttonColors.borderColor, shape)
-                        } else {
-                            Modifier
-                        }
-                    )
             }
         )
         // Hover overlay drawn on top of background
@@ -297,7 +285,6 @@ fun DarwinButton(
     enabled: Boolean = true,
     loading: Boolean = false,
     loadingText: String? = null,
-    glass: Boolean = false,
     fullWidth: Boolean = false,
     leftIcon: (@Composable () -> Unit)? = null,
     rightIcon: (@Composable () -> Unit)? = null,
@@ -310,7 +297,6 @@ fun DarwinButton(
         enabled = enabled,
         loading = loading,
         loadingText = loadingText,
-        glass = glass,
         fullWidth = fullWidth,
         leftIcon = leftIcon,
         rightIcon = rightIcon,

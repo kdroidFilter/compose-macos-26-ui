@@ -61,19 +61,17 @@ import kotlinx.coroutines.launch
 /**
  * State holder for the Darwin tabs system.
  *
- * Tracks selected tab, glass mode flag, and measured trigger positions
- * for the animated indicator. Fields are backed by [mutableStateOf] so the
- * state object can be created once and updated on recomposition without
- * losing measured layout data.
+ * Tracks selected tab and measured trigger positions for the animated
+ * indicator. Fields are backed by [mutableStateOf] so the state object
+ * can be created once and updated on recomposition without losing
+ * measured layout data.
  */
 class DarwinTabsState(
     selectedTab: String,
     onTabSelected: (String) -> Unit,
-    glass: Boolean,
 ) {
     var selectedTab by mutableStateOf(selectedTab)
     var onTabSelected by mutableStateOf(onTabSelected)
-    var glass by mutableStateOf(glass)
 
     internal val tabOffsets = mutableStateMapOf<String, Dp>()
     internal val tabWidths = mutableStateMapOf<String, Dp>()
@@ -96,7 +94,6 @@ internal val LocalDarwinTabsState = staticCompositionLocalOf<DarwinTabsState> {
  *
  * @param selectedTab The value of the currently active tab.
  * @param onTabSelected Callback invoked when a tab trigger is clicked.
- * @param glass When `true`, the tabs list uses a frosted-glass background.
  * @param modifier Modifier applied to the outer column.
  * @param content Composable children.
  */
@@ -104,14 +101,12 @@ internal val LocalDarwinTabsState = staticCompositionLocalOf<DarwinTabsState> {
 fun DarwinTabs(
     selectedTab: String,
     onTabSelected: (String) -> Unit,
-    glass: Boolean = false,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    val state = remember { DarwinTabsState(selectedTab, onTabSelected, glass) }
+    val state = remember { DarwinTabsState(selectedTab, onTabSelected) }
     state.selectedTab = selectedTab
     state.onTabSelected = onTabSelected
-    state.glass = glass
 
     CompositionLocalProvider(LocalDarwinTabsState provides state) {
         Column(modifier = modifier) {
@@ -135,17 +130,9 @@ fun DarwinTabsList(
     val isDark = DarwinTheme.colors.isDark
 
     // Background & border colours
-    val backgroundColor = if (state.glass) {
-        if (isDark) Zinc900.copy(alpha = 0.60f) else Color.White.copy(alpha = 0.60f)
-    } else {
-        if (isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f)
-    }
+    val backgroundColor = if (isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f)
 
-    val borderColor = if (state.glass) {
-        if (isDark) Color.White.copy(alpha = 0.10f) else Color.White.copy(alpha = 0.20f)
-    } else {
-        if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
-    }
+    val borderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 
     // Indicator colour: bg-black/10 dark:bg-white/10
     val indicatorColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)

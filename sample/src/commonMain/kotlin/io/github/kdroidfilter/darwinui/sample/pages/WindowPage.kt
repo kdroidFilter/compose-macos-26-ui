@@ -1,7 +1,6 @@
 package io.github.kdroidfilter.darwinui.sample.pages
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,19 +30,10 @@ fun WindowDefaultExample() {
     }
 }
 
-@GalleryExample("Window", "Glass")
-@Composable
-fun WindowGlassExample() {
-    DarwinWindow(title = "Notes", glass = true, modifier = Modifier.fillMaxWidth(0.6f).height(160.dp)) {
-        Box(modifier = Modifier.padding(12.dp)) { DarwinText("Glass morphism window with translucent background.", color = DarwinTheme.colors.textSecondary) }
-    }
-}
-
 @Composable
 internal fun WindowPage() {
     GalleryPage("Window", "A macOS-style window container with traffic light buttons.") {
         SectionHeader("Examples")
         ExampleCard(title = "Default", sourceCode = GallerySources.WindowDefaultExample) { WindowDefaultExample() }
-        ExampleCard(title = "Glass", description = "Window with glass morphism effect", sourceCode = GallerySources.WindowGlassExample) { WindowGlassExample() }
     }
 }
