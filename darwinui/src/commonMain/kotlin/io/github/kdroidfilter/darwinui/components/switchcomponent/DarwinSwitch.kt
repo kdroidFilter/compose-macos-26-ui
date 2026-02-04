@@ -2,14 +2,9 @@ package io.github.kdroidfilter.darwinui.components.switchcomponent
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.focusable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,18 +22,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
-import io.github.kdroidfilter.darwinui.theme.Zinc300
-import io.github.kdroidfilter.darwinui.theme.Zinc700
+import io.github.kdroidfilter.darwinui.theme.Zinc600
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 
+// Emerald-500 — the React darwin-ui switch "on" color
+private val Emerald500 = Color(0xFF10B981)
+
 /**
- * A macOS-inspired toggle switch component for Darwin UI.
+ * A macOS-inspired toggle switch matching the React darwin-ui Switch.
  *
- * Features an animated thumb that slides between on and off positions
- * using a snappy spring animation. The track changes color based on state.
+ * React dimensions: track w-9 h-5 (36×20px), thumb h-4 w-4 (16px),
+ * track padding px-0.5 (2px), thumb travel 16px.
  *
  * @param checked Whether the switch is currently in the "on" position.
  * @param onCheckedChange Callback invoked when the user toggles the switch.
@@ -61,47 +60,33 @@ fun DarwinSwitch(
     val typography = DarwinTheme.typography
 
     val interactionSource = remember { MutableInteractionSource() }
-    val isFocused by interactionSource.collectIsFocusedAsState()
 
-    // Track dimensions
-    val trackWidth = 44.dp
-    val trackHeight = 24.dp
-    val thumbSize = 20.dp
+    // React: w-9 h-5 = 36×20px
+    val trackWidth = 36.dp
+    val trackHeight = 20.dp
+    // React: h-4 w-4 = 16px
+    val thumbSize = 16.dp
+    // React: px-0.5 = 2px
     val thumbPadding = 2.dp
 
-    // Thumb offset: slides from left (unchecked) to right (checked)
-    // Unchecked position: thumbPadding = 2dp
-    // Checked position: trackWidth - thumbSize - thumbPadding = 44 - 20 - 2 = 22dp
+    // React: animate x from 0 to 16
     val thumbOffset by animateDpAsState(
-        targetValue = if (checked) (trackWidth - thumbSize - thumbPadding) else thumbPadding,
-        animationSpec = darwinSpring(
-            preset = DarwinSpringPreset.Snappy,
-        ),
+        targetValue = if (checked) 16.dp else 0.dp,
+        animationSpec = darwinSpring(preset = DarwinSpringPreset.Snappy),
         label = "switchThumbOffset",
     )
 
     val disabledAlpha = if (enabled) 1f else 0.5f
 
-    // Track color
+    // Track color — React:
+    // checked: bg-emerald-500
+    // glass unchecked: bg-white/60 dark:bg-zinc-900/60
+    // default unchecked: bg-zinc-600 (same for light and dark)
     val trackColor = when {
-        glass && checked -> colors.glassBackground
-        checked -> colors.accent
-        glass -> colors.glassBackground
-        colors.isDark -> Zinc700
-        else -> Zinc300
+        checked -> Emerald500
+        glass -> if (colors.isDark) Color(0x99181818) else Color(0x99FFFFFF)
+        else -> Zinc600
     }
-
-    // Track border
-    val trackBorderColor = when {
-        isFocused -> colors.ring
-        glass -> colors.glassBorder
-        checked -> colors.accent
-        colors.isDark -> Zinc700
-        else -> Zinc300
-    }
-
-    // Focus ring
-    val focusRingColor = if (isFocused) colors.ring.copy(alpha = 0.5f) else Color.Transparent
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -118,62 +103,39 @@ fun DarwinSwitch(
                 indication = null,
             ),
     ) {
-        // Focus ring wrapper
+        // Track
         Box(
-            contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(width = trackWidth + 4.dp, height = trackHeight + 4.dp),
+                .size(width = trackWidth, height = trackHeight)
+                .clip(shapes.full)
+                .background(trackColor, shapes.full),
         ) {
-            // Focus ring
-            if (isFocused) {
-                Box(
-                    modifier = Modifier
-                        .size(width = trackWidth + 4.dp, height = trackHeight + 4.dp)
-                        .clip(shapes.full)
-                        .border(
-                            width = 2.dp,
-                            color = focusRingColor,
-                            shape = shapes.full,
-                        )
-                )
-            }
-
-            // Track
+            // Thumb — React: h-4 w-4 rounded-full bg-white shadow-sm
             Box(
                 modifier = Modifier
-                    .size(width = trackWidth, height = trackHeight)
-                    .clip(shapes.full)
-                    .background(trackColor, shapes.full)
-                    .border(
-                        width = if (glass) 1.dp else 0.dp,
-                        color = if (glass) trackBorderColor else Color.Transparent,
-                        shape = shapes.full,
-                    ),
-            ) {
-                // Thumb
-                Box(
-                    modifier = Modifier
-                        .offset(x = thumbOffset)
-                        .align(Alignment.CenterStart)
-                        .size(thumbSize)
-                        .shadow(
-                            elevation = 2.dp,
-                            shape = CircleShape,
-                            clip = false,
-                        )
-                        .clip(CircleShape)
-                        .background(Color.White, CircleShape),
-                )
-            }
+                    .offset(x = thumbOffset + thumbPadding)
+                    .align(Alignment.CenterStart)
+                    .size(thumbSize)
+                    .shadow(
+                        elevation = 1.dp,
+                        shape = CircleShape,
+                        clip = false,
+                    )
+                    .clip(CircleShape)
+                    .background(Color.White, CircleShape),
+            )
         }
 
-        // Optional label
+        // Optional label — React: gap-2 text-[13px]
         if (label != null) {
             Spacer(modifier = Modifier.width(8.dp))
             BasicText(
                 text = label,
                 style = typography.bodyMedium.merge(
-                    TextStyle(color = colors.textPrimary)
+                    TextStyle(
+                        color = colors.textPrimary,
+                        fontSize = 13.sp,
+                    )
                 ),
             )
         }

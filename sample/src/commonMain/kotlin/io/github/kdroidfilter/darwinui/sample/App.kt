@@ -1,6 +1,11 @@
 package io.github.kdroidfilter.darwinui.sample
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +15,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -119,7 +125,9 @@ import io.github.kdroidfilter.darwinui.sample.gallery.PreviewContainer
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.CodeBlock
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
+import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.darwinSpring
 
 // Navigation data
 private data class SidebarEntry(val id: String, val label: String, val group: String)
@@ -1065,8 +1073,40 @@ private fun CheckboxPage() {
 }
 
 @Composable
+private fun SwitchPreview() {
+    var s1 by remember { mutableStateOf(true) }
+    var s2 by remember { mutableStateOf(false) }
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        HoverOffsetItem { DarwinSwitch(checked = s1, onCheckedChange = { s1 = it }, label = "Enable notifications") }
+        HoverOffsetItem { DarwinSwitch(checked = s2, onCheckedChange = { s2 = it }, label = "Dark mode") }
+        HoverOffsetItem { DarwinSwitch(checked = false, onCheckedChange = {}, label = "Disabled", enabled = false) }
+    }
+}
+
+/** Wraps content with a whileHover={{ x: 4 }} effect matching React's Framer Motion. */
+@Composable
+private fun HoverOffsetItem(content: @Composable () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isHovered by interactionSource.collectIsHoveredAsState()
+    val offsetX by animateDpAsState(
+        targetValue = if (isHovered) 4.dp else 0.dp,
+        animationSpec = tween(durationMillis = 200, easing = androidx.compose.animation.core.FastOutSlowInEasing),
+        label = "hoverOffset",
+    )
+    Box(
+        modifier = Modifier
+            .offset(x = offsetX)
+            .hoverable(interactionSource),
+    ) {
+        content()
+    }
+}
+
+@Composable
 private fun SwitchPage() {
     GalleryPage("Switch", "A control that toggles between on and off states.") {
+        PreviewContainer { SwitchPreview() }
+
         SectionHeader("Examples")
         ExampleCard(title = "States", sourceCode = GallerySources.SwitchStatesExample) { SwitchStatesExample() }
     }
