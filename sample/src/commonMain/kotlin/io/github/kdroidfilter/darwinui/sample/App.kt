@@ -876,22 +876,50 @@ fun ProgressCircularExample() {
     }
 }
 
-@GalleryExample("Skeleton", "Circle")
-@Composable
-fun SkeletonCircleExample() { DarwinSkeletonCircle() }
-
-@GalleryExample("Skeleton", "Text Lines")
-@Composable
-fun SkeletonTextLinesExample() { DarwinSkeletonText(lines = 3, modifier = Modifier.width(300.dp)) }
-
-@GalleryExample("Skeleton", "Rectangle")
-@Composable
-fun SkeletonRectangleExample() { DarwinSkeleton(modifier = Modifier.fillMaxWidth(0.5f).height(100.dp)) }
-
 @GalleryExample("Skeleton", "Card Skeleton")
 @Composable
 fun SkeletonCardExample() {
-    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) { DarwinSkeletonCircle(); Column(verticalArrangement = Arrangement.spacedBy(4.dp)) { DarwinSkeletonText(lines = 3, modifier = Modifier.width(200.dp)) } }
+    // Matches React preview: avatar + text lines + content block + button row
+    Column(
+        modifier = Modifier.widthIn(max = 384.dp).fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        // Avatar row: circle h-12 w-12 + text lines
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+        ) {
+            DarwinSkeletonCircle(size = 48.dp) // h-12 w-12
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                DarwinSkeleton(modifier = Modifier.fillMaxWidth(0.75f).height(16.dp)) // h-4 w-3/4
+                DarwinSkeleton(modifier = Modifier.fillMaxWidth(0.5f).height(12.dp)) // h-3 w-1/2
+            }
+        }
+        // Content block: h-24 w-full rounded-lg
+        DarwinSkeleton(modifier = Modifier.fillMaxWidth().height(96.dp)) // h-24
+        // Button row
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            DarwinSkeleton(modifier = Modifier.width(80.dp).height(32.dp), shape = DarwinTheme.shapes.small) // h-8 w-20 rounded-md
+            DarwinSkeleton(modifier = Modifier.width(80.dp).height(32.dp), shape = DarwinTheme.shapes.small) // h-8 w-20 rounded-md
+        }
+    }
+}
+
+@GalleryExample("Skeleton", "Glass Effect")
+@Composable
+fun SkeletonGlassExample() {
+    // Matches React glass example: circle + 2 text lines
+    Column(
+        modifier = Modifier.widthIn(max = 384.dp).fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        DarwinSkeletonCircle(size = 48.dp, glass = true)
+        DarwinSkeleton(modifier = Modifier.fillMaxWidth(0.75f).height(16.dp), glass = true)
+        DarwinSkeleton(modifier = Modifier.fillMaxWidth(0.5f).height(16.dp), glass = true)
+    }
 }
 
 @GalleryExample("Alert", "Info")
@@ -1320,11 +1348,14 @@ private fun ProgressPage() {
 @Composable
 private fun SkeletonPage() {
     GalleryPage("Skeleton", "Used to show a placeholder while content is loading.") {
+        SectionHeader("Usage")
+        CodeBlock("""DarwinSkeleton(modifier = Modifier.fillMaxWidth().height(16.dp))
+DarwinSkeletonCircle(size = 48.dp)
+DarwinSkeleton(modifier = Modifier.height(96.dp), glass = true)""")
+
         SectionHeader("Examples")
-        ExampleCard(title = "Circle", sourceCode = GallerySources.SkeletonCircleExample) { SkeletonCircleExample() }
-        ExampleCard(title = "Text Lines", sourceCode = GallerySources.SkeletonTextLinesExample) { SkeletonTextLinesExample() }
-        ExampleCard(title = "Rectangle", sourceCode = GallerySources.SkeletonRectangleExample) { SkeletonRectangleExample() }
-        ExampleCard(title = "Card Skeleton", sourceCode = GallerySources.SkeletonCardExample) { SkeletonCardExample() }
+        ExampleCard(title = "Card Skeleton", description = "Avatar, text lines, content block, and button placeholders", sourceCode = GallerySources.SkeletonCardExample) { SkeletonCardExample() }
+        ExampleCard(title = "Glass Effect", description = "Skeleton with frosted glass morphism", sourceCode = GallerySources.SkeletonGlassExample) { SkeletonGlassExample() }
     }
 }
 
