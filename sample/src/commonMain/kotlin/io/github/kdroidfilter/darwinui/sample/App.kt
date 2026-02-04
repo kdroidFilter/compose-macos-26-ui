@@ -37,14 +37,12 @@ import io.github.kdroidfilter.darwinui.icons.LucideMoon
 import io.github.kdroidfilter.darwinui.icons.LucideSun
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import com.composables.icons.lucide.TextAlignStart
-import com.composables.icons.lucide.AppWindow
 import com.composables.icons.lucide.Bell
 import com.composables.icons.lucide.Calendar
 import com.composables.icons.lucide.ChevronsUpDown
 import com.composables.icons.lucide.CircleUser
 import com.composables.icons.lucide.Columns3
 import com.composables.icons.lucide.CreditCard
-import com.composables.icons.lucide.Eye
 import com.composables.icons.lucide.ListChecks
 import com.composables.icons.lucide.Loader
 import com.composables.icons.lucide.Lucide
@@ -54,7 +52,6 @@ import com.composables.icons.lucide.MessageSquare
 import com.composables.icons.lucide.Ellipsis
 import com.composables.icons.lucide.MousePointerClick
 import com.composables.icons.lucide.PanelLeft
-import com.composables.icons.lucide.PanelTop
 import com.composables.icons.lucide.PanelTopOpen
 import com.composables.icons.lucide.Scan
 import com.composables.icons.lucide.Search
@@ -66,7 +63,6 @@ import com.composables.icons.lucide.TextCursorInput
 import com.composables.icons.lucide.ToggleLeft
 import com.composables.icons.lucide.TriangleAlert
 import com.composables.icons.lucide.Upload
-import com.composables.icons.lucide.X
 import io.github.kdroidfilter.darwinui.sample.pages.AccordionPage
 import io.github.kdroidfilter.darwinui.sample.pages.AlertPage
 import io.github.kdroidfilter.darwinui.sample.pages.AvatarPage
@@ -74,7 +70,6 @@ import io.github.kdroidfilter.darwinui.sample.pages.BadgePage
 import io.github.kdroidfilter.darwinui.sample.pages.ButtonPage
 import io.github.kdroidfilter.darwinui.sample.pages.CardPage
 import io.github.kdroidfilter.darwinui.sample.pages.CheckboxPage
-import io.github.kdroidfilter.darwinui.sample.pages.CloseButtonPage
 import io.github.kdroidfilter.darwinui.sample.pages.ContextMenuPage
 import io.github.kdroidfilter.darwinui.sample.pages.DateSelectPage
 import io.github.kdroidfilter.darwinui.sample.pages.DialogPage
@@ -83,7 +78,6 @@ import io.github.kdroidfilter.darwinui.sample.pages.InputPage
 import io.github.kdroidfilter.darwinui.sample.pages.MultiSelectPage
 import io.github.kdroidfilter.darwinui.sample.pages.PopoverPage
 import io.github.kdroidfilter.darwinui.sample.pages.ProgressPage
-import io.github.kdroidfilter.darwinui.sample.pages.RevealPage
 import io.github.kdroidfilter.darwinui.sample.pages.SearchInputPage
 import io.github.kdroidfilter.darwinui.sample.pages.SelectPage
 import io.github.kdroidfilter.darwinui.sample.pages.SidebarPage
@@ -95,9 +89,7 @@ import io.github.kdroidfilter.darwinui.sample.pages.TabsPage
 import io.github.kdroidfilter.darwinui.sample.pages.TextAreaPage
 import io.github.kdroidfilter.darwinui.sample.pages.ToastPage
 import io.github.kdroidfilter.darwinui.sample.pages.TooltipPage
-import io.github.kdroidfilter.darwinui.sample.pages.TopBarPage
 import io.github.kdroidfilter.darwinui.sample.pages.UploadPage
-import io.github.kdroidfilter.darwinui.sample.pages.WindowPage
 
 // Navigation data — static tuples (id, label, group, icon)
 private data class SidebarEntryDef(val id: String, val label: String, val group: String, val icon: ImageVector)
@@ -130,10 +122,6 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("tabs", "Tabs", "NAVIGATION", Lucide.Columns3),
     SidebarEntryDef("accordion", "Accordion", "NAVIGATION", Lucide.ChevronsUpDown),
     SidebarEntryDef("sidebar", "Sidebar", "NAVIGATION", Lucide.PanelLeft),
-    SidebarEntryDef("window", "Window", "LAYOUT", Lucide.AppWindow),
-    SidebarEntryDef("topbar", "Top Bar", "LAYOUT", Lucide.PanelTop),
-    SidebarEntryDef("closebutton", "Close Button", "LAYOUT", Lucide.X),
-    SidebarEntryDef("reveal", "Reveal", "EFFECTS", Lucide.Eye),
 )
 
 @Composable
@@ -226,10 +214,6 @@ fun App() {
                         "tabs" -> TabsPage()
                         "accordion" -> AccordionPage()
                         "sidebar" -> SidebarPage()
-                        "window" -> WindowPage()
-                        "topbar" -> TopBarPage()
-                        "closebutton" -> CloseButtonPage()
-                        "reveal" -> RevealPage()
                     }
                     Spacer(modifier = Modifier.height(48.dp))
                 }
