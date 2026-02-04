@@ -1,160 +1,280 @@
 package io.github.kdroidfilter.darwinui.components.sidebar
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.icons.DarwinIcon
+import io.github.kdroidfilter.darwinui.icons.LucideChevronsLeft
+import io.github.kdroidfilter.darwinui.icons.LucideLogOut
+import io.github.kdroidfilter.darwinui.theme.Blue500
+import io.github.kdroidfilter.darwinui.theme.DarwinDuration
+import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import io.github.kdroidfilter.darwinui.theme.glassOrDefault
+import io.github.kdroidfilter.darwinui.theme.Zinc100
+import io.github.kdroidfilter.darwinui.theme.Zinc200
+import io.github.kdroidfilter.darwinui.theme.Zinc400
+import io.github.kdroidfilter.darwinui.theme.Zinc500
+import io.github.kdroidfilter.darwinui.theme.Zinc600
+import io.github.kdroidfilter.darwinui.theme.Zinc700
+import io.github.kdroidfilter.darwinui.theme.Zinc900
+import io.github.kdroidfilter.darwinui.theme.darwinSpring
+import io.github.kdroidfilter.darwinui.theme.darwinTween
+
+// =============================================================================
+// Data
+// =============================================================================
 
 /**
- * macOS-style navigation sidebar.
+ * Data for a single sidebar navigation item.
  *
- * A fixed-width vertical panel intended for the left side of a layout,
- * providing navigation via [DarwinSidebarSection] and [DarwinSidebarItem]
- * composables. Supports optional header and footer sections, and a
- * scrollable content area in the middle.
+ * @param label Display text and unique identifier for the item.
+ * @param onClick Callback invoked when this item is clicked.
+ * @param icon Optional Lucide-style [ImageVector] rendered before the label.
+ */
+data class DarwinSidebarItem(
+    val label: String,
+    val onClick: () -> Unit,
+    val icon: ImageVector? = null,
+)
+
+// =============================================================================
+// DarwinSidebar — main component
+// =============================================================================
+
+/**
+ * macOS-style navigation sidebar matching the React darwin-ui `Sidebar` component.
  *
- * @param width The fixed width of the sidebar. Defaults to 240dp.
- * @param glass When true, applies a glass-morphism background effect.
- * @param modifier Modifier to be applied to the sidebar container.
- * @param header Optional composable rendered at the top of the sidebar
- *   with 16dp padding.
- * @param footer Optional composable rendered at the bottom of the sidebar
- *   with 16dp padding and a top border.
- * @param content The main sidebar content (typically [DarwinSidebarSection]
- *   and [DarwinSidebarItem] composables), rendered inside a scrollable column.
+ * Renders a vertical panel with navigation items, an optional collapse toggle,
+ * and a logout button at the bottom. Automatically separates "Settings" from
+ * other items, placing it in the bottom section (matching React behaviour).
+ *
+ * Desktop width animates between 200dp (expanded) and 56dp (collapsed) using
+ * a spring animation. Labels are revealed naturally by the growing width
+ * (Apple-style push from start to end).
+ *
+ * @param items List of navigation items. The "Settings" item is automatically
+ *   moved to the bottom section.
+ * @param activeItem The label of the currently active item.
+ * @param onLogout Callback invoked when the logout button is clicked.
+ * @param modifier Modifier applied to the sidebar root.
+ * @param collapsed Whether the sidebar is in collapsed (icon-only) mode.
+ * @param onCollapsedChange Callback invoked when the collapse toggle is clicked.
+ *   When non-null, the collapse toggle button is shown by default.
+ * @param collapsible Whether to show the collapse toggle button. Defaults to
+ *   `true` when [onCollapsedChange] is provided.
+ * @param glass When true, applies frosted-glass background and right border.
  */
 @Composable
 fun DarwinSidebar(
-    width: Dp = 240.dp,
-    glass: Boolean = false,
+    items: List<DarwinSidebarItem>,
+    activeItem: String,
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier,
-    header: (@Composable () -> Unit)? = null,
-    footer: (@Composable () -> Unit)? = null,
-    content: @Composable ColumnScope.() -> Unit,
+    collapsed: Boolean = false,
+    onCollapsedChange: ((Boolean) -> Unit)? = null,
+    collapsible: Boolean = onCollapsedChange != null,
+    glass: Boolean = false,
 ) {
     val colors = DarwinTheme.colors
-    val backgroundColor = glassOrDefault(glass, colors.backgroundElevated)
+    val isDark = colors.isDark
 
-    Column(
+    // Separate Settings from top items (like React)
+    val topItems = items.filter { it.label != "Settings" }
+    val settingsItem = items.find { it.label == "Settings" }
+
+    // Animated width: collapsed=56dp, expanded=200dp
+    val animatedWidth by animateDpAsState(
+        targetValue = if (collapsed) 56.dp else 200.dp,
+        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+    )
+
+    // Animated padding: collapsed=8dp(p-2), expanded=12dp(p-3)
+    val animatedPadding by animateDpAsState(
+        targetValue = if (collapsed) 8.dp else 12.dp,
+        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+    )
+
+    // Glass colours
+    val glassBackground = if (isDark) Zinc900.copy(alpha = 0.80f) else Color.White.copy(alpha = 0.80f)
+    val glassBorderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.White.copy(alpha = 0.20f)
+
+    // Bottom section border
+    val bottomBorderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Zinc200
+
+    Box(
         modifier = modifier
-            .width(width)
+            .width(animatedWidth)
             .fillMaxHeight()
-            .background(backgroundColor),
+            .clipToBounds(),
     ) {
-        // Right border is drawn via a Box overlay approach
-        Box(
+        Column(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-        ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                // ---- Header ----
-                if (header != null) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                    ) {
-                        header()
-                    }
-                }
-
-                // ---- Scrollable content ----
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState()),
-                    content = content,
+                .fillMaxHeight()
+                .width(animatedWidth)
+                .then(
+                    if (glass) Modifier.background(glassBackground)
+                    else Modifier
                 )
-
-                // ---- Footer ----
-                if (footer != null) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(colors.borderSubtle)
-                            .height(1.dp),
-                    )
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                    ) {
-                        footer()
+                .padding(animatedPadding),
+        ) {
+            // ---- Top items (flex-1, space-y-1) ----
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                topItems.forEach { item ->
+                    if (item.icon != null) {
+                        // Items with icons: always present, label revealed by width
+                        SidebarItemRow(
+                            label = item.label,
+                            onClick = item.onClick,
+                            active = activeItem == item.label,
+                            icon = item.icon,
+                            isCollapsed = collapsed,
+                        )
+                    } else {
+                        // Items without icons: smooth exit, instant enter
+                        AnimatedVisibility(
+                            visible = !collapsed,
+                            enter = EnterTransition.None,
+                            exit = shrinkVertically(darwinSpring(DarwinSpringPreset.Smooth)) + fadeOut(darwinTween(DarwinDuration.Fast)),
+                        ) {
+                            SidebarItemRow(
+                                label = item.label,
+                                onClick = item.onClick,
+                                active = activeItem == item.label,
+                                icon = null,
+                                isCollapsed = false,
+                            )
+                        }
                     }
                 }
             }
 
-            // Right border line
+            // ---- Bottom section: border-t + pt-3, space-y-1 ----
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(bottomBorderColor),
+            )
+
+            Column(
+                modifier = Modifier.padding(top = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                // Collapse toggle
+                if (collapsible) {
+                    CollapseToggle(
+                        isCollapsed = collapsed,
+                        onClick = { onCollapsedChange?.invoke(!collapsed) },
+                    )
+                }
+
+                // Settings item (fade out if no icon)
+                if (settingsItem != null) {
+                    if (settingsItem.icon != null) {
+                        SidebarItemRow(
+                            label = settingsItem.label,
+                            onClick = settingsItem.onClick,
+                            active = activeItem == settingsItem.label,
+                            icon = settingsItem.icon,
+                            isCollapsed = collapsed,
+                        )
+                    } else {
+                        AnimatedVisibility(
+                            visible = !collapsed,
+                            enter = EnterTransition.None,
+                            exit = shrinkVertically(darwinSpring(DarwinSpringPreset.Smooth)) + fadeOut(darwinTween(DarwinDuration.Fast)),
+                        ) {
+                            SidebarItemRow(
+                                label = settingsItem.label,
+                                onClick = settingsItem.onClick,
+                                active = activeItem == settingsItem.label,
+                                icon = null,
+                                isCollapsed = false,
+                            )
+                        }
+                    }
+                }
+
+                // Logout (always has icon)
+                SidebarItemRow(
+                    label = "Logout",
+                    onClick = onLogout,
+                    active = false,
+                    icon = LucideLogOut,
+                    isCollapsed = collapsed,
+                )
+            }
+        }
+
+        // Right border (glass mode only)
+        if (glass) {
             Box(
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .width(1.dp)
                     .fillMaxHeight()
-                    .background(colors.border),
+                    .background(glassBorderColor),
             )
         }
     }
 }
 
-// ===========================================================================
-// Sidebar Item
-// ===========================================================================
+// =============================================================================
+// SidebarItemRow — internal item renderer
+// =============================================================================
+//
+// Uses a single Row layout for both collapsed and expanded states.
+// The label is always rendered — the sidebar's clipToBounds naturally
+// reveals it from start to end as the width grows (Apple-style push).
+// On collapse, the shrinking width clips the label away.
+// =============================================================================
 
-/**
- * A single navigation item within a [DarwinSidebar].
- *
- * Displays a row containing an optional icon, a label, and an optional
- * badge. Supports selected and hover states with appropriate visual
- * feedback matching macOS sidebar aesthetics.
- *
- * @param label The text label for this navigation item.
- * @param selected Whether this item is currently selected. When true,
- *   the background tints with the accent color and text uses the accent color.
- * @param onClick Callback invoked when this item is clicked.
- * @param icon Optional composable rendered before the label.
- * @param badge Optional composable rendered at the end of the row
- *   (e.g., a count badge).
- * @param modifier Modifier to be applied to this item.
- */
 @Composable
-fun DarwinSidebarItem(
+private fun SidebarItemRow(
     label: String,
-    selected: Boolean = false,
     onClick: () -> Unit,
-    icon: (@Composable () -> Unit)? = null,
-    badge: (@Composable () -> Unit)? = null,
-    modifier: Modifier = Modifier,
+    active: Boolean,
+    icon: ImageVector?,
+    isCollapsed: Boolean,
 ) {
-    val colors = DarwinTheme.colors
+    val isDark = DarwinTheme.colors.isDark
     val shapes = DarwinTheme.shapes
     val typography = DarwinTheme.typography
 
@@ -162,20 +282,42 @@ fun DarwinSidebarItem(
     val isHovered by interactionSource.collectIsHoveredAsState()
 
     val backgroundColor = when {
-        selected -> colors.accent.copy(alpha = 0.10f)
-        isHovered -> colors.surfaceVariant
+        active -> Blue500
+        isHovered -> if (isDark) Color.White.copy(alpha = 0.10f) else Zinc100
         else -> Color.Transparent
     }
 
-    val textColor = if (selected) colors.accent else colors.textPrimary
+    val textColor = when {
+        active -> Color.White
+        isHovered -> if (isDark) Zinc100 else Zinc900
+        else -> if (isDark) Zinc400 else Zinc600
+    }
+
+    val iconColor = when {
+        active -> Color.White
+        isHovered -> if (isDark) Zinc200 else Zinc700
+        else -> if (isDark) Zinc400 else Zinc500
+    }
+
+    // Animated icon size: 16dp expanded → 20dp collapsed
+    val iconSize by animateDpAsState(
+        targetValue = if (isCollapsed) 20.dp else 16.dp,
+        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+    )
+
+    // Animated horizontal padding: 12dp expanded → 10dp collapsed
+    // At 10dp collapsed: item internal width = 40dp - 20dp = 20dp = icon size → centered
+    val hPadding by animateDpAsState(
+        targetValue = if (isCollapsed) 10.dp else 12.dp,
+        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+    )
 
     Row(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 4.dp, vertical = 2.dp)
-            .height(36.dp)
-            .clip(shapes.medium)
-            .background(backgroundColor, shapes.medium)
+            .height(40.dp)
+            .clip(shapes.extraLarge) // rounded-xl = 16dp
+            .background(backgroundColor, shapes.extraLarge)
             .hoverable(interactionSource = interactionSource)
             .clickable(
                 interactionSource = interactionSource,
@@ -183,66 +325,105 @@ fun DarwinSidebarItem(
                 role = Role.Tab,
                 onClick = onClick,
             )
-            .padding(horizontal = 12.dp),
+            .padding(horizontal = hPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (icon != null) {
-            icon()
-            Spacer(modifier = Modifier.width(8.dp))
+            DarwinIcon(
+                imageVector = icon,
+                size = iconSize,
+                tint = iconColor,
+            )
+            // gap-3 spacer between icon and label
+            Spacer(modifier = Modifier.width(12.dp))
         }
 
         DarwinText(
             text = label,
-            style = typography.bodyMedium,
+            style = typography.bodyMedium.merge(
+                TextStyle(fontWeight = FontWeight.Medium)
+            ),
             color = textColor,
-            modifier = Modifier.weight(1f),
+            maxLines = 1,
+            overflow = TextOverflow.Clip,
         )
-
-        if (badge != null) {
-            badge()
-        }
     }
 }
 
-// ===========================================================================
-// Sidebar Section
-// ===========================================================================
+// =============================================================================
+// CollapseToggle — internal collapse button
+// =============================================================================
 
-/**
- * A grouping section within a [DarwinSidebar].
- *
- * Provides an optional title label above a column of [DarwinSidebarItem]
- * composables, helping organize navigation items into logical groups.
- *
- * @param title Optional section title displayed as a small label above the items.
- * @param modifier Modifier to be applied to this section.
- * @param content The section content, typically [DarwinSidebarItem] composables.
- */
 @Composable
-fun DarwinSidebarSection(
-    title: String? = null,
-    modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.() -> Unit,
+private fun CollapseToggle(
+    isCollapsed: Boolean,
+    onClick: () -> Unit,
 ) {
-    val colors = DarwinTheme.colors
+    val isDark = DarwinTheme.colors.isDark
+    val shapes = DarwinTheme.shapes
     val typography = DarwinTheme.typography
 
-    Column(modifier = modifier.fillMaxWidth()) {
-        if (title != null) {
-            DarwinText(
-                text = title,
-                style = typography.labelSmall,
-                color = colors.textTertiary,
-                modifier = Modifier.padding(
-                    start = 12.dp,
-                    end = 12.dp,
-                    top = 16.dp,
-                    bottom = 4.dp,
-                ),
-            )
-        }
+    val interactionSource = remember { MutableInteractionSource() }
+    val isHovered by interactionSource.collectIsHoveredAsState()
 
-        content()
+    val textColor = when {
+        isHovered -> if (isDark) Zinc200 else Zinc700
+        else -> if (isDark) Zinc400 else Zinc500
+    }
+
+    val backgroundColor = when {
+        isHovered -> if (isDark) Color.White.copy(alpha = 0.10f) else Zinc100
+        else -> Color.Transparent
+    }
+
+    // ChevronsLeft rotates 180° when collapsed
+    val iconRotation by animateFloatAsState(
+        targetValue = if (isCollapsed) 180f else 0f,
+        animationSpec = darwinTween(DarwinDuration.Slow),
+    )
+
+    // Animated icon size and padding (same as SidebarItemRow)
+    val iconSize by animateDpAsState(
+        targetValue = if (isCollapsed) 20.dp else 16.dp,
+        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+    )
+    val hPadding by animateDpAsState(
+        targetValue = if (isCollapsed) 10.dp else 12.dp,
+        animationSpec = darwinSpring(DarwinSpringPreset.Smooth),
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp)
+            .clip(shapes.extraLarge)
+            .background(backgroundColor, shapes.extraLarge)
+            .hoverable(interactionSource = interactionSource)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick,
+            )
+            .padding(horizontal = hPadding),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        DarwinIcon(
+            imageVector = LucideChevronsLeft,
+            size = iconSize,
+            tint = textColor,
+            modifier = Modifier.graphicsLayer { rotationZ = iconRotation },
+        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        DarwinText(
+            text = "Collapse",
+            style = typography.bodyMedium.merge(
+                TextStyle(fontWeight = FontWeight.Medium)
+            ),
+            color = textColor,
+            maxLines = 1,
+            overflow = TextOverflow.Clip,
+        )
     }
 }
-

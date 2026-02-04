@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
@@ -38,6 +39,8 @@ import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import io.github.kdroidfilter.darwinui.icons.DarwinIcon
 import io.github.kdroidfilter.darwinui.icons.LucideDownload
@@ -102,7 +105,6 @@ import io.github.kdroidfilter.darwinui.components.select.DarwinSelect
 import io.github.kdroidfilter.darwinui.components.select.DarwinSelectOption
 import io.github.kdroidfilter.darwinui.components.sidebar.DarwinSidebar
 import io.github.kdroidfilter.darwinui.components.sidebar.DarwinSidebarItem
-import io.github.kdroidfilter.darwinui.components.sidebar.DarwinSidebarSection
 import io.github.kdroidfilter.darwinui.components.skeleton.DarwinSkeleton
 import io.github.kdroidfilter.darwinui.components.skeleton.DarwinSkeletonCircle
 import io.github.kdroidfilter.darwinui.components.skeleton.DarwinSkeletonText
@@ -141,6 +143,8 @@ import io.github.kdroidfilter.darwinui.theme.Blue500
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
+import io.github.kdroidfilter.darwinui.theme.glassEffect
+import androidx.compose.ui.text.style.TextAlign
 
 // Navigation data
 private data class SidebarEntry(val id: String, val label: String, val group: String)
@@ -191,72 +195,52 @@ fun App() {
             var searchQuery by remember { mutableStateOf("") }
 
             Row(modifier = Modifier.fillMaxSize()) {
-                // Sidebar
-                DarwinSidebar(
-                    width = 240.dp,
-                    header = {
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                            ) {
-                                Column {
-                                    DarwinText(
-                                        text = "Darwin UI",
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = DarwinTheme.colors.textPrimary,
-                                    )
-                                    DarwinText(
-                                        text = "Component Docs",
-                                        style = DarwinTheme.typography.bodySmall,
-                                        color = DarwinTheme.colors.textTertiary,
-                                    )
+                // Gallery navigation sidebar (custom layout, not the DarwinSidebar component)
+                Box(modifier = Modifier.width(240.dp).fillMaxHeight().background(DarwinTheme.colors.backgroundElevated)) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        // Header
+                        Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                    Column {
+                                        DarwinText(text = "Darwin UI", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = DarwinTheme.colors.textPrimary)
+                                        DarwinText(text = "Component Docs", style = DarwinTheme.typography.bodySmall, color = DarwinTheme.colors.textTertiary)
+                                    }
+                                    DarwinButton(onClick = { isDark = !isDark }, variant = DarwinButtonVariant.Ghost, size = DarwinButtonSize.Icon) { DarwinIcon(if (isDark) LucideSun else LucideMoon) }
                                 }
-                                // Theme toggle
-                                DarwinButton(
-                                    onClick = { isDark = !isDark },
-                                    variant = DarwinButtonVariant.Ghost,
-                                    size = DarwinButtonSize.Icon,
-                                ) {
-                                    DarwinIcon(if (isDark) LucideSun else LucideMoon)
+                                DarwinSearchField(value = searchQuery, onValueChange = { searchQuery = it }, placeholder = "Search components...", modifier = Modifier.fillMaxWidth())
+                            }
+                        }
+
+                        // Scrollable navigation items
+                        Column(modifier = Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState())) {
+                            val query = searchQuery.lowercase().trim()
+                            val filtered = if (query.isEmpty()) sidebarEntries else sidebarEntries.filter { it.label.lowercase().contains(query) }
+                            val groups = filtered.groupBy { it.group }
+                            for ((group, entries) in groups) {
+                                DarwinText(text = group, style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary, modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 4.dp))
+                                for (entry in entries) {
+                                    val isSelected = selectedPage == entry.id
+                                    val navInteractionSource = remember { MutableInteractionSource() }
+                                    val navHovered by navInteractionSource.collectIsHoveredAsState()
+                                    val navBg = when { isSelected -> DarwinTheme.colors.accent.copy(alpha = 0.10f); navHovered -> DarwinTheme.colors.surfaceVariant; else -> Color.Transparent }
+                                    val navTextColor = if (isSelected) DarwinTheme.colors.accent else DarwinTheme.colors.textPrimary
+                                    Box(
+                                        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 2.dp).height(36.dp)
+                                            .clip(DarwinTheme.shapes.medium).background(navBg, DarwinTheme.shapes.medium)
+                                            .hoverable(navInteractionSource).clickable(interactionSource = navInteractionSource, indication = null, role = Role.Tab, onClick = { selectedPage = entry.id })
+                                            .padding(horizontal = 12.dp),
+                                        contentAlignment = Alignment.CenterStart,
+                                    ) { DarwinText(text = entry.label, style = DarwinTheme.typography.bodyMedium, color = navTextColor) }
                                 }
                             }
-                            // Search
-                            DarwinSearchField(
-                                value = searchQuery,
-                                onValueChange = { searchQuery = it },
-                                placeholder = "Search components...",
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                        }
-                    },
-                ) {
-                    val query = searchQuery.lowercase().trim()
-                    val filtered = if (query.isEmpty()) sidebarEntries
-                    else sidebarEntries.filter { it.label.lowercase().contains(query) }
-
-                    val groups = filtered.groupBy { it.group }
-                    for ((group, entries) in groups) {
-                        DarwinSidebarSection(title = group) {
-                            for (entry in entries) {
-                                DarwinSidebarItem(
-                                    label = entry.label,
-                                    selected = selectedPage == entry.id,
-                                    onClick = { selectedPage = entry.id },
-                                )
+                            if (filtered.isEmpty()) {
+                                DarwinText(text = "No results found", style = DarwinTheme.typography.bodySmall, color = DarwinTheme.colors.textTertiary, modifier = Modifier.padding(16.dp))
                             }
                         }
                     }
-
-                    if (filtered.isEmpty()) {
-                        DarwinText(
-                            text = "No results found",
-                            style = DarwinTheme.typography.bodySmall,
-                            color = DarwinTheme.colors.textTertiary,
-                            modifier = Modifier.padding(16.dp),
-                        )
-                    }
+                    // Right border
+                    Box(modifier = Modifier.align(Alignment.CenterEnd).width(1.dp).fillMaxHeight().background(DarwinTheme.colors.border))
                 }
 
                 // Main content area
@@ -1115,13 +1099,81 @@ fun AccordionSingleModeExample() {
 @GalleryExample("Sidebar", "Preview")
 @Composable
 fun SidebarPreviewExample() {
-    var sidebarSelected by remember { mutableStateOf("dashboard") }
-    DarwinCard(modifier = Modifier.fillMaxWidth(0.7f).height(350.dp)) {
-        Row(modifier = Modifier.fillMaxSize()) {
-            DarwinSidebar(width = 180.dp, header = { DarwinText("My App", fontWeight = FontWeight.Bold, color = DarwinTheme.colors.textPrimary) }, footer = { DarwinText("v1.0.0", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary) }) {
-                DarwinSidebarSection(title = "MAIN") { DarwinSidebarItem(label = "Home", selected = sidebarSelected == "home", onClick = { sidebarSelected = "home" }); DarwinSidebarItem(label = "Dashboard", selected = sidebarSelected == "dashboard", onClick = { sidebarSelected = "dashboard" }); DarwinSidebarItem(label = "Settings", selected = sidebarSelected == "settings", onClick = { sidebarSelected = "settings" }); DarwinSidebarItem(label = "Profile", selected = sidebarSelected == "profile", onClick = { sidebarSelected = "profile" }) }
+    var activeItem by remember { mutableStateOf("Dashboard") }
+    var isCollapsed by remember { mutableStateOf(false) }
+    val sidebarItems = remember {
+        listOf(
+            DarwinSidebarItem("Dashboard", onClick = { activeItem = "Dashboard" }),
+            DarwinSidebarItem("Projects", onClick = { activeItem = "Projects" }),
+            DarwinSidebarItem("Analytics", onClick = { activeItem = "Analytics" }),
+            DarwinSidebarItem("Settings", onClick = { activeItem = "Settings" }),
+        )
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            DarwinSwitch(checked = isCollapsed, onCheckedChange = { isCollapsed = it })
+            DarwinText(text = if (isCollapsed) "Collapsed" else "Expanded", style = DarwinTheme.typography.bodySmall, color = DarwinTheme.colors.textSecondary)
+        }
+        DarwinCard(modifier = Modifier.fillMaxWidth().height(320.dp)) {
+            Row(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier.fillMaxHeight().background(DarwinTheme.colors.muted)) {
+                    DarwinSidebar(items = sidebarItems, activeItem = activeItem, onLogout = { activeItem = "Logged out" }, collapsed = isCollapsed, onCollapsedChange = { isCollapsed = it }, collapsible = true)
+                }
+                Box(modifier = Modifier.width(1.dp).fillMaxHeight().background(DarwinTheme.colors.border))
+                Box(modifier = Modifier.weight(1f).fillMaxHeight().padding(16.dp), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        DarwinText(text = "Current page:", color = DarwinTheme.colors.textSecondary, style = DarwinTheme.typography.bodySmall)
+                        DarwinText(text = activeItem, fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 4.dp))
+                    }
+                }
             }
-            Box(modifier = Modifier.weight(1f).fillMaxHeight().padding(16.dp)) { DarwinText(text = "Selected: $sidebarSelected", color = DarwinTheme.colors.textSecondary) }
+        }
+        DarwinText(text = "Use the toggle or click \"Collapse\" in the sidebar.", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary.copy(alpha = 0.70f), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+    }
+}
+
+@GalleryExample("Sidebar", "Collapsible")
+@Composable
+fun SidebarCollapsibleExample() {
+    var active by remember { mutableStateOf("Dashboard") }
+    var collapsed by remember { mutableStateOf(false) }
+    val items = remember {
+        listOf(
+            DarwinSidebarItem("Dashboard", onClick = { active = "Dashboard" }),
+            DarwinSidebarItem("Projects", onClick = { active = "Projects" }),
+            DarwinSidebarItem("Settings", onClick = { active = "Settings" }),
+        )
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        DarwinSwitch(checked = collapsed, onCheckedChange = { collapsed = it }, label = "Collapsed")
+        DarwinCard(modifier = Modifier.fillMaxWidth().height(192.dp)) {
+            Row(modifier = Modifier.fillMaxSize()) {
+                DarwinSidebar(items = items, activeItem = active, onLogout = {}, collapsed = collapsed, onCollapsedChange = { collapsed = it }, collapsible = true)
+                Box(modifier = Modifier.weight(1f).fillMaxHeight().padding(16.dp), contentAlignment = Alignment.Center) {
+                    DarwinText(text = "Current: $active", color = DarwinTheme.colors.textSecondary)
+                }
+            }
+        }
+    }
+}
+
+@GalleryExample("Sidebar", "Glass")
+@Composable
+fun SidebarGlassExample() {
+    var active by remember { mutableStateOf("Dashboard") }
+    val items = remember {
+        listOf(
+            DarwinSidebarItem("Dashboard", onClick = { active = "Dashboard" }),
+            DarwinSidebarItem("Projects", onClick = { active = "Projects" }),
+            DarwinSidebarItem("Settings", onClick = { active = "Settings" }),
+        )
+    }
+    Box(modifier = Modifier.fillMaxWidth().height(192.dp).clip(DarwinTheme.shapes.large).glassEffect()) {
+        Row(modifier = Modifier.fillMaxSize()) {
+            DarwinSidebar(items = items, activeItem = active, onLogout = {})
+            Box(modifier = Modifier.weight(1f).fillMaxHeight().padding(16.dp), contentAlignment = Alignment.Center) {
+                DarwinText(text = "Current: $active", color = DarwinTheme.colors.textSecondary)
+            }
         }
     }
 }
@@ -1558,9 +1610,11 @@ private fun AccordionPage() {
 
 @Composable
 private fun SidebarPage() {
-    GalleryPage("Sidebar", "A navigation sidebar with sections, items, and optional header/footer.") {
+    GalleryPage("Sidebar", "A macOS-style navigation sidebar with collapsible state and glass effect.") {
         SectionHeader("Examples")
         ExampleCard(title = "Preview", sourceCode = GallerySources.SidebarPreviewExample) { SidebarPreviewExample() }
+        ExampleCard(title = "Collapsible", description = "Sidebar with collapse toggle", sourceCode = GallerySources.SidebarCollapsibleExample) { SidebarCollapsibleExample() }
+        ExampleCard(title = "Glass", description = "Sidebar with frosted glass effect", sourceCode = GallerySources.SidebarGlassExample) { SidebarGlassExample() }
     }
 }
 
