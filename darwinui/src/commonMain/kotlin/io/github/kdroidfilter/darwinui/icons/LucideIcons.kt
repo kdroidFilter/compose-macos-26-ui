@@ -491,6 +491,168 @@ private var _LucideCopy: ImageVector? = null
 // ChevronRight
 // =============================================================================
 
+// =============================================================================
+// Upload
+// =============================================================================
+
+val LucideUpload: ImageVector
+    get() {
+        if (_LucideUpload != null) return _LucideUpload!!
+        _LucideUpload = ImageVector.Builder(
+            name = "upload", defaultWidth = 24.dp, defaultHeight = 24.dp,
+            viewportWidth = 24f, viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(21f, 15f); verticalLineToRelative(4f); arcToRelative(2f, 2f, 0f, false, true, -2f, 2f); horizontalLineTo(5f); arcToRelative(2f, 2f, 0f, false, true, -2f, -2f); verticalLineToRelative(-4f)
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(17f, 8f); lineToRelative(-5f, -5f); lineToRelative(-5f, 5f)
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(12f, 3f); verticalLineToRelative(12f)
+            }
+        }.build()
+        return _LucideUpload!!
+    }
+private var _LucideUpload: ImageVector? = null
+
+// =============================================================================
+// Image
+// =============================================================================
+
+val LucideImage: ImageVector
+    get() {
+        if (_LucideImage != null) return _LucideImage!!
+        _LucideImage = ImageVector.Builder(
+            name = "image", defaultWidth = 24.dp, defaultHeight = 24.dp,
+            viewportWidth = 24f, viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(5f, 3f); horizontalLineToRelative(14f); arcToRelative(2f, 2f, 0f, false, true, 2f, 2f); verticalLineToRelative(14f); arcToRelative(2f, 2f, 0f, false, true, -2f, 2f); horizontalLineTo(5f); arcToRelative(2f, 2f, 0f, false, true, -2f, -2f); verticalLineTo(5f); arcToRelative(2f, 2f, 0f, false, true, 2f, -2f)
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(10.5f, 8.5f); arcTo(2.5f, 2.5f, 0f, false, true, 8f, 11f); arcTo(2.5f, 2.5f, 0f, false, true, 5.5f, 8.5f); arcTo(2.5f, 2.5f, 0f, false, true, 10.5f, 8.5f); close()
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(21f, 15f); lineToRelative(-5f, -5f); lineTo(5f, 21f)
+            }
+        }.build()
+        return _LucideImage!!
+    }
+private var _LucideImage: ImageVector? = null
+
+// =============================================================================
+// Star
+// =============================================================================
+
+val LucideStar: ImageVector
+    get() {
+        if (_LucideStar != null) return _LucideStar!!
+        _LucideStar = ImageVector.Builder(
+            name = "star", defaultWidth = 24.dp, defaultHeight = 24.dp,
+            viewportWidth = 24f, viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(11.525f, 2.295f)
+                arcToRelative(0.53f, 0.53f, 0f, false, true, 0.95f, 0f)
+                lineToRelative(2.31f, 4.679f)
+                arcToRelative(0.53f, 0.53f, 0f, false, false, 0.398f, 0.29f)
+                lineToRelative(5.164f, 0.75f)
+                arcToRelative(0.53f, 0.53f, 0f, false, true, 0.294f, 0.904f)
+                lineToRelative(-3.736f, 3.642f)
+                arcToRelative(0.53f, 0.53f, 0f, false, false, -0.152f, 0.469f)
+                lineToRelative(0.882f, 5.14f)
+                arcToRelative(0.53f, 0.53f, 0f, false, true, -0.769f, 0.559f)
+                lineToRelative(-4.618f, -2.428f)
+                arcToRelative(0.53f, 0.53f, 0f, false, false, -0.493f, 0f)
+                lineToRelative(-4.618f, 2.428f)
+                arcToRelative(0.53f, 0.53f, 0f, false, true, -0.769f, -0.559f)
+                lineToRelative(0.882f, -5.14f)
+                arcToRelative(0.53f, 0.53f, 0f, false, false, -0.152f, -0.469f)
+                lineToRelative(-3.736f, -3.642f)
+                arcToRelative(0.53f, 0.53f, 0f, false, true, 0.294f, -0.904f)
+                lineToRelative(5.164f, -0.75f)
+                arcToRelative(0.53f, 0.53f, 0f, false, false, 0.398f, -0.29f)
+                close()
+            }
+        }.build()
+        return _LucideStar!!
+    }
+private var _LucideStar: ImageVector? = null
+
+// =============================================================================
+// StarOff
+// =============================================================================
+
+val LucideStarOff: ImageVector
+    get() {
+        if (_LucideStarOff != null) return _LucideStarOff!!
+        _LucideStarOff = ImageVector.Builder(
+            name = "star-off", defaultWidth = 24.dp, defaultHeight = 24.dp,
+            viewportWidth = 24f, viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(8.34f, 8.34f)
+                lineToRelative(-1.99f, -1.99f)
+                lineToRelative(-3.979f, 3.879f)
+                arcToRelative(0.53f, 0.53f, 0f, false, false, 0.294f, 0.904f)
+                lineToRelative(5.164f, 0.75f)
+                arcToRelative(0.53f, 0.53f, 0f, false, true, 0.399f, 0.291f)
+                lineToRelative(2.31f, 4.679f)
+                arcToRelative(0.53f, 0.53f, 0f, false, false, 0.95f, 0f)
+                lineToRelative(2.31f, -4.68f)
+                arcToRelative(0.53f, 0.53f, 0f, false, true, 0.399f, -0.29f)
+                lineToRelative(5.163f, -0.75f)
+                arcToRelative(0.53f, 0.53f, 0f, false, false, 0.294f, -0.904f)
+                lineToRelative(-3.736f, -3.642f)
+                arcToRelative(0.53f, 0.53f, 0f, false, true, -0.152f, -0.468f)
+                lineToRelative(0.882f, -5.14f)
+                arcToRelative(0.53f, 0.53f, 0f, false, false, -0.77f, -0.56f)
+                lineToRelative(-4.617f, 2.429f)
+                arcToRelative(0.53f, 0.53f, 0f, false, true, -0.493f, 0f)
+                lineTo(8.34f, 8.34f)
+                close()
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(2f, 2f); lineToRelative(20f, 20f)
+            }
+        }.build()
+        return _LucideStarOff!!
+    }
+private var _LucideStarOff: ImageVector? = null
+
+// =============================================================================
+// ArrowLeftRight
+// =============================================================================
+
+val LucideArrowLeftRight: ImageVector
+    get() {
+        if (_LucideArrowLeftRight != null) return _LucideArrowLeftRight!!
+        _LucideArrowLeftRight = ImageVector.Builder(
+            name = "arrow-left-right", defaultWidth = 24.dp, defaultHeight = 24.dp,
+            viewportWidth = 24f, viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(8f, 3f); lineToRelative(-4f, 4f); lineToRelative(4f, 4f)
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(4f, 7f); horizontalLineToRelative(16f)
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(16f, 21f); lineToRelative(4f, -4f); lineToRelative(-4f, -4f)
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(20f, 17f); horizontalLineTo(4f)
+            }
+        }.build()
+        return _LucideArrowLeftRight!!
+    }
+private var _LucideArrowLeftRight: ImageVector? = null
+
+// =============================================================================
+// ChevronRight
+// =============================================================================
+
 val LucideChevronRight: ImageVector
     get() {
         if (_LucideChevronRight != null) return _LucideChevronRight!!
