@@ -1,13 +1,29 @@
 package io.github.kdroidfilter.darwinui.components.slider
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -15,35 +31,40 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.text.DarwinText
-import io.github.kdroidfilter.darwinui.theme.*
-import kotlin.math.roundToInt
+import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import kotlin.math.round
+import kotlin.math.roundToInt
 
 /**
  * Size variants for the Darwin slider.
  *
- * @property trackHeight Height of the slider track.
- * @property thumbSize Diameter of the slider thumb.
+ * Matches React Tailwind classes:
+ * - sm: track h-1 (4px), thumb h-3 w-3 (12px)
+ * - md: track h-2 (8px), thumb h-4 w-4 (16px)
+ * - lg: track h-3 (12px), thumb h-5 w-5 (20px)
  */
 enum class DarwinSliderSize(val trackHeight: Dp, val thumbSize: Dp) {
-    Sm(trackHeight = 4.dp, thumbSize = 14.dp),
-    Md(trackHeight = 6.dp, thumbSize = 18.dp),
-    Lg(trackHeight = 8.dp, thumbSize = 22.dp),
+    Sm(trackHeight = 4.dp, thumbSize = 12.dp),
+    Md(trackHeight = 8.dp, thumbSize = 16.dp),
+    Lg(trackHeight = 12.dp, thumbSize = 20.dp),
 }
 
+private val Blue500 = Color(0xFF3B82F6)
+
 /**
- * Darwin UI Slider -- a range slider component mirroring the React darwin-ui Slider.
+ * Darwin UI Slider — a range slider component mirroring the React darwin-ui Slider.
  *
  * Features a rounded track with a filled portion indicating current progress,
- * a draggable circular thumb, and an optional value label shown above the thumb.
+ * a draggable circular thumb with a blue ring, hover/tap scale animations,
+ * and an optional value label shown below the track (right-aligned).
  *
  * @param value Current value of the slider.
  * @param onValueChange Callback invoked when the value changes during drag or tap.
@@ -52,7 +73,7 @@ enum class DarwinSliderSize(val trackHeight: Dp, val thumbSize: Dp) {
  * @param max Maximum value of the slider range.
  * @param step Step increment for snapping.
  * @param size Size variant controlling track height and thumb diameter.
- * @param showValue Whether to display the current value above the thumb.
+ * @param showValue Whether to display the current value below the slider.
  * @param enabled Whether the slider is interactive.
  * @param glass Whether to use semi-transparent glass styling on the track.
  * @param modifier Modifier applied to the root layout.
@@ -72,15 +93,16 @@ fun DarwinSlider(
     modifier: Modifier = Modifier,
 ) {
     val colors = DarwinTheme.colors
-
-    val trackColor = when {
-        glass -> colors.glassBackground
-        colors.isDark -> Zinc700
-        else -> Zinc300
-    }
-    val filledColor = colors.accent
-    val thumbColor = Color.White
     val disabledAlpha = if (enabled) 1f else 0.5f
+
+    // React: bg-black/10 dark:bg-white/10
+    val trackColor = when {
+        glass -> if (colors.isDark) Color(0xFF18181B).copy(alpha = 0.40f) else Color.White.copy(alpha = 0.40f)
+        else -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
+    }
+
+    // React: bg-blue-500
+    val filledColor = Blue500
 
     // Snap value to step
     fun snapToStep(raw: Float): Float {
@@ -90,62 +112,40 @@ fun DarwinSlider(
         return (min + steps * step).coerceIn(min, max)
     }
 
-    // Animated fraction for smooth thumb movement
     val fraction = ((value - min) / (max - min)).coerceIn(0f, 1f)
+    var isDragging by remember { mutableStateOf(false) }
+
+    // Instant during drag, animated otherwise (React: duration 0 during drag, 0.1 otherwise)
     val animatedFraction by animateFloatAsState(
         targetValue = fraction,
-        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+        animationSpec = if (isDragging) tween(durationMillis = 0) else tween(durationMillis = 100),
     )
 
     val density = LocalDensity.current
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
-
     val thumbSizePx = with(density) { size.thumbSize.toPx() }
 
-    // Calculate value from an x position within the track area
+    // Hover / press state for thumb scale
+    val thumbInteractionSource = remember { MutableInteractionSource() }
+    val isThumbHovered by thumbInteractionSource.collectIsHoveredAsState()
+
+    // React: whileHover scale 1.1, whileTap scale 0.95, dragging scale 1.1
+    val thumbScale by animateFloatAsState(
+        targetValue = when {
+            isDragging -> 1.1f
+            isThumbHovered -> 1.1f
+            else -> 1f
+        },
+        animationSpec = tween(durationMillis = 150),
+    )
+
     fun valueFromPosition(x: Float): Float {
-        val trackWidth = containerSize.width.toFloat() - thumbSizePx
-        val rawFraction = ((x - thumbSizePx / 2f) / trackWidth).coerceIn(0f, 1f)
+        val trackWidth = containerSize.width.toFloat()
+        val rawFraction = (x / trackWidth).coerceIn(0f, 1f)
         return snapToStep(min + rawFraction * (max - min))
     }
 
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        // Value label above thumb
-        if (showValue) {
-            BoxWithConstraints(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                val labelOffset = with(density) {
-                    val trackWidth = containerSize.width.toFloat() - thumbSizePx
-                    val thumbCenter = thumbSizePx / 2f + animatedFraction * trackWidth
-                    thumbCenter.toDp()
-                }
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.TopStart,
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .offset(x = labelOffset - 16.dp)
-                            .width(32.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        DarwinText(
-                            text = if (step >= 1f) value.roundToInt().toString()
-                            else "${(round(value * 10f) / 10f)}",
-                            style = DarwinTheme.typography.labelSmall,
-                            color = colors.textSecondary.copy(alpha = disabledAlpha),
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(4.dp))
-        }
-
+    Column(modifier = modifier) {
         // Slider track + thumb
         Box(
             modifier = Modifier
@@ -164,8 +164,15 @@ fun DarwinSlider(
                             }
                             .pointerInput(min, max, step) {
                                 detectDragGestures(
-                                    onDragEnd = { onValueChangeFinished?.invoke() },
-                                    onDragCancel = { onValueChangeFinished?.invoke() },
+                                    onDragStart = { isDragging = true },
+                                    onDragEnd = {
+                                        isDragging = false
+                                        onValueChangeFinished?.invoke()
+                                    },
+                                    onDragCancel = {
+                                        isDragging = false
+                                        onValueChangeFinished?.invoke()
+                                    },
                                 ) { change, _ ->
                                     change.consume()
                                     val newValue = valueFromPosition(change.position.x)
@@ -175,10 +182,13 @@ fun DarwinSlider(
                     } else {
                         Modifier
                     }
+                )
+                .then(
+                    if (!enabled) Modifier.graphicsLayer { alpha = 0.5f } else Modifier
                 ),
             contentAlignment = Alignment.CenterStart,
         ) {
-            // Track background + filled portion drawn with Canvas
+            // Track background + filled portion
             Canvas(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -189,7 +199,7 @@ fun DarwinSlider(
 
                 // Background track
                 drawRoundRect(
-                    color = trackColor.copy(alpha = trackColor.alpha * disabledAlpha),
+                    color = trackColor,
                     cornerRadius = cornerRadius,
                     size = this.size,
                 )
@@ -198,14 +208,14 @@ fun DarwinSlider(
                 val filledWidth = animatedFraction * this.size.width
                 if (filledWidth > 0f) {
                     drawRoundRect(
-                        color = filledColor.copy(alpha = disabledAlpha),
+                        color = filledColor,
                         cornerRadius = cornerRadius,
                         size = Size(filledWidth, this.size.height),
                     )
                 }
             }
 
-            // Thumb
+            // Thumb — React: white, shadow-md, ring-2 ring-blue-500/50
             val trackWidthPx = containerSize.width.toFloat() - thumbSizePx
             val thumbOffsetPx = animatedFraction * trackWidthPx
             val thumbOffsetDp = with(density) { thumbOffsetPx.toDp() }
@@ -214,13 +224,37 @@ fun DarwinSlider(
                 modifier = Modifier
                     .offset(x = thumbOffsetDp)
                     .size(size.thumbSize)
+                    .graphicsLayer {
+                        scaleX = thumbScale
+                        scaleY = thumbScale
+                    }
+                    .hoverable(thumbInteractionSource)
                     .shadow(
                         elevation = 4.dp,
                         shape = CircleShape,
                         clip = false,
                     )
                     .clip(CircleShape)
-                    .background(thumbColor.copy(alpha = disabledAlpha)),
+                    .background(Color.White)
+                    .border(
+                        width = 2.dp,
+                        color = Blue500.copy(alpha = 0.5f),
+                        shape = CircleShape,
+                    ),
+            )
+        }
+
+        // Value display — React: mt-1 text-right text-xs text-zinc-500 dark:text-zinc-400
+        if (showValue) {
+            DarwinText(
+                text = if (step >= 1f) value.roundToInt().toString()
+                else "${(round(value * 10f) / 10f)}",
+                style = DarwinTheme.typography.labelSmall,
+                color = if (colors.isDark) Color(0xFFA1A1AA) else Color(0xFF71717A),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                textAlign = androidx.compose.ui.text.style.TextAlign.End,
             )
         }
     }

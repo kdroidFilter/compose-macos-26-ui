@@ -647,18 +647,43 @@ fun MultiSelectPreselectedExample() {
     DarwinMultiSelect(options = options, selectedValues = selected, onValuesChange = { selected = it }, label = "Favorites", modifier = Modifier.fillMaxWidth(0.5f))
 }
 
+@GalleryExample("Slider", "Volume")
+@Composable
+fun SliderVolumeExample() {
+    var value by remember { mutableStateOf(50f) }
+    Column(modifier = Modifier.fillMaxWidth(0.5f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+        ) {
+            DarwinText(
+                text = "Volume",
+                style = DarwinTheme.typography.bodySmall,
+                color = DarwinTheme.colors.textTertiary,
+            )
+            DarwinText(
+                text = "${value.toInt()}%",
+                style = DarwinTheme.typography.bodySmall,
+                color = androidx.compose.ui.graphics.Color(0xFF60A5FA), // blue-400
+            )
+        }
+        DarwinSlider(value = value, onValueChange = { value = it }, min = 0f, max = 100f)
+    }
+}
+
 @GalleryExample("Slider", "With Value Display")
 @Composable
 fun SliderWithValueExample() {
     var value by remember { mutableStateOf(50f) }
-    DarwinSlider(value = value, onValueChange = { value = it }, min = 0f, max = 100f, showValue = true, modifier = Modifier.fillMaxWidth(0.5f))
-}
-
-@GalleryExample("Slider", "Without Value")
-@Composable
-fun SliderWithoutValueExample() {
-    var value by remember { mutableStateOf(30f) }
-    DarwinSlider(value = value, onValueChange = { value = it }, min = 0f, max = 100f, modifier = Modifier.fillMaxWidth(0.5f))
+    Column(modifier = Modifier.fillMaxWidth(0.5f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        DarwinText(
+            text = "With value display",
+            style = DarwinTheme.typography.bodySmall,
+            color = DarwinTheme.colors.textTertiary,
+        )
+        DarwinSlider(value = value, onValueChange = { value = it }, min = 0f, max = 100f, showValue = true)
+    }
 }
 
 @GalleryExample("Upload", "Default")
@@ -1168,8 +1193,8 @@ private fun MultiSelectPage() {
 private fun SliderPage() {
     GalleryPage("Slider", "An input where the user selects a value from within a given range.") {
         SectionHeader("Examples")
+        ExampleCard(title = "Volume", sourceCode = GallerySources.SliderVolumeExample) { SliderVolumeExample() }
         ExampleCard(title = "With Value Display", sourceCode = GallerySources.SliderWithValueExample) { SliderWithValueExample() }
-        ExampleCard(title = "Without Value", sourceCode = GallerySources.SliderWithoutValueExample) { SliderWithoutValueExample() }
     }
 }
 
