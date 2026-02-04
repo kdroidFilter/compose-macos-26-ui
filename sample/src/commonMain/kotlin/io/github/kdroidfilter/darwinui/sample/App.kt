@@ -3,6 +3,7 @@ package io.github.kdroidfilter.darwinui.sample
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -33,7 +35,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.delay
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import io.github.kdroidfilter.darwinui.icons.DarwinIcon
 import io.github.kdroidfilter.darwinui.icons.LucideDownload
@@ -128,6 +132,7 @@ import io.github.kdroidfilter.darwinui.sample.gallery.PreviewContainer
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.CodeBlock
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
+import io.github.kdroidfilter.darwinui.theme.Blue500
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
@@ -799,42 +804,36 @@ fun AvatarGroupExample() {
 @GalleryExample("Card", "Default")
 @Composable
 fun CardDefaultExample() {
-    DarwinCard(modifier = Modifier.fillMaxWidth(0.6f)) {
-        DarwinCardHeader { DarwinCardTitle { DarwinText("Card Title") }; DarwinCardDescription { DarwinText("Card description text goes here.") } }
-        DarwinCardContent { DarwinText("This is the card body content.", color = DarwinTheme.colors.textSecondary) }
-        DarwinCardFooter { DarwinButton(text = "Cancel", onClick = {}, variant = DarwinButtonVariant.Ghost, size = DarwinButtonSize.Small); DarwinButton(text = "Save", onClick = {}, variant = DarwinButtonVariant.Accent, size = DarwinButtonSize.Small) }
+    // Pixel-perfect match with React previews.tsx CardPreview()
+    DarwinCard(modifier = Modifier.widthIn(max = 384.dp).fillMaxWidth()) {
+        DarwinCardHeader {
+            DarwinCardTitle { DarwinText("Card Title") }
+            DarwinCardDescription { DarwinText("This is a description of the card content.") }
+        }
+        DarwinCardContent {
+            DarwinText(
+                "Cards can contain any content including text, images, and other components.",
+                color = DarwinTheme.colors.mutedForeground,
+            )
+        }
+        DarwinCardFooter {
+            DarwinButton(text = "Action", onClick = {}, variant = DarwinButtonVariant.Primary, size = DarwinButtonSize.Small)
+            DarwinButton(text = "Cancel", onClick = {}, variant = DarwinButtonVariant.Ghost, size = DarwinButtonSize.Small)
+        }
     }
 }
 
 @GalleryExample("Card", "Glass")
 @Composable
 fun CardGlassExample() {
-    DarwinCard(modifier = Modifier.fillMaxWidth(0.6f), glass = true) {
-        DarwinCardHeader { DarwinCardTitle { DarwinText("Glass Card") }; DarwinCardDescription { DarwinText("With glass morphism effect.") } }
-        DarwinCardContent { DarwinText("Semi-transparent background with blur.", color = DarwinTheme.colors.textSecondary) }
-    }
-}
-
-@GalleryExample("Card", "Multiple Cards")
-@Composable
-fun CardMultipleExample() {
-    Row(horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxWidth()) {
-        DarwinCard(modifier = Modifier.weight(1f)) {
-            DarwinCardHeader { DarwinCardTitle { DarwinText("Dashboard Overview") } }
-            DarwinCardContent {
-                DarwinText("Your analytics and metrics are ready to view.", color = DarwinTheme.colors.textSecondary)
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 8.dp)) {
-                    DarwinBadge(variant = DarwinBadgeVariant.Success) { DarwinText("Active") }
-                    DarwinBadge(variant = DarwinBadgeVariant.Info) { DarwinText("3 updates") }
-                }
-            }
+    // Pixel-perfect match with React CardGlassExample from previews.tsx
+    DarwinCard(modifier = Modifier.widthIn(max = 384.dp).fillMaxWidth(), glass = true) {
+        DarwinCardHeader {
+            DarwinCardTitle { DarwinText("Glass Card") }
+            DarwinCardDescription { DarwinText("Frosted glass effect") }
         }
-        DarwinCard(modifier = Modifier.weight(1f)) {
-            DarwinCardHeader { DarwinCardTitle { DarwinText("Notifications") } }
-            DarwinCardContent {
-                DarwinText("You have 5 unread messages.", color = DarwinTheme.colors.textSecondary)
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 8.dp)) { DarwinBadge(variant = DarwinBadgeVariant.Warning) { DarwinText("5 new") } }
-            }
+        DarwinCardContent {
+            DarwinText("Content with glassmorphism styling.", color = DarwinTheme.colors.mutedForeground)
         }
     }
 }
@@ -1345,10 +1344,21 @@ private fun AvatarPage() {
 @Composable
 private fun CardPage() {
     GalleryPage("Card", "Displays a card with header, content, and footer.") {
+        PreviewContainer { CardDefaultExample() }
+
+        SectionHeader("Usage")
+        CodeBlock("""DarwinCard {
+    DarwinCardHeader {
+        DarwinCardTitle { DarwinText("Title") }
+        DarwinCardDescription { DarwinText("Description") }
+    }
+    DarwinCardContent { DarwinText("Content") }
+    DarwinCardFooter { DarwinButton(text = "Action", onClick = {}) }
+}""")
+
         SectionHeader("Examples")
         ExampleCard(title = "Default", sourceCode = GallerySources.CardDefaultExample) { CardDefaultExample() }
         ExampleCard(title = "Glass", description = "Card with glass morphism effect", sourceCode = GallerySources.CardGlassExample) { CardGlassExample() }
-        ExampleCard(title = "Multiple Cards", sourceCode = GallerySources.CardMultipleExample) { CardMultipleExample() }
     }
 }
 

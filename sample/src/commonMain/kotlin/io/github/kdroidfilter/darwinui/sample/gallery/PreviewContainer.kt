@@ -26,10 +26,10 @@ fun PreviewContainer(
             .clip(DarwinTheme.shapes.extraLarge)
             .border(
                 width = 1.dp,
-                color = DarwinTheme.colors.border,
+                color = DarwinTheme.colors.border.copy(alpha = 0.60f), // border-border/60
                 shape = DarwinTheme.shapes.extraLarge,
             )
-            .background(DarwinTheme.colors.backgroundSubtle.copy(alpha = 0.5f)),
+            .background(DarwinTheme.colors.muted.copy(alpha = 0.20f)), // bg-muted/20
     ) {
         DarwinText(
             text = "Preview",

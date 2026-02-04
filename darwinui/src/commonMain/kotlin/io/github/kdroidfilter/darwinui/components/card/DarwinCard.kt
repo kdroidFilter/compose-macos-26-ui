@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
@@ -28,13 +29,13 @@ import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 /**
  * A card container that follows the Darwin UI design system.
  *
- * Cards are surfaces that display content and actions about a single topic.
- * They use a compound-component pattern with [DarwinCardHeader], [DarwinCardContent],
- * and [DarwinCardFooter] as children.
+ * Pixel-perfect match with the React darwin-ui Card component:
+ * - `rounded-2xl border text-card-foreground transition-colors duration-150`
+ * - Default: `bg-card border-border hover:border-border/80`
+ * - Glass: `bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-white/20 dark:border-white/10`
  *
- * @param glass When true, applies a glass-morphism effect (semi-transparent background with
- *              a subtle border). When false, uses the standard card colors.
- * @param shape The shape of the card. Defaults to [DarwinTheme.shapes.large] (12dp rounded).
+ * @param glass When true, applies a glass-morphism effect.
+ * @param shape The shape of the card. Defaults to [DarwinTheme.shapes.extraLarge] (16dp = rounded-2xl).
  * @param modifier Modifier to be applied to the card container.
  * @param content The card content, typically composed of [DarwinCardHeader],
  *                [DarwinCardContent], and [DarwinCardFooter].
@@ -43,7 +44,7 @@ import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 fun DarwinCard(
     modifier: Modifier = Modifier,
     glass: Boolean = false,
-    shape: Shape = DarwinTheme.shapes.large,
+    shape: Shape = DarwinTheme.shapes.extraLarge, // rounded-2xl = 16dp
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val backgroundColor = glassOrDefault(glass, DarwinTheme.colors.card)
@@ -62,8 +63,8 @@ fun DarwinCard(
 /**
  * Header section of a [DarwinCard].
  *
- * Typically contains a [DarwinCardTitle] and optionally a [DarwinCardDescription].
- * Rendered as a column with top and horizontal padding.
+ * Pixel-perfect match with React CardHeader:
+ * - `flex flex-col space-y-1.5 p-6`
  *
  * @param modifier Modifier to be applied to the header.
  * @param content The header content, usually [DarwinCardTitle] and [DarwinCardDescription].
@@ -76,7 +77,8 @@ fun DarwinCardHeader(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+            .padding(24.dp), // p-6 = 24dp
+        verticalArrangement = Arrangement.spacedBy(6.dp), // space-y-1.5 = 6dp
         content = content,
     )
 }
@@ -84,7 +86,9 @@ fun DarwinCardHeader(
 /**
  * Title text for a [DarwinCardHeader].
  *
- * Displays text using the headlineSmall typography style (semibold, 18sp).
+ * Pixel-perfect match with React CardTitle:
+ * - `font-semibold leading-none tracking-tight text-card-foreground`
+ * - h3 with Tailwind Preflight inherits body font-size (1rem = 16sp)
  *
  * @param modifier Modifier to be applied to the title.
  * @param content The composable content for the title, typically a [Text] composable.
@@ -94,12 +98,12 @@ fun DarwinCardTitle(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    val style = DarwinTheme.typography.headlineSmall.merge(
-        TextStyle(
-            color = DarwinTheme.colors.cardForeground,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 18.sp,
-        )
+    val style = TextStyle(
+        color = DarwinTheme.colors.cardForeground,
+        fontWeight = FontWeight.SemiBold,  // font-semibold
+        fontSize = 16.sp,                  // h3 with Preflight = text-base = 16sp
+        lineHeight = 16.sp,               // leading-none = lineHeight == fontSize
+        letterSpacing = (-0.025).em,       // tracking-tight
     )
     CompositionLocalProvider(
         LocalDarwinTextStyle provides style,
@@ -113,8 +117,8 @@ fun DarwinCardTitle(
 /**
  * Description text for a [DarwinCardHeader].
  *
- * Displays secondary text using the bodySmall typography style with the
- * textSecondary color.
+ * Pixel-perfect match with React CardDescription:
+ * - `text-sm text-muted-foreground`
  *
  * @param modifier Modifier to be applied to the description.
  * @param content The composable content for the description, typically a [Text] composable.
@@ -124,13 +128,14 @@ fun DarwinCardDescription(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    val style = DarwinTheme.typography.bodySmall.merge(
-        TextStyle(color = DarwinTheme.colors.textSecondary)
+    // text-sm = 14sp, text-muted-foreground
+    val style = DarwinTheme.typography.bodyMedium.merge(
+        TextStyle(color = DarwinTheme.colors.mutedForeground)
     )
     CompositionLocalProvider(
         LocalDarwinTextStyle provides style,
     ) {
-        Box(modifier = modifier.padding(top = 4.dp)) {
+        Box(modifier = modifier) {
             content()
         }
     }
@@ -139,7 +144,8 @@ fun DarwinCardDescription(
 /**
  * Content section of a [DarwinCard].
  *
- * The main body area of the card with horizontal and vertical padding.
+ * Pixel-perfect match with React CardContent:
+ * - `p-6 pt-0`
  *
  * @param modifier Modifier to be applied to the content area.
  * @param content The composable content to display in the card body.
@@ -152,7 +158,7 @@ fun DarwinCardContent(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(start = 24.dp, end = 24.dp, bottom = 24.dp), // p-6 pt-0
         content = content,
     )
 }
@@ -160,10 +166,11 @@ fun DarwinCardContent(
 /**
  * Footer section of a [DarwinCard].
  *
- * Typically used to hold action buttons, aligned to the end of the row.
+ * Pixel-perfect match with React CardFooter:
+ * - `flex items-center p-6 pt-0`
  *
  * @param modifier Modifier to be applied to the footer.
- * @param content The footer content, usually [DarwinCardAction] composables.
+ * @param content The footer content, usually action buttons.
  */
 @Composable
 fun DarwinCardFooter(
@@ -173,27 +180,33 @@ fun DarwinCardFooter(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-        horizontalArrangement = Arrangement.End,
-        verticalAlignment = Alignment.CenterVertically,
+            .padding(start = 24.dp, end = 24.dp, bottom = 24.dp), // p-6 pt-0
+        horizontalArrangement = Arrangement.spacedBy(8.dp), // gap-2 (commonly added via className in React)
+        verticalAlignment = Alignment.CenterVertically, // items-center
         content = content,
     )
 }
 
 /**
- * A slot for action buttons within [DarwinCardFooter].
+ * A slot for action buttons within a [DarwinCard].
  *
- * Provides a simple wrapper for placing interactive elements in the card footer.
+ * Pixel-perfect match with React CardAction:
+ * - `flex items-center gap-2 p-6 pt-0`
  *
- * @param modifier Modifier to be applied to the action slot.
- * @param content The action content, typically a button composable.
+ * @param modifier Modifier to be applied to the action row.
+ * @param content The action content, typically button composables.
  */
 @Composable
 fun DarwinCardAction(
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
+    content: @Composable RowScope.() -> Unit,
 ) {
-    Box(modifier = modifier) {
-        content()
-    }
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 24.dp, end = 24.dp, bottom = 24.dp), // p-6 pt-0
+        horizontalArrangement = Arrangement.spacedBy(8.dp), // gap-2 = 8dp
+        verticalAlignment = Alignment.CenterVertically,     // items-center
+        content = content,
+    )
 }
