@@ -4,7 +4,8 @@ A macOS-inspired UI component library for Compose Multiplatform with full light/
 
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.3.0-7F52FF.svg?logo=kotlin)](https://kotlinlang.org)
 [![Compose Multiplatform](https://img.shields.io/badge/Compose_Multiplatform-1.10.0-4285F4.svg?logo=jetpackcompose)](https://www.jetbrains.com/compose-multiplatform/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Commercial License](https://img.shields.io/badge/License-Commercial-green.svg)](#commercial-license--20)
 
 ## Features
 
@@ -223,4 +224,16 @@ DarwinUI/
 
 ## License
 
-MIT License — see [LICENSE](LICENSE) for details.
+Darwin UI is available under a **dual license**:
+
+### Open Source — GPL v3
+
+Free for open-source projects. If your project is distributed under a GPL-compatible license, you can use Darwin UI at no cost under the terms of the [GNU General Public License v3.0](LICENSE).
+
+### Commercial License — $20
+
+For proprietary/closed-source projects, a commercial license is available for **$20** (one-time payment). This license covers usage in **up to 5 commercial projects**.
+
+[Purchase a commercial license](https://github.com/kdroidFilter/DarwinUI) <!-- TODO: update link -->
+
+If you have questions about licensing, feel free to open an issue.
