@@ -55,3 +55,5 @@ kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+vanniktechMavenPublish = { id = "com.vanniktech.maven.publish", version = "0.33.0" }
+dokka = { id = "org.jetbrains.dokka", version = "2.0.0" }

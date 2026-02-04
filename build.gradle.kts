@@ -9,6 +9,8 @@ plugins {
     alias(libs.plugins.kotlinJvm) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.vanniktechMavenPublish) apply false
+    alias(libs.plugins.dokka) apply false
     alias(libs.plugins.detekt)
 }
 
