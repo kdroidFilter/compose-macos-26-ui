@@ -200,12 +200,14 @@ fun DarwinDialog(
  *
  * @param size  Size preset controlling the max width.
  * @param glass Enable frosted glass effect on the panel.
+ * @param showCloseButton Show a close (X) button at the top-right corner (React: absolute right-4 top-4).
  */
 @Composable
 fun DarwinDialogContent(
     modifier: Modifier = Modifier,
     size: DarwinDialogSize = DarwinDialogSize.Md,
     glass: Boolean = false,
+    showCloseButton: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val colors = DarwinTheme.colors
@@ -243,6 +245,17 @@ fun DarwinDialogContent(
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             content()
+        }
+
+        // React: DialogClose at absolute right-4 top-4
+        if (showCloseButton) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp),
+            ) {
+                DarwinDialogClose()
+            }
         }
     }
 }

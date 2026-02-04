@@ -68,7 +68,6 @@ import io.github.kdroidfilter.darwinui.components.card.DarwinCardTitle
 import io.github.kdroidfilter.darwinui.components.checkbox.DarwinCheckbox
 import io.github.kdroidfilter.darwinui.components.closebutton.DarwinCloseButton
 import io.github.kdroidfilter.darwinui.components.dialog.DarwinDialog
-import io.github.kdroidfilter.darwinui.components.dialog.DarwinDialogBody
 import io.github.kdroidfilter.darwinui.components.dialog.DarwinDialogContent
 import io.github.kdroidfilter.darwinui.components.dialog.DarwinDialogDescription
 import io.github.kdroidfilter.darwinui.components.dialog.DarwinDialogFooter
@@ -897,13 +896,15 @@ fun DialogDefaultExample() {
         DarwinButton(text = "Open Dialog", onClick = { showDialog = true }, variant = DarwinButtonVariant.Primary)
     }
     DarwinDialog(open = showDialog, onOpenChange = { showDialog = it }) {
-        DarwinDialogContent {
-            DarwinDialogHeader { DarwinDialogTitle("Edit Profile"); DarwinDialogDescription("Make changes to your profile here.") }
-            DarwinDialogBody {
-                var name by remember { mutableStateOf("John Doe") }; var email by remember { mutableStateOf("john@example.com") }
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) { DarwinTextField(value = name, onValueChange = { name = it }, label = "Name", modifier = Modifier.fillMaxWidth()); DarwinTextField(value = email, onValueChange = { email = it }, label = "Email", modifier = Modifier.fillMaxWidth()) }
+        DarwinDialogContent(showCloseButton = true) {
+            DarwinDialogHeader {
+                DarwinDialogTitle("Confirm Action")
+                DarwinDialogDescription("Are you sure you want to proceed? This action cannot be undone.")
             }
-            DarwinDialogFooter { DarwinButton(text = "Cancel", onClick = { showDialog = false }, variant = DarwinButtonVariant.Ghost); DarwinButton(text = "Save", onClick = { showDialog = false }, variant = DarwinButtonVariant.Accent) }
+            DarwinDialogFooter {
+                DarwinButton(text = "Cancel", onClick = { showDialog = false }, variant = DarwinButtonVariant.Ghost)
+                DarwinButton(text = "Confirm", onClick = { showDialog = false }, variant = DarwinButtonVariant.Primary)
+            }
         }
     }
 }
