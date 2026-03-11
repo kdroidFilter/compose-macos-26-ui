@@ -445,20 +445,9 @@ private fun SidebarItemRow(
 
     // When collapsed, always use Small dimensions so icons fit the fixed 56dp width
     val collapsedSize = SidebarIconSize.Small
-    val animatedIconSize by animateDpAsState(
-        targetValue = if (isCollapsed) collapsedSize.collapsedIconDp else sidebarIconSize.iconDp,
-        animationSpec = sidebarSpring(),
-    )
-
-    val hPadding by animateDpAsState(
-        targetValue = if (isCollapsed) collapsedSize.collapsedHPadding else sidebarIconSize.hPadding,
-        animationSpec = sidebarSpring(),
-    )
-
-    val iconLabelGap by animateDpAsState(
-        targetValue = if (isCollapsed) 0.dp else sidebarIconSize.iconGap,
-        animationSpec = sidebarSpring(),
-    )
+    val iconSize = if (isCollapsed) collapsedSize.collapsedIconDp else sidebarIconSize.iconDp
+    val hPadding = if (isCollapsed) collapsedSize.collapsedHPadding else sidebarIconSize.hPadding
+    val iconLabelGap = if (isCollapsed) 0.dp else sidebarIconSize.iconGap
 
     val labelAlpha by animateFloatAsState(
         targetValue = if (isCollapsed) 0f else 1f,
@@ -490,7 +479,7 @@ private fun SidebarItemRow(
             Icon(
                 imageVector = icon,
                 tint = iconColor,
-                modifier = Modifier.size(animatedIconSize),
+                modifier = Modifier.size(iconSize),
             )
             Spacer(modifier = Modifier.width(iconLabelGap))
         }
@@ -531,19 +520,9 @@ private fun CollapseToggle(
     )
 
     val collapsedSize = SidebarIconSize.Small
-    val animatedIconSize by animateDpAsState(
-        targetValue = if (isCollapsed) collapsedSize.collapsedIconDp else sidebarIconSize.iconDp,
-        animationSpec = sidebarSpring(),
-    )
-    val hPadding by animateDpAsState(
-        targetValue = if (isCollapsed) collapsedSize.collapsedHPadding else sidebarIconSize.hPadding,
-        animationSpec = sidebarSpring(),
-    )
-
-    val iconLabelGap by animateDpAsState(
-        targetValue = if (isCollapsed) 0.dp else sidebarIconSize.iconGap,
-        animationSpec = sidebarSpring(),
-    )
+    val iconSize = if (isCollapsed) collapsedSize.collapsedIconDp else sidebarIconSize.iconDp
+    val hPadding = if (isCollapsed) collapsedSize.collapsedHPadding else sidebarIconSize.hPadding
+    val iconLabelGap = if (isCollapsed) 0.dp else sidebarIconSize.iconGap
 
     val labelAlpha by animateFloatAsState(
         targetValue = if (isCollapsed) 0f else 1f,
@@ -571,7 +550,7 @@ private fun CollapseToggle(
         Icon(
             imageVector = LucideChevronsLeft,
             tint = textColor,
-            modifier = Modifier.size(animatedIconSize).graphicsLayer { rotationZ = iconRotation },
+            modifier = Modifier.size(iconSize).graphicsLayer { rotationZ = iconRotation },
         )
 
         Spacer(modifier = Modifier.width(iconLabelGap))
