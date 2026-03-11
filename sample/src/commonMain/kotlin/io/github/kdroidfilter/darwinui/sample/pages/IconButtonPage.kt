@@ -2,18 +2,18 @@ package io.github.kdroidfilter.darwinui.sample.pages
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import com.composables.icons.lucide.Heart
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Settings
 import com.composables.icons.lucide.Star
-import io.github.kdroidfilter.darwinui.components.FilledIconButton
-import io.github.kdroidfilter.darwinui.components.IconButton
-import io.github.kdroidfilter.darwinui.components.OutlinedIconButton
+import io.github.kdroidfilter.darwinui.components.OutlineButton
 import io.github.kdroidfilter.darwinui.components.PrimaryButton
 import io.github.kdroidfilter.darwinui.components.SecondaryButton
-import io.github.kdroidfilter.darwinui.components.OutlineButton
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.sample.gallery.ComparisonSection
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -21,7 +21,7 @@ import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 
 @Composable
 internal fun IconButtonPage() {
-    GalleryPage("Icon Button", "Compare Darwin icon-in-button with Material 3 dedicated icon button components.") {
+    GalleryPage("Icon Button", "Darwin icon-in-button vs Material 3 dedicated IconButton components.") {
         SectionHeader("Variants")
         ComparisonSection(
             darwinContent = {

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,17 +16,18 @@ import io.github.kdroidfilter.darwinui.components.Card
 import io.github.kdroidfilter.darwinui.components.CardContent
 import io.github.kdroidfilter.darwinui.components.CardHeader
 import io.github.kdroidfilter.darwinui.components.CardTitle
-import io.github.kdroidfilter.darwinui.components.Surface
+import io.github.kdroidfilter.darwinui.components.Surface as DarwinSurface
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.sample.gallery.ComparisonSection
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import androidx.compose.material3.Text as M3Text
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun SurfacePage() {
-    GalleryPage("Surface", "Compare Darwin Card with Material 3 Surface container component.") {
+    GalleryPage("Surface", "Darwin Card/Surface vs Material 3 Surface container.") {
         SectionHeader("Container Variants")
         ComparisonSection(
             darwinContent = {
@@ -34,16 +36,14 @@ internal fun SurfacePage() {
                         CardTitle { Text("Darwin Card") }
                     }
                     CardContent {
-                        Text("A structured container with header, content, and footer sections.")
+                        Text("Structured container with header/content/footer sections.")
                     }
                 }
-            },
-            materialContent = {
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    Surface(
+                    DarwinSurface(
                         modifier = Modifier.size(80.dp),
                         color = DarwinTheme.colorScheme.surface,
                     ) {
@@ -51,16 +51,7 @@ internal fun SurfacePage() {
                             Text("Surface", style = DarwinTheme.typography.labelSmall)
                         }
                     }
-                    Surface(
-                        modifier = Modifier.size(80.dp),
-                        color = DarwinTheme.colorScheme.surfaceVariant,
-                        shape = DarwinTheme.shapes.medium,
-                    ) {
-                        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp)) {
-                            Text("Variant", style = DarwinTheme.typography.labelSmall)
-                        }
-                    }
-                    Surface(
+                    DarwinSurface(
                         modifier = Modifier.size(80.dp),
                         color = DarwinTheme.colorScheme.primaryContainer,
                         shape = DarwinTheme.shapes.large,
@@ -70,7 +61,7 @@ internal fun SurfacePage() {
                             Text("Elevated", style = DarwinTheme.typography.labelSmall)
                         }
                     }
-                    Surface(
+                    DarwinSurface(
                         modifier = Modifier.size(80.dp),
                         color = DarwinTheme.colorScheme.surface,
                         shape = DarwinTheme.shapes.extraLarge,
@@ -78,6 +69,32 @@ internal fun SurfacePage() {
                     ) {
                         Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp)) {
                             Text("Outlined", style = DarwinTheme.typography.labelSmall)
+                        }
+                    }
+                }
+            },
+            materialContent = {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Surface(modifier = Modifier.size(80.dp), tonalElevation = 0.dp) {
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp)) {
+                            M3Text("Surface")
+                        }
+                    }
+                    Surface(modifier = Modifier.size(80.dp), tonalElevation = 4.dp) {
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp)) {
+                            M3Text("Elevated")
+                        }
+                    }
+                    Surface(
+                        modifier = Modifier.size(80.dp),
+                        tonalElevation = 0.dp,
+                        border = BorderStroke(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outline),
+                    ) {
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp)) {
+                            M3Text("Outlined")
                         }
                     }
                 }

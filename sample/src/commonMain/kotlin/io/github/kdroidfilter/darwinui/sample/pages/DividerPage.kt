@@ -7,39 +7,46 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.HorizontalDivider
+import io.github.kdroidfilter.darwinui.components.HorizontalDivider as DarwinHorizontalDivider
 import io.github.kdroidfilter.darwinui.components.Text
-import io.github.kdroidfilter.darwinui.components.VerticalDivider
+import io.github.kdroidfilter.darwinui.components.VerticalDivider as DarwinVerticalDivider
 import io.github.kdroidfilter.darwinui.sample.gallery.ComparisonSection
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
-import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import androidx.compose.material3.Text as M3Text
 
 @Composable
 internal fun DividerPage() {
-    GalleryPage("Divider", "Thin lines that group content in lists and layouts.") {
+    GalleryPage("Divider", "Darwin HorizontalDivider/VerticalDivider vs Material 3 equivalents.") {
         SectionHeader("Horizontal")
         ComparisonSection(
             darwinContent = {
-                Text(
-                    "Darwin uses border or background modifiers for separators.",
-                    style = DarwinTheme.typography.bodySmall,
-                    color = DarwinTheme.colors.textTertiary,
-                )
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text("Section A")
+                    DarwinHorizontalDivider()
+                    Text("Section B")
+                    DarwinHorizontalDivider()
+                    Text("Section C")
+                }
             },
             materialContent = {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Text("Section A")
+                    M3Text("Section A")
                     HorizontalDivider()
-                    Text("Section B")
+                    M3Text("Section B")
                     HorizontalDivider()
-                    Text("Section C")
+                    M3Text("Section C")
                 }
             },
         )
@@ -47,11 +54,18 @@ internal fun DividerPage() {
         SectionHeader("Vertical")
         ComparisonSection(
             darwinContent = {
-                Text(
-                    "No dedicated Darwin divider component.",
-                    style = DarwinTheme.typography.bodySmall,
-                    color = DarwinTheme.colors.textTertiary,
-                )
+                Box(modifier = Modifier.height(48.dp)) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                    ) {
+                        Text("Left", modifier = Modifier.padding(vertical = 12.dp))
+                        DarwinVerticalDivider()
+                        Text("Center", modifier = Modifier.padding(vertical = 12.dp))
+                        DarwinVerticalDivider()
+                        Text("Right", modifier = Modifier.padding(vertical = 12.dp))
+                    }
+                }
             },
             materialContent = {
                 Box(modifier = Modifier.height(48.dp)) {
@@ -59,11 +73,11 @@ internal fun DividerPage() {
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.padding(horizontal = 8.dp),
                     ) {
-                        Text("Left", modifier = Modifier.padding(vertical = 12.dp))
+                        M3Text("Left", modifier = Modifier.padding(vertical = 12.dp))
                         VerticalDivider()
-                        Text("Center", modifier = Modifier.padding(vertical = 12.dp))
+                        M3Text("Center", modifier = Modifier.padding(vertical = 12.dp))
                         VerticalDivider()
-                        Text("Right", modifier = Modifier.padding(vertical = 12.dp))
+                        M3Text("Right", modifier = Modifier.padding(vertical = 12.dp))
                     }
                 }
             },

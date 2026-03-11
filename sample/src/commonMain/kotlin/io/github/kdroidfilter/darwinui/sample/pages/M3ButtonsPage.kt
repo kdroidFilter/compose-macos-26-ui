@@ -3,32 +3,33 @@ package io.github.kdroidfilter.darwinui.sample.pages
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.material3.Button
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.AccentButton
-import io.github.kdroidfilter.darwinui.components.Button
 import io.github.kdroidfilter.darwinui.components.DestructiveButton
-import io.github.kdroidfilter.darwinui.components.ElevatedButton
-import io.github.kdroidfilter.darwinui.components.FilledTonalButton
 import io.github.kdroidfilter.darwinui.components.HyperlinkButton
 import io.github.kdroidfilter.darwinui.components.InfoButton
 import io.github.kdroidfilter.darwinui.components.OutlineButton
-import io.github.kdroidfilter.darwinui.components.OutlinedButton
 import io.github.kdroidfilter.darwinui.components.PrimaryButton
 import io.github.kdroidfilter.darwinui.components.SecondaryButton
 import io.github.kdroidfilter.darwinui.components.SubtleButton
 import io.github.kdroidfilter.darwinui.components.SuccessButton
 import io.github.kdroidfilter.darwinui.components.Text
-import io.github.kdroidfilter.darwinui.components.TextButton
 import io.github.kdroidfilter.darwinui.components.WarningButton
 import io.github.kdroidfilter.darwinui.sample.gallery.ComparisonSection
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
+import androidx.compose.material3.Text as M3Text
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun M3ButtonsPage() {
-    GalleryPage("Buttons", "Compare Darwin convenience wrappers with Material 3-aligned button variants.") {
+    GalleryPage("Buttons", "Darwin convenience wrappers vs real Material 3 button components.") {
         SectionHeader("Variants")
         ComparisonSection(
             darwinContent = {
@@ -53,11 +54,11 @@ internal fun M3ButtonsPage() {
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Button(onClick = {}) { Text("Filled") }
-                    OutlinedButton(onClick = {}) { Text("Outlined") }
-                    TextButton(onClick = {}) { Text("Text") }
-                    ElevatedButton(onClick = {}) { Text("Elevated") }
-                    FilledTonalButton(onClick = {}) { Text("Filled Tonal") }
+                    Button(onClick = {}) { M3Text("Filled") }
+                    OutlinedButton(onClick = {}) { M3Text("Outlined") }
+                    TextButton(onClick = {}) { M3Text("Text") }
+                    ElevatedButton(onClick = {}) { M3Text("Elevated") }
+                    FilledTonalButton(onClick = {}) { M3Text("Filled Tonal") }
                 }
             },
         )
@@ -81,11 +82,11 @@ internal fun M3ButtonsPage() {
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Button(onClick = {}, enabled = false) { Text("Filled") }
-                    OutlinedButton(onClick = {}, enabled = false) { Text("Outlined") }
-                    TextButton(onClick = {}, enabled = false) { Text("Text") }
-                    ElevatedButton(onClick = {}, enabled = false) { Text("Elevated") }
-                    FilledTonalButton(onClick = {}, enabled = false) { Text("Filled Tonal") }
+                    Button(onClick = {}, enabled = false) { M3Text("Filled") }
+                    OutlinedButton(onClick = {}, enabled = false) { M3Text("Outlined") }
+                    TextButton(onClick = {}, enabled = false) { M3Text("Text") }
+                    ElevatedButton(onClick = {}, enabled = false) { M3Text("Elevated") }
+                    FilledTonalButton(onClick = {}, enabled = false) { M3Text("Filled Tonal") }
                 }
             },
         )
@@ -103,7 +104,7 @@ internal fun M3ButtonsPage() {
             },
             materialContent = {
                 Text(
-                    "No built-in loading state in M3 API — use Darwin wrappers for loading support.",
+                    "No built-in loading state in M3 — use Darwin wrappers or add your own CircularProgressIndicator.",
                     style = io.github.kdroidfilter.darwinui.theme.DarwinTheme.typography.bodySmall,
                     color = io.github.kdroidfilter.darwinui.theme.DarwinTheme.colors.textTertiary,
                 )
