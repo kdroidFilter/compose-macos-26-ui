@@ -59,7 +59,6 @@ import io.github.kdroidfilter.darwinui.icons.LucideCalendar
 import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.icons.LucideChevronLeft
 import io.github.kdroidfilter.darwinui.icons.LucideChevronRight
-import io.github.kdroidfilter.darwinui.theme.Blue500
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
@@ -133,9 +132,6 @@ data class DateConfig(
 // Color helpers
 // =============================================================================
 
-private val Blue400 = Color(0xFF60A5FA)
-private val BluePillBg = Blue500.copy(alpha = 0.15f)
-private val BluePillBorder = Blue500.copy(alpha = 0.20f)
 
 // =============================================================================
 // InlineSelect — blue pill dropdown
@@ -149,6 +145,9 @@ private fun <T> InlineSelect(
     labelOf: (T) -> String,
 ) {
     val colors = DarwinTheme.colors
+    val accentColor = colors.accent
+    val pillBg = accentColor.copy(alpha = 0.15f)
+    val pillBorder = accentColor.copy(alpha = 0.20f)
     val density = LocalDensity.current
     var expanded by remember { mutableStateOf(false) }
     val pillShape = RoundedCornerShape(6.dp)
@@ -170,8 +169,8 @@ private fun <T> InlineSelect(
             modifier = Modifier
                 .onGloballyPositioned { triggerHeightPx = it.size.height }
                 .clip(pillShape)
-                .background(BluePillBg, pillShape)
-                .border(1.dp, BluePillBorder, pillShape)
+                .background(pillBg, pillShape)
+                .border(1.dp, pillBorder, pillShape)
                 .hoverable(interactionSource)
                 .clickable(
                     indication = null,
@@ -184,12 +183,12 @@ private fun <T> InlineSelect(
             Text(
                 text = labelOf(selected),
                 style = DarwinTheme.typography.bodySmall,
-                color = Blue400,
+                color = accentColor,
                 fontWeight = FontWeight.Medium,
             )
             Icon(
                 imageVector = LucideChevronDown,
-                tint = Blue400,
+                tint = accentColor,
                 modifier = Modifier.size(12.dp).rotate(chevronRotation),
             )
         }
@@ -218,11 +217,11 @@ private fun <T> InlineSelect(
                         val isSelected = option == selected
 
                         val optBg = when {
-                            isSelected -> BluePillBg
+                            isSelected -> pillBg
                             optHovered -> colors.muted
                             else -> Color.Transparent
                         }
-                        val optColor = if (isSelected) Blue400 else colors.textPrimary
+                        val optColor = if (isSelected) accentColor else colors.textPrimary
 
                         Box(
                             modifier = Modifier
@@ -262,6 +261,9 @@ private fun DatePickerButton(
     dateMode: DateMode,
     onDateSelected: (LocalDate) -> Unit,
 ) {
+    val accentColor = DarwinTheme.colors.accent
+    val pillBg = accentColor.copy(alpha = 0.15f)
+    val pillBorder = accentColor.copy(alpha = 0.20f)
     val density = LocalDensity.current
     var expanded by remember { mutableStateOf(false) }
     val pillShape = RoundedCornerShape(6.dp)
@@ -284,8 +286,8 @@ private fun DatePickerButton(
                     triggerWidthPx = it.size.width
                 }
                 .clip(pillShape)
-                .background(BluePillBg, pillShape)
-                .border(1.dp, BluePillBorder, pillShape)
+                .background(pillBg, pillShape)
+                .border(1.dp, pillBorder, pillShape)
                 .hoverable(interactionSource)
                 .clickable(
                     indication = null,
@@ -295,11 +297,11 @@ private fun DatePickerButton(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Icon(imageVector = LucideCalendar, tint = Blue400, modifier = Modifier.size(12.dp))
+            Icon(imageVector = LucideCalendar, tint = accentColor, modifier = Modifier.size(12.dp))
             Text(
                 text = label,
                 style = DarwinTheme.typography.bodySmall,
-                color = Blue400,
+                color = accentColor,
                 fontWeight = FontWeight.Medium,
             )
         }
@@ -335,6 +337,7 @@ private fun CalendarGrid(
     onDateSelected: (LocalDate) -> Unit,
 ) {
     val colors = DarwinTheme.colors
+    val accentColor = colors.accent
     val panelShape = RoundedCornerShape(10.dp)
     val panelBg = if (colors.isDark) Color(0xFF1C1C1F) else Color(0xFFFAFAFA)
     val panelBorder = if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
@@ -478,14 +481,14 @@ private fun CalendarGrid(
                     val cellHovered by cellInteraction.collectIsHoveredAsState()
 
                     val cellBg = when {
-                        isSelected -> Blue500
+                        isSelected -> accentColor
                         cellHovered && isCurrentMonth -> colors.muted
                         else -> Color.Transparent
                     }
                     val textColor = when {
                         isSelected -> Color.White
                         !isCurrentMonth -> colors.textPrimary.copy(alpha = 0.3f)
-                        isToday -> Blue400
+                        isToday -> accentColor
                         else -> colors.textPrimary
                     }
 
@@ -524,6 +527,9 @@ private fun TimePickerButton(
     onTimeChanged: (Int, Int) -> Unit,
 ) {
     val colors = DarwinTheme.colors
+    val accentColor = colors.accent
+    val pillBg = accentColor.copy(alpha = 0.15f)
+    val pillBorder = accentColor.copy(alpha = 0.20f)
     val density = LocalDensity.current
     var expanded by remember { mutableStateOf(false) }
     val pillShape = RoundedCornerShape(6.dp)
@@ -541,8 +547,8 @@ private fun TimePickerButton(
             modifier = Modifier
                 .onGloballyPositioned { triggerHeightPx = it.size.height }
                 .clip(pillShape)
-                .background(BluePillBg, pillShape)
-                .border(1.dp, BluePillBorder, pillShape)
+                .background(pillBg, pillShape)
+                .border(1.dp, pillBorder, pillShape)
                 .hoverable(interactionSource)
                 .clickable(
                     indication = null,
@@ -554,7 +560,7 @@ private fun TimePickerButton(
             Text(
                 text = label,
                 style = DarwinTheme.typography.bodySmall,
-                color = Blue400,
+                color = accentColor,
                 fontWeight = FontWeight.Medium,
             )
         }
@@ -604,7 +610,7 @@ private fun TimePickerButton(
                         ),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        cursorBrush = SolidColor(Blue500),
+                        cursorBrush = SolidColor(accentColor),
                     )
 
                     Text(
@@ -632,7 +638,7 @@ private fun TimePickerButton(
                         ),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        cursorBrush = SolidColor(Blue500),
+                        cursorBrush = SolidColor(accentColor),
                     )
                 }
             }
@@ -884,6 +890,9 @@ fun DateSelect(
     modifier: Modifier = Modifier,
 ) {
     val colors = DarwinTheme.colors
+    val accentColor = colors.accent
+    val pillBg = accentColor.copy(alpha = 0.15f)
+    val pillBorder = accentColor.copy(alpha = 0.20f)
     val shapes = DarwinTheme.shapes
 
     var dialogOpen by remember { mutableStateOf(false) }
@@ -961,12 +970,12 @@ fun DateSelect(
                             val chipHovered by chipInteraction.collectIsHoveredAsState()
 
                             val chipBg = when {
-                                isSelected -> BluePillBg
+                                isSelected -> pillBg
                                 chipHovered -> colors.muted
                                 else -> Color.Transparent
                             }
-                            val chipBorder = if (isSelected) BluePillBorder else colors.border
-                            val chipColor = if (isSelected) Blue400 else colors.textSecondary
+                            val chipBorder = if (isSelected) pillBorder else colors.border
+                            val chipColor = if (isSelected) accentColor else colors.textSecondary
 
                             Box(
                                 modifier = Modifier

@@ -56,7 +56,7 @@ class RadioButtonColors(
 object RadioButtonDefaults {
     @Composable
     fun colors(
-        selectedColor: Color = Blue500,
+        selectedColor: Color = DarwinTheme.colorScheme.accent,
         unselectedColor: Color = if (DarwinTheme.colorScheme.isDark) Zinc600 else Color.Black.copy(alpha = 0.30f),
         disabledSelectedColor: Color = selectedColor.copy(alpha = 0.5f),
         disabledUnselectedColor: Color = unselectedColor.copy(alpha = 0.5f),

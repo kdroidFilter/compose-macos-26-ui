@@ -92,11 +92,11 @@ object CheckboxDefaults {
     fun colors(
         checkedCheckmarkColor: Color = Color.White,
         uncheckedCheckmarkColor: Color = Color.Transparent,
-        checkedBoxColor: Color = Blue500,
+        checkedBoxColor: Color = DarwinTheme.colorScheme.accent,
         uncheckedBoxColor: Color = if (DarwinTheme.colorScheme.isDark) Zinc800 else Color.White,
         disabledCheckedBoxColor: Color = checkedBoxColor.copy(alpha = 0.5f),
         disabledUncheckedBoxColor: Color = uncheckedBoxColor.copy(alpha = 0.5f),
-        checkedBorderColor: Color = Blue500,
+        checkedBorderColor: Color = DarwinTheme.colorScheme.accent,
         uncheckedBorderColor: Color = if (DarwinTheme.colorScheme.isDark) Zinc600 else Color.Black.copy(alpha = 0.20f),
         disabledBorderColor: Color = uncheckedBorderColor.copy(alpha = 0.5f),
         disabledIndeterminateBorderColor: Color = checkedBorderColor.copy(alpha = 0.5f),

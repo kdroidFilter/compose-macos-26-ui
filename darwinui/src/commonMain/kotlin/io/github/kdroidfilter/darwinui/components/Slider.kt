@@ -82,9 +82,9 @@ class SliderColors(
 object SliderDefaults {
     @Composable
     fun colors(
-        thumbColor: Color = Blue500,
-        activeTrackColor: Color = Blue500,
-        activeTickColor: Color = Blue500.copy(alpha = 0.5f),
+        thumbColor: Color = DarwinTheme.colorScheme.accent,
+        activeTrackColor: Color = DarwinTheme.colorScheme.accent,
+        activeTickColor: Color = DarwinTheme.colorScheme.accent.copy(alpha = 0.5f),
         inactiveTrackColor: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(0.10f) else Color.Black.copy(0.10f),
         inactiveTickColor: Color = inactiveTrackColor.copy(alpha = 0.5f),
         disabledThumbColor: Color = thumbColor.copy(0.38f),

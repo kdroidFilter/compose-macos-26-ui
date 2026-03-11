@@ -1,9 +1,13 @@
 package io.github.kdroidfilter.darwinui.sample
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -11,7 +15,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -104,6 +111,7 @@ import io.github.kdroidfilter.darwinui.sample.pages.ToastPage
 import io.github.kdroidfilter.darwinui.sample.pages.TopAppBarPage
 import io.github.kdroidfilter.darwinui.sample.pages.TooltipPage
 import io.github.kdroidfilter.darwinui.sample.pages.UploadPage
+import io.github.kdroidfilter.darwinui.theme.AccentColor
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
 // Navigation data — static tuples (id, label, group, icon)
@@ -158,8 +166,9 @@ private val sidebarEntryDefs = listOf(
 @Composable
 fun App() {
     var isDark by remember { mutableStateOf(false) }
+    var accentColor by remember { mutableStateOf(AccentColor.Blue) }
 
-    DarwinTheme(darkTheme = isDark) {
+    DarwinTheme(darkTheme = isDark, accentColor = accentColor) {
         val toastState = rememberToastState()
 
         Box(modifier = Modifier.fillMaxSize().background(DarwinTheme.colors.background)) {
@@ -220,6 +229,10 @@ fun App() {
                                         onValueChange = { searchQuery = it },
                                         placeholder = "Search components...",
                                         modifier = Modifier.fillMaxWidth(),
+                                    )
+                                    AccentColorPicker(
+                                        selected = accentColor,
+                                        onSelect = { accentColor = it },
                                     )
                                     if (filteredDefs.isEmpty()) {
                                         Text(
@@ -294,6 +307,37 @@ fun App() {
             }
 
             ToastHost(state = toastState)
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun AccentColorPicker(
+    selected: AccentColor,
+    onSelect: (AccentColor) -> Unit,
+) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        AccentColor.entries.forEach { color ->
+            val isSelected = color == selected
+            val displayColor = if (DarwinTheme.colors.isDark) color.dark else color.light
+            Box(
+                modifier = Modifier
+                    .size(20.dp)
+                    .clip(CircleShape)
+                    .background(displayColor, CircleShape)
+                    .then(
+                        if (isSelected) {
+                            Modifier.border(2.dp, DarwinTheme.colors.textPrimary, CircleShape)
+                        } else {
+                            Modifier
+                        }
+                    )
+                    .clickable { onSelect(color) },
+            )
         }
     }
 }

@@ -17,7 +17,8 @@ import androidx.compose.runtime.*
 @Composable
 fun DarwinTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    colorScheme: ColorScheme = if (darkTheme) darkColorScheme() else lightColorScheme(),
+    accentColor: AccentColor = AccentColor.Blue,
+    colorScheme: ColorScheme = if (darkTheme) darkColorScheme(accentColor) else lightColorScheme(accentColor),
     typography: DarwinTypography = DarwinTypography(),
     shapes: DarwinShapes = DarwinShapes(),
     animations: DarwinAnimations = DarwinAnimations(),

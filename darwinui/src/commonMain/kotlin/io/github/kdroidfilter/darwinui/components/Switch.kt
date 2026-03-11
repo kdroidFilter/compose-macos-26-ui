@@ -75,7 +75,7 @@ object SwitchDefaults {
     @Composable
     fun colors(
         checkedThumbColor: Color = Color.White,
-        checkedTrackColor: Color = Emerald500,
+        checkedTrackColor: Color = DarwinTheme.colorScheme.accent,
         checkedBorderColor: Color = Color.Transparent,
         uncheckedThumbColor: Color = Color.White,
         uncheckedTrackColor: Color = Zinc600,

@@ -435,7 +435,7 @@ fun PrimaryButton(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled && !loading,
-        colors = ButtonColors(Blue500, Color.White, Blue500.copy(0.5f), Color.White.copy(0.5f)),
+        colors = ButtonColors(DarwinTheme.colors.accent, Color.White, DarwinTheme.colors.accent.copy(0.5f), Color.White.copy(0.5f)),
     ) {
         if (loading) {
             Spinner(modifier = Modifier.size(16.dp), color = Color.White)
@@ -780,8 +780,8 @@ fun HyperlinkButton(
         enabled = enabled,
         shape = DarwinTheme.shapes.medium,
         colors = ButtonColors(
-            Color.Transparent, if (isDark) Color(0xFF60A5FA) else Blue600,
-            Color.Transparent, if (isDark) Color(0xFF60A5FA).copy(0.5f) else Blue600.copy(0.5f),
+            Color.Transparent, DarwinTheme.colors.accent,
+            Color.Transparent, DarwinTheme.colors.accent.copy(0.5f),
         ),
         border = null,
         contentPadding = ButtonDefaults.TextButtonContentPadding,

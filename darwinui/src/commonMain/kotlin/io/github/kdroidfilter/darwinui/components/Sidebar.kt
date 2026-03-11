@@ -370,7 +370,7 @@ private fun SidebarItemRow(
     val isHovered by interactionSource.collectIsHoveredAsState()
 
     val backgroundColor = when {
-        active -> Blue500
+        active -> DarwinTheme.colors.accent
         isHovered -> if (isDark) Color.White.copy(alpha = 0.10f) else Zinc100
         else -> Color.Transparent
     }
