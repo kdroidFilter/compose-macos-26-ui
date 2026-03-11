@@ -206,6 +206,7 @@ fun App() {
                     showBorder = false,
                     collapsed = sidebarCollapsed,
                     onCollapsedChange = { sidebarCollapsed = it },
+                    collapsible = true,
                     iconSize = sidebarIconSize,
                     header = {
                         Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 10.dp)) {

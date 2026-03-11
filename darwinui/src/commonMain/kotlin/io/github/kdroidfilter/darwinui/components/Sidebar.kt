@@ -1,5 +1,6 @@
 package io.github.kdroidfilter.darwinui.components
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -23,6 +24,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,29 +34,24 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideChevronsLeft
 import io.github.kdroidfilter.darwinui.icons.LucideLogOut
-import androidx.compose.ui.unit.Dp
-import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import io.github.kdroidfilter.darwinui.theme.Zinc500
-import io.github.kdroidfilter.darwinui.theme.Zinc600
-import io.github.kdroidfilter.darwinui.theme.Zinc700
-import io.github.kdroidfilter.darwinui.theme.Zinc900
-import io.github.kdroidfilter.darwinui.theme.darwinTween
-import kotlin.math.roundToInt
+import io.github.kdroidfilter.darwinui.theme.darwinSpring
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.tooling.preview.Preview
 
 // =============================================================================
 // Animation helper — critically damped spring (no overshoot) with Smooth stiffness
@@ -77,40 +74,32 @@ private fun <T> sidebarSpring() = spring<T>(
  */
 enum class SidebarIconSize(
     val iconDp: Dp,
-    val collapsedIconDp: Dp,
     val itemHeight: Dp,
     val hPadding: Dp,
-    val collapsedHPadding: Dp,
     val iconGap: Dp,
     val itemSpacing: Dp,
     val groupHeaderMaxHeight: Dp,
 ) {
     Small(
         iconDp = 16.dp,
-        collapsedIconDp = 18.dp,
         itemHeight = 26.dp,
         hPadding = 8.dp,
-        collapsedHPadding = 8.dp,
         iconGap = 6.dp,
         itemSpacing = 1.dp,
         groupHeaderMaxHeight = 24.dp,
     ),
     Medium(
         iconDp = 18.dp,
-        collapsedIconDp = 20.dp,
         itemHeight = 30.dp,
         hPadding = 10.dp,
-        collapsedHPadding = 10.dp,
         iconGap = 8.dp,
         itemSpacing = 2.dp,
         groupHeaderMaxHeight = 28.dp,
     ),
     Large(
         iconDp = 26.dp,
-        collapsedIconDp = 26.dp,
         itemHeight = 42.dp,
         hPadding = 12.dp,
-        collapsedHPadding = 12.dp,
         iconGap = 10.dp,
         itemSpacing = 3.dp,
         groupHeaderMaxHeight = 32.dp,
@@ -124,6 +113,10 @@ enum class SidebarIconSize(
 /**
  * Data for a single sidebar navigation item.
  *
+ * [onClick] is intentionally excluded from [equals]/[hashCode] to keep
+ * [SidebarItem] stable for Compose's skipping mechanism (lambdas don't
+ * implement structural equality).
+ *
  * @param label Display text for the item.
  * @param onClick Callback invoked when this item is clicked.
  * @param icon Optional Lucide-style [ImageVector] rendered before the label.
@@ -131,13 +124,27 @@ enum class SidebarIconSize(
  *   items are rendered in groups with a header label above each group.
  * @param id Unique identifier used for active-item matching. Defaults to [label].
  */
-data class SidebarItem(
+class SidebarItem(
     val label: String,
     val onClick: () -> Unit,
     val icon: ImageVector? = null,
     val group: String? = null,
     val id: String = label,
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SidebarItem) return false
+        return id == other.id && label == other.label && icon == other.icon && group == other.group
+    }
+
+    override fun hashCode(): Int {
+        var result = label.hashCode()
+        result = 31 * result + (icon?.hashCode() ?: 0)
+        result = 31 * result + (group?.hashCode() ?: 0)
+        result = 31 * result + id.hashCode()
+        return result
+    }
+}
 
 // =============================================================================
 // Sidebar — main component
@@ -150,19 +157,19 @@ fun Sidebar(
     modifier: Modifier = Modifier,
     iconSize: SidebarIconSize = SidebarIconSize.Medium,
     onLogout: (() -> Unit)? = null,
+    logoutLabel: String = "Logout",
     collapsed: Boolean = false,
     onCollapsedChange: ((Boolean) -> Unit)? = null,
-    collapsible: Boolean = onCollapsedChange != null,
+    collapsible: Boolean = false,
     showBorder: Boolean = false,
     header: (@Composable () -> Unit)? = null,
+    pinnedItems: List<SidebarItem> = emptyList(),
 ) {
     val colors = DarwinTheme.colors
-    val typography = DarwinTheme.typography
     val isDark = colors.isDark
 
-    val topItems = items.filter { it.label != "Settings" }
-    val settingsItem = items.find { it.label == "Settings" }
-    val hasGroups = items.any { it.group != null }
+    val hasGroups = remember(items) { items.any { it.group != null } }
+    val groupedItems = remember(items) { if (hasGroups) items.groupBy { it.group } else null }
 
     // Animated width: collapsed=56dp, expanded=272dp (matches macOS sidebar)
     val animatedWidth by animateDpAsState(
@@ -176,7 +183,7 @@ fun Sidebar(
         animationSpec = sidebarSpring(),
     )
 
-    val hasBottomSection = collapsible || settingsItem != null || onLogout != null
+    val hasBottomSection = collapsible || pinnedItems.isNotEmpty() || onLogout != null
 
     val sidebarContentShape = DarwinTheme.shapes.extraLarge
     val sidebarBorderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.08f)
@@ -221,13 +228,17 @@ fun Sidebar(
                     animationSpec = sidebarSpring(),
                 )
 
+                // layout{} reads headerFraction during the layout phase, which is
+                // acceptable here: it is an animated State so Compose only re-lays
+                // this subtree (not the whole sidebar) on each animation frame.
+                // graphicsLayer confines the alpha read to the draw phase.
                 Box(
                     modifier = Modifier
                         .clipToBounds()
                         .graphicsLayer { alpha = headerFraction }
                         .layout { measurable, constraints ->
                             val placeable = measurable.measure(constraints)
-                            val h = (placeable.height * headerFraction).roundToInt()
+                            val h = (placeable.height * headerFraction).toInt()
                             layout(placeable.width, h) {
                                 placeable.placeRelative(0, 0)
                             }
@@ -242,16 +253,28 @@ fun Sidebar(
                 modifier = Modifier
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 6.dp),
+                    .padding(horizontal = 6.dp, vertical = 4.dp),
                 verticalArrangement = Arrangement.spacedBy(iconSize.itemSpacing),
             ) {
-                if (hasGroups) {
-                    val groups = topItems.groupBy { it.group }
-                    for ((group, groupItems) in groups) {
+                if (hasGroups && groupedItems != null) {
+                    for ((group, groupItems) in groupedItems) {
                         if (group != null) {
                             GroupHeader(text = group, isCollapsed = collapsed, sidebarIconSize = iconSize)
                         }
                         groupItems.forEach { item ->
+                            key(item.id) {
+                                SidebarItemWithVisibility(
+                                    item = item,
+                                    activeItem = activeItem,
+                                    collapsed = collapsed,
+                                    sidebarIconSize = iconSize,
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    items.forEach { item ->
+                        key(item.id) {
                             SidebarItemWithVisibility(
                                 item = item,
                                 activeItem = activeItem,
@@ -259,15 +282,6 @@ fun Sidebar(
                                 sidebarIconSize = iconSize,
                             )
                         }
-                    }
-                } else {
-                    topItems.forEach { item ->
-                        SidebarItemWithVisibility(
-                            item = item,
-                            activeItem = activeItem,
-                            collapsed = collapsed,
-                            sidebarIconSize = iconSize,
-                        )
                     }
                 }
             }
@@ -286,18 +300,20 @@ fun Sidebar(
                         )
                     }
 
-                    if (settingsItem != null) {
-                        SidebarItemWithVisibility(
-                            item = settingsItem,
-                            activeItem = activeItem,
-                            collapsed = collapsed,
-                            sidebarIconSize = iconSize,
-                        )
+                    pinnedItems.forEach { item ->
+                        key(item.id) {
+                            SidebarItemWithVisibility(
+                                item = item,
+                                activeItem = activeItem,
+                                collapsed = collapsed,
+                                sidebarIconSize = iconSize,
+                            )
+                        }
                     }
 
                     if (onLogout != null) {
                         SidebarItemRow(
-                            label = "Logout",
+                            label = logoutLabel,
                             onClick = onLogout,
                             active = false,
                             icon = LucideLogOut,
@@ -357,6 +373,9 @@ private fun SidebarItemWithVisibility(
             animationSpec = sidebarSpring(),
         )
 
+        // The outer Box handles visibility for text-only items.
+        // isCollapsed=false is passed to SidebarItemRow so its internal
+        // labelAlpha always targets 1f — the Box controls visibility, not the row.
         Box(
             modifier = Modifier
                 .height(itemHeight)
@@ -430,29 +449,40 @@ private fun SidebarItemRow(
     icon: ImageVector?,
     isCollapsed: Boolean,
     sidebarIconSize: SidebarIconSize = SidebarIconSize.Medium,
+    iconModifier: Modifier = Modifier,
+    iconContentDescription: String? = null,
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val colors = DarwinTheme.colors
     val typography = DarwinTheme.typography
 
     val interactionSource = remember { MutableInteractionSource() }
 
-    val backgroundColor = if (active) DarwinTheme.colors.accent else Color.Transparent
-
-    val textColor = if (active) Color.White else if (isDark) Color(0xFFD4D4D8) else Zinc600
-    val iconColor = if (active) Color.White else if (isDark) Color(0xFFD4D4D8) else Zinc500
+    val backgroundColor by animateColorAsState(
+        targetValue = if (active) colors.accent else Color.Transparent,
+        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+    )
+    val contentColor by animateColorAsState(
+        targetValue = if (active) colors.onAccent else colors.textSecondary,
+        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+    )
 
     val itemShape = DarwinTheme.shapes.small
 
-    // When collapsed, always use Small dimensions so icons fit the fixed 56dp width
-    val collapsedSize = SidebarIconSize.Small
-    val iconSize = if (isCollapsed) collapsedSize.collapsedIconDp else sidebarIconSize.iconDp
-    val hPadding = if (isCollapsed) collapsedSize.collapsedHPadding else sidebarIconSize.hPadding
-    val iconLabelGap = if (isCollapsed) 0.dp else sidebarIconSize.iconGap
-
-    val labelAlpha by animateFloatAsState(
-        targetValue = if (isCollapsed) 0f else 1f,
+    // Collapse fraction drives all collapse animations: 0f = expanded, 1f = collapsed.
+    // When sidebarIconSize changes (without collapse), the fraction stays at its current
+    // value and the new Dp values take effect instantly — no unwanted size animation.
+    val collapseFraction by animateFloatAsState(
+        targetValue = if (isCollapsed) 1f else 0f,
         animationSpec = sidebarSpring(),
     )
+
+    // When collapsed: center the icon within 56dp total sidebar width.
+    // Total horizontal insets = animatedPadding(6dp) + scrollColumn padding(6dp) + hPadding.
+    // To center: each side = (56dp - iconDp) / 2, so hPadding = (56dp - iconDp) / 2 - 12dp.
+    val collapsedHPadding = ((56.dp - sidebarIconSize.iconDp) / 2 - 12.dp).coerceAtLeast(0.dp)
+    val hPadding = lerp(sidebarIconSize.hPadding, collapsedHPadding, collapseFraction)
+    val iconLabelGap = lerp(sidebarIconSize.iconGap, 0.dp, collapseFraction)
+    val labelAlpha = 1f - collapseFraction
 
     val textStyle = when (sidebarIconSize) {
         SidebarIconSize.Small -> typography.bodySmall
@@ -478,8 +508,11 @@ private fun SidebarItemRow(
         if (icon != null) {
             Icon(
                 imageVector = icon,
-                tint = iconColor,
-                modifier = Modifier.size(iconSize),
+                tint = contentColor,
+                // Describe the icon when collapsed (icon is the only visible label);
+                // null when expanded (the text label is present and the icon is decorative).
+                contentDescription = if (isCollapsed) (iconContentDescription ?: label) else null,
+                modifier = Modifier.size(sidebarIconSize.iconDp).then(iconModifier),
             )
             Spacer(modifier = Modifier.width(iconLabelGap))
         }
@@ -487,7 +520,7 @@ private fun SidebarItemRow(
         Text(
             text = label,
             style = textStyle,
-            color = textColor,
+            color = contentColor,
             maxLines = 1,
             overflow = TextOverflow.Clip,
             modifier = Modifier.graphicsLayer { alpha = labelAlpha },
@@ -505,65 +538,23 @@ private fun CollapseToggle(
     onClick: () -> Unit,
     sidebarIconSize: SidebarIconSize = SidebarIconSize.Medium,
 ) {
-    val isDark = DarwinTheme.colors.isDark
-    val typography = DarwinTheme.typography
-
-    val interactionSource = remember { MutableInteractionSource() }
-
-    val textColor = if (isDark) Color(0xFFD4D4D8) else Zinc500
-
-    val itemShape = DarwinTheme.shapes.small
-
     val iconRotation by animateFloatAsState(
         targetValue = if (isCollapsed) 180f else 0f,
-        animationSpec = darwinTween(DarwinDuration.Slow),
-    )
-
-    val collapsedSize = SidebarIconSize.Small
-    val iconSize = if (isCollapsed) collapsedSize.collapsedIconDp else sidebarIconSize.iconDp
-    val hPadding = if (isCollapsed) collapsedSize.collapsedHPadding else sidebarIconSize.hPadding
-    val iconLabelGap = if (isCollapsed) 0.dp else sidebarIconSize.iconGap
-
-    val labelAlpha by animateFloatAsState(
-        targetValue = if (isCollapsed) 0f else 1f,
+        // Tween intentional here: rotation arc reads better with an easing curve
+        // than a spring. Label fade stays on sidebarSpring() inside SidebarItemRow.
         animationSpec = sidebarSpring(),
     )
 
-    val textStyle = when (sidebarIconSize) {
-        SidebarIconSize.Small -> typography.bodySmall
-        SidebarIconSize.Medium -> typography.bodyMedium
-        SidebarIconSize.Large -> typography.bodyLarge
-    }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(sidebarIconSize.itemHeight)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = onClick,
-            )
-            .padding(horizontal = hPadding),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            imageVector = LucideChevronsLeft,
-            tint = textColor,
-            modifier = Modifier.size(iconSize).graphicsLayer { rotationZ = iconRotation },
-        )
-
-        Spacer(modifier = Modifier.width(iconLabelGap))
-
-        Text(
-            text = "Collapse",
-            style = textStyle,
-            color = textColor,
-            maxLines = 1,
-            overflow = TextOverflow.Clip,
-            modifier = Modifier.graphicsLayer { alpha = labelAlpha },
-        )
-    }
+    SidebarItemRow(
+        label = "Collapse",
+        onClick = onClick,
+        active = false,
+        icon = LucideChevronsLeft,
+        isCollapsed = isCollapsed,
+        sidebarIconSize = sidebarIconSize,
+        iconModifier = Modifier.graphicsLayer { rotationZ = iconRotation },
+        iconContentDescription = if (isCollapsed) "Expand sidebar" else "Collapse sidebar",
+    )
 }
 
 @Preview
@@ -573,8 +564,9 @@ private fun SidebarPreview() {
         Sidebar(
             items = listOf(
                 SidebarItem(label = "Home", onClick = {}),
-                SidebarItem(label = "Settings", onClick = {}),
+                SidebarItem(label = "Projects", onClick = {}),
             ),
+            pinnedItems = listOf(SidebarItem(label = "Settings", onClick = {})),
             activeItem = "Home",
         )
     }

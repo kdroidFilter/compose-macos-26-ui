@@ -47,8 +47,10 @@ fun SidebarPreviewExample() {
             SidebarItem("Dashboard", onClick = { activeItem = "Dashboard" }, icon = LucideHome),
             SidebarItem("Projects", onClick = { activeItem = "Projects" }, icon = LucideFolder),
             SidebarItem("Analytics", onClick = { activeItem = "Analytics" }, icon = LucideBarChart3),
-            SidebarItem("Settings", onClick = { activeItem = "Settings" }, icon = LucideSettings),
         )
+    }
+    val pinnedItems = remember {
+        listOf(SidebarItem("Settings", onClick = { activeItem = "Settings" }, icon = LucideSettings))
     }
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -64,6 +66,7 @@ fun SidebarPreviewExample() {
                 Box(modifier = Modifier.fillMaxHeight().background(DarwinTheme.colors.muted)) {
                     Sidebar(
                         items = sidebarItems,
+                        pinnedItems = pinnedItems,
                         activeItem = activeItem,
                         onLogout = { activeItem = "Logged out" },
                         collapsed = isCollapsed,
@@ -103,8 +106,10 @@ fun SidebarCollapsibleExample() {
         listOf(
             SidebarItem("Dashboard", onClick = { active = "Dashboard" }, icon = LucideHome),
             SidebarItem("Projects", onClick = { active = "Projects" }, icon = LucideFolder),
-            SidebarItem("Settings", onClick = { active = "Settings" }, icon = LucideSettings),
         )
+    }
+    val pinnedItems = remember {
+        listOf(SidebarItem("Settings", onClick = { active = "Settings" }, icon = LucideSettings))
     }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Switcher(checked = collapsed, onCheckedChange = { collapsed = it }, label = "Collapsed")
@@ -112,6 +117,7 @@ fun SidebarCollapsibleExample() {
             Row(modifier = Modifier.fillMaxSize()) {
                 Sidebar(
                     items = items,
+                    pinnedItems = pinnedItems,
                     activeItem = active,
                     onLogout = {},
                     collapsed = collapsed,
