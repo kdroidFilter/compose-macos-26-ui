@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.AccentButton
 import io.github.kdroidfilter.darwinui.components.Button
-import io.github.kdroidfilter.darwinui.components.ButtonSize
 import io.github.kdroidfilter.darwinui.components.DestructiveButton
 import io.github.kdroidfilter.darwinui.components.HyperlinkButton
 import io.github.kdroidfilter.darwinui.components.InfoButton
@@ -76,11 +75,11 @@ private fun ButtonPreview() {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("ICON BUTTONS", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                PrimaryButton(onClick = {}, size = ButtonSize.Icon) { Icon(LucidePlus) }
-                SecondaryButton(onClick = {}, size = ButtonSize.Icon) { Icon(LucideSettings) }
-                OutlineButton(onClick = {}, size = ButtonSize.Icon) { Icon(LucideHeart) }
-                SubtleButton(onClick = {}, size = ButtonSize.Icon) { Icon(LucideShare2) }
-                DestructiveButton(onClick = {}, size = ButtonSize.Icon) { Icon(LucideTrash2) }
+                PrimaryButton(onClick = {}) { Icon(LucidePlus) }
+                SecondaryButton(onClick = {}) { Icon(LucideSettings) }
+                OutlineButton(onClick = {}) { Icon(LucideHeart) }
+                SubtleButton(onClick = {}) { Icon(LucideShare2) }
+                DestructiveButton(onClick = {}) { Icon(LucideTrash2) }
             }
         }
         // With Icons
@@ -115,7 +114,7 @@ fun ButtonVariantsExample() {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Button(text = "Default", onClick = {})
+        Button(onClick = {}) { Text("Default") }
         PrimaryButton(text = "Primary", onClick = {})
         SecondaryButton(text = "Secondary", onClick = {})
         AccentButton(text = "Accent", onClick = {})
@@ -137,9 +136,9 @@ fun ButtonSizesExample() {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Button(text = "Small", onClick = {}, size = ButtonSize.Small)
-        Button(text = "Default", onClick = {}, size = ButtonSize.Default)
-        Button(text = "Large", onClick = {}, size = ButtonSize.Large)
+        Button(onClick = {}) { Text("Small") }
+        Button(onClick = {}) { Text("Default") }
+        Button(onClick = {}) { Text("Large") }
     }
 }
 
@@ -151,10 +150,10 @@ fun ButtonStatesExample() {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Button(text = "Disabled", onClick = {}, enabled = false)
-        Button(text = "Loading", onClick = {}, loading = true)
-        Button(text = "Loading + text", onClick = {}, loading = true, loadingText = "Saving...")
-        Button(text = "Default", onClick = {})
+        Button(onClick = {}, enabled = false) { Text("Disabled") }
+        PrimaryButton(text = "Loading", onClick = {}, loading = true)
+        PrimaryButton(text = "Loading + text", onClick = {}, loading = true, loadingText = "Saving...")
+        Button(onClick = {}) { Text("Default") }
     }
 }
 

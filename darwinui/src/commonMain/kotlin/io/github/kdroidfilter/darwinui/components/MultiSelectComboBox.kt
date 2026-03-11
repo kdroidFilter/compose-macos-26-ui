@@ -285,7 +285,7 @@ fun MultiSelectComboBox(
                                     Icon(
                                         imageVector = LucideCheck,
                                         tint = colors.accent,
-                                        size = 12.dp,
+                                        modifier = Modifier.size(12.dp),
                                     )
                                 }
                             }
@@ -367,7 +367,7 @@ fun MultiSelectComboBox(
                                     } else {
                                         if (colors.isDark) Color(0xFF71717A) else Color(0xFFA1A1AA)
                                     },
-                                    size = 12.dp,
+                                    modifier = Modifier.size(12.dp),
                                 )
                             }
                         }

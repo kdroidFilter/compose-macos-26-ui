@@ -9,7 +9,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.components.TextField
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.CodeBlock
@@ -24,10 +26,8 @@ private fun InputPreview() {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
         var text by remember { mutableStateOf("") }
         var errorText by remember { mutableStateOf("") }
-        var successText by remember { mutableStateOf("Valid input") }
-        TextField(value = text, onValueChange = { text = it }, placeholder = "Type something...")
-        TextField(value = errorText, onValueChange = { errorText = it }, placeholder = "Error state", isError = true)
-        TextField(value = successText, onValueChange = { successText = it }, placeholder = "Success state", isSuccess = true)
+        TextField(value = text, onValueChange = { text = it }, placeholder = { Text("Type something...") })
+        TextField(value = errorText, onValueChange = { errorText = it }, placeholder = { Text("Error state") }, isError = true)
     }
 }
 
@@ -38,8 +38,8 @@ fun InputDefaultExample() {
     TextField(
         value = text,
         onValueChange = { text = it },
-        placeholder = "Enter your name...",
-        label = "Name",
+        placeholder = { Text("Enter your name...") },
+        label = { Text("Name") },
         modifier = Modifier.fillMaxWidth(0.5f),
     )
 }
@@ -51,24 +51,10 @@ fun InputErrorExample() {
     TextField(
         value = text,
         onValueChange = { text = it },
-        placeholder = "Required field",
-        label = "Email",
+        placeholder = { Text("Required field") },
+        label = { Text("Email") },
         isError = true,
-        supportingText = "This field is required",
-        modifier = Modifier.fillMaxWidth(0.5f),
-    )
-}
-
-@GalleryExample("Input", "Success State")
-@Composable
-fun InputSuccessExample() {
-    var text by remember { mutableStateOf("valid@email.com") }
-    TextField(
-        value = text,
-        onValueChange = { text = it },
-        label = "Verified email",
-        isSuccess = true,
-        supportingText = "Email verified",
+        supportingText = { Text("This field is required") },
         modifier = Modifier.fillMaxWidth(0.5f),
     )
 }
@@ -80,9 +66,9 @@ fun InputWithLabelExample() {
     TextField(
         value = text,
         onValueChange = { text = it },
-        placeholder = "you@example.com",
-        label = "Email address",
-        supportingText = "We'll never share your email.",
+        placeholder = { Text("you@example.com") },
+        label = { Text("Email address") },
+        supportingText = { Text("We'll never share your email.") },
         modifier = Modifier.fillMaxWidth(0.5f),
     )
 }
@@ -94,9 +80,9 @@ fun InputPasswordExample() {
     TextField(
         value = password,
         onValueChange = { password = it },
-        placeholder = "Password",
-        label = "Password",
-        password = true,
+        placeholder = { Text("Password") },
+        label = { Text("Password") },
+        visualTransformation = PasswordVisualTransformation(),
         modifier = Modifier.fillMaxWidth(0.5f),
     )
 }
@@ -111,8 +97,8 @@ internal fun InputPage() {
 TextField(
     value = text,
     onValueChange = { text = it },
-    placeholder = "Enter text...",
-    label = "Label",
+    placeholder = { Text("Enter text...") },
+    label = { Text("Label") },
 )""")
 
         SectionHeader("Examples")
@@ -130,11 +116,6 @@ TextField(
             description = "Input with error validation",
             sourceCode = GallerySources.InputErrorExample,
         ) { InputErrorExample() }
-        ExampleCard(
-            title = "Success State",
-            description = "Input with success validation",
-            sourceCode = GallerySources.InputSuccessExample,
-        ) { InputSuccessExample() }
         ExampleCard(
             title = "Password",
             description = "Password input with visibility toggle",

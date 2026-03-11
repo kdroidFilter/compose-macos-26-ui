@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -212,6 +213,50 @@ fun Badge(
     CompositionLocalProvider(LocalDarwinTextStyle provides textStyle) {
         Box(modifier = badgeModifier) {
             content()
+        }
+    }
+}
+
+// ===========================================================================
+// M3-style Badge overload
+// ===========================================================================
+
+/**
+ * A simple badge — mirrors Material3's Badge API.
+ *
+ * For the full Darwin Badge with variant support, use [Badge] with [BadgeVariant].
+ *
+ * @param modifier Modifier for the badge container.
+ * @param containerColor Background color of the badge.
+ * @param contentColor Text/content color.
+ * @param content Optional content (number, label). If null, renders a dot.
+ */
+@Composable
+fun Badge(
+    modifier: Modifier = Modifier,
+    containerColor: Color = DarwinTheme.colors.destructive,
+    contentColor: Color = DarwinTheme.colors.onDestructive,
+    content: (@Composable () -> Unit)? = null,
+) {
+    val shape = DarwinTheme.shapes.full
+    if (content == null) {
+        Box(
+            modifier = modifier
+                .clip(shape)
+                .background(containerColor, shape)
+                .size(8.dp),
+        )
+    } else {
+        val textStyle = DarwinTheme.typography.labelSmall.merge(TextStyle(color = contentColor))
+        Box(
+            modifier = modifier
+                .clip(shape)
+                .background(containerColor, shape)
+                .padding(horizontal = 6.dp, vertical = 2.dp),
+        ) {
+            CompositionLocalProvider(LocalDarwinTextStyle provides textStyle) {
+                content()
+            }
         }
     }
 }

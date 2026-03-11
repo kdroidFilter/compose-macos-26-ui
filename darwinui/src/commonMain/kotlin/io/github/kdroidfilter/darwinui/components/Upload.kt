@@ -239,7 +239,7 @@ private fun DefaultEmptyState(
             Icon(
                 imageVector = LucideImage,
                 tint = colors.textSecondary,
-                size = 16.dp,
+                modifier = Modifier.size(16.dp),
             )
         }
 
@@ -319,7 +319,7 @@ private fun DefaultWithFiles(
                     Icon(
                         imageVector = LucideUpload,
                         tint = colors.textSecondary,
-                        size = 14.dp,
+                        modifier = Modifier.size(14.dp),
                     )
                     Text(
                         text = "Add",
@@ -343,7 +343,7 @@ private fun DefaultWithFiles(
                         Icon(
                             imageVector = LucideTrash2,
                             tint = Red500,
-                            size = 14.dp,
+                            modifier = Modifier.size(14.dp),
                         )
                         Text(
                             text = "Remove all",
@@ -435,7 +435,7 @@ private fun DefaultImageCard(
                     Icon(
                         imageVector = LucideImage,
                         tint = colors.textTertiary,
-                        size = 20.dp,
+                        modifier = Modifier.size(20.dp),
                     )
                     Spacer(Modifier.height(4.dp))
                     // Progress bar
@@ -466,7 +466,7 @@ private fun DefaultImageCard(
                 Icon(
                     imageVector = LucideImage,
                     tint = colors.textTertiary,
-                    size = 24.dp,
+                    modifier = Modifier.size(24.dp),
                 )
             }
 
@@ -484,7 +484,7 @@ private fun DefaultImageCard(
                     Icon(
                         imageVector = LucideX,
                         tint = Color.White,
-                        size = 14.dp,
+                        modifier = Modifier.size(14.dp),
                     )
                 }
             }
@@ -523,13 +523,13 @@ private fun DefaultImageCard(
                             Icon(
                                 imageVector = LucideStar,
                                 tint = Amber500,
-                                size = 14.dp,
+                                modifier = Modifier.size(14.dp),
                             )
                         } else {
                             Icon(
                                 imageVector = LucideStarOff,
                                 tint = if (colors.isDark) Color(0xFFF4F4F5) else Color(0xFF18181B),
-                                size = 14.dp,
+                                modifier = Modifier.size(14.dp),
                             )
                         }
                     }
@@ -548,7 +548,7 @@ private fun DefaultImageCard(
                         Icon(
                             imageVector = LucideArrowLeftRight,
                             tint = if (colors.isDark) Color(0xFFF4F4F5) else Color(0xFF18181B),
-                            size = 14.dp,
+                            modifier = Modifier.size(14.dp),
                         )
                     }
                 }
@@ -638,7 +638,7 @@ private fun CompactEmptyState(
             Icon(
                 imageVector = LucideImage,
                 tint = colors.mutedForeground,
-                size = 14.dp,
+                modifier = Modifier.size(14.dp),
             )
         }
 
@@ -699,7 +699,7 @@ private fun CompactWithFiles(
                     Icon(
                         imageVector = LucideUpload,
                         tint = colors.mutedForeground,
-                        size = 12.dp,
+                        modifier = Modifier.size(12.dp),
                     )
                     Text(
                         text = "Add",
@@ -721,7 +721,7 @@ private fun CompactWithFiles(
                         Icon(
                             imageVector = LucideTrash2,
                             tint = Red500,
-                            size = 12.dp,
+                            modifier = Modifier.size(12.dp),
                         )
                     }
                 }
@@ -786,7 +786,7 @@ private fun CompactImageCard(
                     animationSpec = tween(300),
                 )
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(LucideImage, tint = colors.textTertiary, size = 16.dp)
+                    Icon(LucideImage, tint = colors.textTertiary, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.height(4.dp))
                     Box(
                         modifier = Modifier
@@ -805,7 +805,7 @@ private fun CompactImageCard(
                     }
                 }
             } else {
-                Icon(LucideImage, tint = colors.textTertiary, size = 20.dp)
+                Icon(LucideImage, tint = colors.textTertiary, modifier = Modifier.size(20.dp))
             }
         }
 
@@ -821,7 +821,7 @@ private fun CompactImageCard(
                     .clickable(onClick = onRemove),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(LucideX, tint = Color.White, size = 12.dp)
+                Icon(LucideX, tint = Color.White, modifier = Modifier.size(12.dp))
             }
         }
 
@@ -893,7 +893,7 @@ private fun InlineVariant(
                                 .background(if (colors.isDark) Color(0xFF27272A) else Color(0xFFE4E4E7)),
                             contentAlignment = Alignment.Center,
                         ) {
-                            Icon(LucideImage, tint = colors.textTertiary, size = 14.dp)
+                            Icon(LucideImage, tint = colors.textTertiary, modifier = Modifier.size(14.dp))
                         }
                     }
                 }
@@ -920,7 +920,7 @@ private fun InlineVariant(
                 Icon(
                     imageVector = LucideUpload,
                     tint = colors.mutedForeground,
-                    size = 14.dp,
+                    modifier = Modifier.size(14.dp),
                 )
             }
 
@@ -938,7 +938,7 @@ private fun InlineVariant(
                     Icon(
                         imageVector = LucideTrash2,
                         tint = Red500,
-                        size = 14.dp,
+                        modifier = Modifier.size(14.dp),
                     )
                 }
             }

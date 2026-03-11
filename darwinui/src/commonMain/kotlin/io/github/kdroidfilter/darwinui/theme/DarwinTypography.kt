@@ -7,11 +7,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import darwinui.darwinui.generated.resources.Res
-import darwinui.darwinui.generated.resources.manrope_bold
-import darwinui.darwinui.generated.resources.manrope_medium
-import darwinui.darwinui.generated.resources.manrope_regular
-import darwinui.darwinui.generated.resources.manrope_semibold
+import composedarwinui.darwinui.generated.resources.Res
+import composedarwinui.darwinui.generated.resources.manrope_bold
+import composedarwinui.darwinui.generated.resources.manrope_medium
+import composedarwinui.darwinui.generated.resources.manrope_regular
+import composedarwinui.darwinui.generated.resources.manrope_semibold
 import org.jetbrains.compose.resources.Font
 
 @Composable
@@ -22,9 +22,11 @@ fun ManropeFontFamily(): FontFamily = FontFamily(
     Font(Res.font.manrope_bold, FontWeight.Bold),
 )
 
+/**
+ * Darwin UI typography scale — mirrors Material3's Typography class exactly.
+ */
 @Immutable
 data class DarwinTypography(
-    // Display
     val displayLarge: TextStyle = TextStyle(
         fontWeight = FontWeight.Bold,
         fontSize = 36.sp,
@@ -43,8 +45,6 @@ data class DarwinTypography(
         lineHeight = 32.sp,
         letterSpacing = 0.sp,
     ),
-
-    // Headline
     val headlineLarge: TextStyle = TextStyle(
         fontWeight = FontWeight.SemiBold,
         fontSize = 22.sp,
@@ -63,8 +63,6 @@ data class DarwinTypography(
         lineHeight = 24.sp,
         letterSpacing = 0.sp,
     ),
-
-    // Title
     val titleLarge: TextStyle = TextStyle(
         fontWeight = FontWeight.SemiBold,
         fontSize = 16.sp,
@@ -83,8 +81,6 @@ data class DarwinTypography(
         lineHeight = 18.sp,
         letterSpacing = 0.1.sp,
     ),
-
-    // Body
     val bodyLarge: TextStyle = TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
@@ -103,8 +99,6 @@ data class DarwinTypography(
         lineHeight = 16.sp,
         letterSpacing = 0.4.sp,
     ),
-
-    // Label
     val labelLarge: TextStyle = TextStyle(
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
@@ -123,20 +117,8 @@ data class DarwinTypography(
         lineHeight = 14.sp,
         letterSpacing = 0.5.sp,
     ),
-
-    // Caption
-    val caption: TextStyle = TextStyle(
-        fontWeight = FontWeight.Normal,
-        fontSize = 11.sp,
-        lineHeight = 14.sp,
-        letterSpacing = 0.4.sp,
-    ),
 ) {
-    /**
-     * Returns a copy of this typography with the given [fontFamily] applied
-     * to every text style.
-     */
-    fun withFontFamily(fontFamily: FontFamily): DarwinTypography = copy(
+    internal fun withFontFamily(fontFamily: FontFamily): DarwinTypography = copy(
         displayLarge = displayLarge.copy(fontFamily = fontFamily),
         displayMedium = displayMedium.copy(fontFamily = fontFamily),
         displaySmall = displaySmall.copy(fontFamily = fontFamily),
@@ -152,7 +134,6 @@ data class DarwinTypography(
         labelLarge = labelLarge.copy(fontFamily = fontFamily),
         labelMedium = labelMedium.copy(fontFamily = fontFamily),
         labelSmall = labelSmall.copy(fontFamily = fontFamily),
-        caption = caption.copy(fontFamily = fontFamily),
     )
 }
 

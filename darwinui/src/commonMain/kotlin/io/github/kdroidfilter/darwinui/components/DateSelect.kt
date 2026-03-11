@@ -190,8 +190,7 @@ private fun <T> InlineSelect(
             Icon(
                 imageVector = LucideChevronDown,
                 tint = Blue400,
-                size = 12.dp,
-                modifier = Modifier.rotate(chevronRotation),
+                modifier = Modifier.size(12.dp).rotate(chevronRotation),
             )
         }
 
@@ -296,7 +295,7 @@ private fun DatePickerButton(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Icon(imageVector = LucideCalendar, tint = Blue400, size = 12.dp)
+            Icon(imageVector = LucideCalendar, tint = Blue400, modifier = Modifier.size(12.dp))
             Text(
                 text = label,
                 style = DarwinTheme.typography.bodySmall,
@@ -409,7 +408,7 @@ private fun CalendarGrid(
                     },
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(imageVector = LucideChevronLeft, tint = colors.textSecondary, size = 14.dp)
+                Icon(imageVector = LucideChevronLeft, tint = colors.textSecondary, modifier = Modifier.size(14.dp))
             }
 
             Text(
@@ -438,7 +437,7 @@ private fun CalendarGrid(
                     },
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(imageVector = LucideChevronRight, tint = colors.textSecondary, size = 14.dp)
+                Icon(imageVector = LucideChevronRight, tint = colors.textSecondary, modifier = Modifier.size(14.dp))
             }
         }
 
@@ -937,7 +936,7 @@ fun DateSelect(
             Icon(
                 imageVector = LucideCalendar,
                 tint = colors.textTertiary,
-                size = 16.dp,
+                modifier = Modifier.size(16.dp),
             )
             Text(
                 text = confirmedConfig?.let { formatSummary(it) } ?: "Select date & time...",

@@ -1,6 +1,8 @@
 package io.github.kdroidfilter.darwinui.components
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -12,14 +14,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -28,19 +32,15 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.Spinner
-import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.theme.Blue500
 import io.github.kdroidfilter.darwinui.theme.Blue600
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import io.github.kdroidfilter.darwinui.theme.DarwinTypography
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
 import io.github.kdroidfilter.darwinui.theme.Purple500
@@ -51,517 +51,660 @@ import io.github.kdroidfilter.darwinui.theme.Zinc300
 import io.github.kdroidfilter.darwinui.theme.Zinc400
 import io.github.kdroidfilter.darwinui.theme.Zinc500
 import io.github.kdroidfilter.darwinui.theme.Zinc800
-import io.github.kdroidfilter.darwinui.theme.Zinc900
+import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
+import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import io.github.kdroidfilter.darwinui.theme.darwinTween
 
 // ===========================================================================
-// ButtonSize
+// ButtonColors — mirrors M3's ButtonColors
 // ===========================================================================
 
-enum class ButtonSize {
-    Small,
-    Default,
-    Large,
-    Icon,
+@Immutable
+class ButtonColors(
+    val containerColor: Color,
+    val contentColor: Color,
+    val disabledContainerColor: Color,
+    val disabledContentColor: Color,
+) {
+    fun copy(
+        containerColor: Color = this.containerColor,
+        contentColor: Color = this.contentColor,
+        disabledContainerColor: Color = this.disabledContainerColor,
+        disabledContentColor: Color = this.disabledContentColor,
+    ) = ButtonColors(containerColor, contentColor, disabledContainerColor, disabledContentColor)
+
+    internal fun resolvedContainerColor(enabled: Boolean) =
+        if (enabled) containerColor else disabledContainerColor
+
+    internal fun resolvedContentColor(enabled: Boolean) =
+        if (enabled) contentColor else disabledContentColor
 }
 
 // ===========================================================================
-// Internal — shared colors / dimensions / layout
+// ButtonElevation — mirrors M3's ButtonElevation (stub, no shadows in Darwin)
 // ===========================================================================
 
-private data class ButtonColors(
-    val background: Color,
-    val contentColor: Color,
-    val borderColor: Color?,
-    val borderWidth: Dp = 1.dp,
+@Stable
+class ButtonElevation(
+    val defaultElevation: Float = 0f,
+    val pressedElevation: Float = 0f,
+    val focusedElevation: Float = 0f,
+    val hoveredElevation: Float = 0f,
+    val disabledElevation: Float = 0f,
 )
 
-private data class ButtonDimensions(
-    val height: Dp,
-    val horizontalPadding: Dp,
-    val iconSpacing: Dp,
-    val textStyle: TextStyle,
-    val indicatorSize: Dp,
-    val indicatorStrokeWidth: Dp,
-)
+// ===========================================================================
+// ButtonDefaults — mirrors M3's ButtonDefaults
+// ===========================================================================
 
-/** Controls how hover overlay and link-underline behave. */
+object ButtonDefaults {
+    val ContentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp)
+    val TextButtonContentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp)
+    val MinHeight = 36.dp
+    val MinWidth = 58.dp
+
+    @Composable
+    fun buttonColors(
+        containerColor: Color = DarwinTheme.colors.primary,
+        contentColor: Color = DarwinTheme.colors.onPrimary,
+        disabledContainerColor: Color = containerColor.copy(alpha = 0.5f),
+        disabledContentColor: Color = contentColor.copy(alpha = 0.5f),
+    ) = ButtonColors(containerColor, contentColor, disabledContainerColor, disabledContentColor)
+
+    @Composable
+    fun outlinedButtonColors(
+        containerColor: Color = Color.Transparent,
+        contentColor: Color = DarwinTheme.colors.primary,
+        disabledContainerColor: Color = Color.Transparent,
+        disabledContentColor: Color = contentColor.copy(alpha = 0.5f),
+    ) = ButtonColors(containerColor, contentColor, disabledContainerColor, disabledContentColor)
+
+    @Composable
+    fun textButtonColors(
+        containerColor: Color = Color.Transparent,
+        contentColor: Color = DarwinTheme.colors.primary,
+        disabledContainerColor: Color = Color.Transparent,
+        disabledContentColor: Color = contentColor.copy(alpha = 0.5f),
+    ) = ButtonColors(containerColor, contentColor, disabledContainerColor, disabledContentColor)
+
+    @Composable
+    fun elevatedButtonColors(
+        containerColor: Color = DarwinTheme.colors.surface,
+        contentColor: Color = DarwinTheme.colors.primary,
+        disabledContainerColor: Color = containerColor.copy(alpha = 0.5f),
+        disabledContentColor: Color = contentColor.copy(alpha = 0.5f),
+    ) = ButtonColors(containerColor, contentColor, disabledContainerColor, disabledContentColor)
+
+    @Composable
+    fun filledTonalButtonColors(
+        containerColor: Color = DarwinTheme.colors.secondary,
+        contentColor: Color = DarwinTheme.colors.onSecondary,
+        disabledContainerColor: Color = containerColor.copy(alpha = 0.5f),
+        disabledContentColor: Color = contentColor.copy(alpha = 0.5f),
+    ) = ButtonColors(containerColor, contentColor, disabledContainerColor, disabledContentColor)
+
+    @Composable
+    fun outlinedButtonBorder(enabled: Boolean = true): BorderStroke = BorderStroke(
+        width = 1.dp,
+        color = if (enabled) DarwinTheme.colors.border else DarwinTheme.colors.border.copy(alpha = 0.5f),
+    )
+
+    fun buttonElevation(
+        defaultElevation: Float = 0f,
+        pressedElevation: Float = 0f,
+        focusedElevation: Float = 0f,
+        hoveredElevation: Float = 0f,
+        disabledElevation: Float = 0f,
+    ) = ButtonElevation(defaultElevation, pressedElevation, focusedElevation, hoveredElevation, disabledElevation)
+}
+
+// ===========================================================================
+// ButtonSize — Darwin extension (not in M3)
+// ===========================================================================
+
+enum class ButtonSize { Small, Default, Large, Icon }
+
+// ===========================================================================
+// Internal layout
+// ===========================================================================
+
 private enum class ButtonBehavior { Solid, Ghost, Outline, Link }
 
 @Composable
-private fun resolveButtonDimensions(
-    size: ButtonSize,
-    typography: DarwinTypography,
-): ButtonDimensions = when (size) {
-    ButtonSize.Small -> ButtonDimensions(
-        height = 32.dp, horizontalPadding = 12.dp, iconSpacing = 6.dp,
-        textStyle = typography.labelSmall, indicatorSize = 14.dp, indicatorStrokeWidth = 1.5.dp,
-    )
-    ButtonSize.Default -> ButtonDimensions(
-        height = 36.dp, horizontalPadding = 16.dp, iconSpacing = 8.dp,
-        textStyle = typography.labelMedium, indicatorSize = 16.dp, indicatorStrokeWidth = 2.dp,
-    )
-    ButtonSize.Large -> ButtonDimensions(
-        height = 40.dp, horizontalPadding = 32.dp, iconSpacing = 8.dp,
-        textStyle = typography.labelLarge, indicatorSize = 18.dp, indicatorStrokeWidth = 2.dp,
-    )
-    ButtonSize.Icon -> ButtonDimensions(
-        height = 36.dp, horizontalPadding = 0.dp, iconSpacing = 0.dp,
-        textStyle = typography.labelMedium, indicatorSize = 16.dp, indicatorStrokeWidth = 2.dp,
-    )
-}
-
-/**
- * Shared button layout used by every public button composable.
- * This follows the same pattern as Material3's internal Surface/Button impl:
- * each public composable resolves its own colors and delegates here.
- */
-@Composable
-private fun ButtonLayout(
+private fun ButtonImpl(
     onClick: () -> Unit,
-    colors: ButtonColors,
-    behavior: ButtonBehavior,
     modifier: Modifier,
-    size: ButtonSize,
     enabled: Boolean,
-    loading: Boolean,
-    loadingText: String?,
-    fullWidth: Boolean,
-    leftIcon: (@Composable () -> Unit)?,
-    rightIcon: (@Composable () -> Unit)?,
-    content: @Composable () -> Unit,
+    shape: Shape,
+    colors: ButtonColors,
+    border: BorderStroke?,
+    contentPadding: PaddingValues,
+    interactionSource: MutableInteractionSource,
+    behavior: ButtonBehavior = ButtonBehavior.Solid,
+    content: @Composable RowScope.() -> Unit,
 ) {
     val themeColors = DarwinTheme.colors
-    val shapes = DarwinTheme.shapes
     val typography = DarwinTheme.typography
-    val dimensions = resolveButtonDimensions(size, typography)
-    val shape = shapes.medium
 
-    val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val isHovered by interactionSource.collectIsHoveredAsState()
-    val isInteractive = enabled && !loading
 
     val scale by animateFloatAsState(
-        targetValue = if (isPressed && isInteractive) 0.97f else 1f,
-        animationSpec = darwinTween(DarwinDuration.Fast),
+        targetValue = if (isPressed && enabled) 0.97f else 1f,
+        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
         label = "button_scale",
     )
     val alpha by animateFloatAsState(
         targetValue = if (!enabled) 0.5f else 1f,
-        animationSpec = darwinTween(DarwinDuration.Normal),
+        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
         label = "button_alpha",
     )
 
-    val hoverOverlay: Color = when {
-        !isHovered || !isInteractive -> Color.Transparent
-        behavior == ButtonBehavior.Ghost -> if (themeColors.isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f)
-        behavior == ButtonBehavior.Outline -> if (themeColors.isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.04f)
-        behavior == ButtonBehavior.Link -> Color.Transparent
-        else -> if (themeColors.isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.06f)
-    }
+    // Animated container and content colors for smooth enabled/disabled transitions
+    val containerColor by animateColorAsState(
+        targetValue = colors.resolvedContainerColor(enabled),
+        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+        label = "buttonContainerColor",
+    )
+    val contentColor by animateColorAsState(
+        targetValue = colors.resolvedContentColor(enabled),
+        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+        label = "buttonContentColor",
+    )
 
-    val linkUnderline = behavior == ButtonBehavior.Link && isHovered && isInteractive
+    // Animated hover overlay
+    val hoverOverlay: Color by animateColorAsState(
+        targetValue = when {
+            !isHovered || !enabled -> Color.Transparent
+            behavior == ButtonBehavior.Ghost -> if (themeColors.isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f)
+            behavior == ButtonBehavior.Outline -> if (themeColors.isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.04f)
+            behavior == ButtonBehavior.Link -> Color.Transparent
+            else -> if (themeColors.isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.06f)
+        },
+        animationSpec = darwinTween(DarwinDuration.Fast),
+        label = "buttonHoverOverlay",
+    )
+
+    val linkUnderline = behavior == ButtonBehavior.Link && isHovered && enabled
+
+    val textStyle = if (linkUnderline)
+        typography.labelMedium.copy(textDecoration = TextDecoration.Underline)
+    else
+        typography.labelMedium
 
     val buttonModifier = modifier
-        .then(if (fullWidth) Modifier.fillMaxWidth() else Modifier)
         .scale(scale)
         .alpha(alpha)
         .clip(shape)
-        .background(colors.background, shape)
-        .then(
-            if (colors.borderColor != null) Modifier.border(colors.borderWidth, colors.borderColor, shape)
-            else Modifier,
-        )
+        .background(containerColor, shape)
+        .then(if (border != null) Modifier.border(border.width, border.brush, shape) else Modifier)
         .background(hoverOverlay, shape)
-        .hoverable(interactionSource = interactionSource, enabled = isInteractive)
+        .hoverable(interactionSource = interactionSource, enabled = enabled)
         .clickable(
             interactionSource = interactionSource,
             indication = null,
-            enabled = isInteractive,
+            enabled = enabled,
             role = Role.Button,
             onClick = onClick,
         )
-        .then(
-            when (size) {
-                ButtonSize.Icon -> Modifier.size(36.dp)
-                else -> Modifier
-                    .defaultMinSize(minHeight = dimensions.height)
-                    .padding(PaddingValues(horizontal = dimensions.horizontalPadding, vertical = 0.dp))
-            },
-        )
+        .defaultMinSize(minHeight = ButtonDefaults.MinHeight)
+        .padding(contentPadding)
 
-    Box(modifier = buttonModifier, contentAlignment = Alignment.Center) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-            if (loading) {
-                Spinner(
-                    modifier = Modifier.size(dimensions.indicatorSize),
-                    color = colors.contentColor,
-                    strokeWidth = dimensions.indicatorStrokeWidth,
-                )
-                if (loadingText != null) {
-                    Spacer(modifier = Modifier.width(dimensions.iconSpacing))
-                    Text(text = loadingText, style = dimensions.textStyle, color = colors.contentColor)
-                }
-            } else {
-                val textStyle = if (linkUnderline) dimensions.textStyle.copy(textDecoration = TextDecoration.Underline)
-                else dimensions.textStyle
-
-                CompositionLocalProvider(
-                    LocalDarwinContentColor provides colors.contentColor,
-                    LocalDarwinTextStyle provides textStyle,
-                ) {
-                    if (leftIcon != null) { leftIcon(); Spacer(modifier = Modifier.width(dimensions.iconSpacing)) }
-                    content()
-                    if (rightIcon != null) { Spacer(modifier = Modifier.width(dimensions.iconSpacing)); rightIcon() }
-                }
-            }
+    CompositionLocalProvider(
+        LocalDarwinContentColor provides contentColor,
+        LocalDarwinTextStyle provides textStyle,
+    ) {
+        Box(modifier = buttonModifier, contentAlignment = Alignment.Center) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                content = content,
+            )
         }
     }
 }
 
 // ===========================================================================
-// Button — default
+// Button — M3-compatible primary API
 // ===========================================================================
 
 @Composable
 fun Button(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
     enabled: Boolean = true,
-    loading: Boolean = false,
-    loadingText: String? = null,
-    fullWidth: Boolean = false,
-    leftIcon: (@Composable () -> Unit)? = null,
-    rightIcon: (@Composable () -> Unit)? = null,
-    content: @Composable () -> Unit,
+    shape: Shape = DarwinTheme.shapes.medium,
+    colors: ButtonColors = ButtonDefaults.buttonColors(),
+    elevation: ButtonElevation? = null,
+    border: BorderStroke? = null,
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    content: @Composable RowScope.() -> Unit,
 ) {
-    val isDark = DarwinTheme.colors.isDark
-    ButtonLayout(
+    ButtonImpl(
         onClick = onClick,
-        colors = ButtonColors(
-            background = if (isDark) Color.White.copy(alpha = 0.10f) else Zinc200,
-            contentColor = if (isDark) Zinc100 else Zinc900,
-            borderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Zinc300,
-        ),
-        behavior = ButtonBehavior.Solid,
-        modifier = modifier, size = size, enabled = enabled, loading = loading,
-        loadingText = loadingText, fullWidth = fullWidth, leftIcon = leftIcon, rightIcon = rightIcon,
+        modifier = modifier,
+        enabled = enabled,
+        shape = shape,
+        colors = colors,
+        border = border,
+        contentPadding = contentPadding,
+        interactionSource = interactionSource,
         content = content,
     )
 }
 
-@Composable
-fun Button(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
-    enabled: Boolean = true,
-    loading: Boolean = false,
-    loadingText: String? = null,
-    fullWidth: Boolean = false,
-    leftIcon: (@Composable () -> Unit)? = null,
-    rightIcon: (@Composable () -> Unit)? = null,
-) {
-    Button(onClick, modifier, size, enabled, loading, loadingText, fullWidth, leftIcon, rightIcon) { Text(text) }
-}
-
 // ===========================================================================
-// PrimaryButton
+// OutlinedButton
 // ===========================================================================
 
 @Composable
-fun PrimaryButton(
+fun OutlinedButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
     enabled: Boolean = true,
-    loading: Boolean = false,
-    loadingText: String? = null,
-    fullWidth: Boolean = false,
-    leftIcon: (@Composable () -> Unit)? = null,
-    rightIcon: (@Composable () -> Unit)? = null,
-    content: @Composable () -> Unit,
+    shape: Shape = DarwinTheme.shapes.medium,
+    colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
+    elevation: ButtonElevation? = null,
+    border: BorderStroke? = ButtonDefaults.outlinedButtonBorder(enabled),
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    content: @Composable RowScope.() -> Unit,
 ) {
-    ButtonLayout(
+    ButtonImpl(
         onClick = onClick,
-        colors = ButtonColors(background = Blue500, contentColor = Color.White, borderColor = null),
-        behavior = ButtonBehavior.Solid,
-        modifier = modifier, size = size, enabled = enabled, loading = loading,
-        loadingText = loadingText, fullWidth = fullWidth, leftIcon = leftIcon, rightIcon = rightIcon,
-        content = content,
-    )
-}
-
-@Composable
-fun PrimaryButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
-    enabled: Boolean = true,
-    loading: Boolean = false,
-    loadingText: String? = null,
-    fullWidth: Boolean = false,
-    leftIcon: (@Composable () -> Unit)? = null,
-    rightIcon: (@Composable () -> Unit)? = null,
-) {
-    PrimaryButton(onClick, modifier, size, enabled, loading, loadingText, fullWidth, leftIcon, rightIcon) { Text(text) }
-}
-
-// ===========================================================================
-// SecondaryButton
-// ===========================================================================
-
-@Composable
-fun SecondaryButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
-    enabled: Boolean = true,
-    loading: Boolean = false,
-    loadingText: String? = null,
-    fullWidth: Boolean = false,
-    leftIcon: (@Composable () -> Unit)? = null,
-    rightIcon: (@Composable () -> Unit)? = null,
-    content: @Composable () -> Unit,
-) {
-    val isDark = DarwinTheme.colors.isDark
-    ButtonLayout(
-        onClick = onClick,
-        colors = ButtonColors(
-            background = if (isDark) Color.White.copy(alpha = 0.05f) else Zinc100,
-            contentColor = if (isDark) Zinc300 else Zinc800,
-            borderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Zinc200,
-        ),
-        behavior = ButtonBehavior.Solid,
-        modifier = modifier, size = size, enabled = enabled, loading = loading,
-        loadingText = loadingText, fullWidth = fullWidth, leftIcon = leftIcon, rightIcon = rightIcon,
-        content = content,
-    )
-}
-
-@Composable
-fun SecondaryButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
-    enabled: Boolean = true,
-    loading: Boolean = false,
-    loadingText: String? = null,
-    fullWidth: Boolean = false,
-    leftIcon: (@Composable () -> Unit)? = null,
-    rightIcon: (@Composable () -> Unit)? = null,
-) {
-    SecondaryButton(onClick, modifier, size, enabled, loading, loadingText, fullWidth, leftIcon, rightIcon) { Text(text) }
-}
-
-// ===========================================================================
-// SuccessButton
-// ===========================================================================
-
-@Composable
-fun SuccessButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
-    enabled: Boolean = true,
-    loading: Boolean = false,
-    loadingText: String? = null,
-    fullWidth: Boolean = false,
-    leftIcon: (@Composable () -> Unit)? = null,
-    rightIcon: (@Composable () -> Unit)? = null,
-    content: @Composable () -> Unit,
-) {
-    ButtonLayout(
-        onClick = onClick,
-        colors = ButtonColors(background = DarwinTheme.colors.success, contentColor = Color.White, borderColor = null),
-        behavior = ButtonBehavior.Solid,
-        modifier = modifier, size = size, enabled = enabled, loading = loading,
-        loadingText = loadingText, fullWidth = fullWidth, leftIcon = leftIcon, rightIcon = rightIcon,
-        content = content,
-    )
-}
-
-@Composable
-fun SuccessButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
-    enabled: Boolean = true,
-    loading: Boolean = false,
-    loadingText: String? = null,
-    fullWidth: Boolean = false,
-    leftIcon: (@Composable () -> Unit)? = null,
-    rightIcon: (@Composable () -> Unit)? = null,
-) {
-    SuccessButton(onClick, modifier, size, enabled, loading, loadingText, fullWidth, leftIcon, rightIcon) { Text(text) }
-}
-
-// ===========================================================================
-// WarningButton
-// ===========================================================================
-
-@Composable
-fun WarningButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
-    enabled: Boolean = true,
-    loading: Boolean = false,
-    loadingText: String? = null,
-    fullWidth: Boolean = false,
-    leftIcon: (@Composable () -> Unit)? = null,
-    rightIcon: (@Composable () -> Unit)? = null,
-    content: @Composable () -> Unit,
-) {
-    ButtonLayout(
-        onClick = onClick,
-        colors = ButtonColors(background = DarwinTheme.colors.warning, contentColor = Color.Black, borderColor = null),
-        behavior = ButtonBehavior.Solid,
-        modifier = modifier, size = size, enabled = enabled, loading = loading,
-        loadingText = loadingText, fullWidth = fullWidth, leftIcon = leftIcon, rightIcon = rightIcon,
-        content = content,
-    )
-}
-
-@Composable
-fun WarningButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
-    enabled: Boolean = true,
-    loading: Boolean = false,
-    loadingText: String? = null,
-    fullWidth: Boolean = false,
-    leftIcon: (@Composable () -> Unit)? = null,
-    rightIcon: (@Composable () -> Unit)? = null,
-) {
-    WarningButton(onClick, modifier, size, enabled, loading, loadingText, fullWidth, leftIcon, rightIcon) { Text(text) }
-}
-
-// ===========================================================================
-// InfoButton
-// ===========================================================================
-
-@Composable
-fun InfoButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
-    enabled: Boolean = true,
-    loading: Boolean = false,
-    loadingText: String? = null,
-    fullWidth: Boolean = false,
-    leftIcon: (@Composable () -> Unit)? = null,
-    rightIcon: (@Composable () -> Unit)? = null,
-    content: @Composable () -> Unit,
-) {
-    ButtonLayout(
-        onClick = onClick,
-        colors = ButtonColors(background = DarwinTheme.colors.info, contentColor = Color.White, borderColor = null),
-        behavior = ButtonBehavior.Solid,
-        modifier = modifier, size = size, enabled = enabled, loading = loading,
-        loadingText = loadingText, fullWidth = fullWidth, leftIcon = leftIcon, rightIcon = rightIcon,
-        content = content,
-    )
-}
-
-@Composable
-fun InfoButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
-    enabled: Boolean = true,
-    loading: Boolean = false,
-    loadingText: String? = null,
-    fullWidth: Boolean = false,
-    leftIcon: (@Composable () -> Unit)? = null,
-    rightIcon: (@Composable () -> Unit)? = null,
-) {
-    InfoButton(onClick, modifier, size, enabled, loading, loadingText, fullWidth, leftIcon, rightIcon) { Text(text) }
-}
-
-// ===========================================================================
-// DestructiveButton
-// ===========================================================================
-
-@Composable
-fun DestructiveButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
-    enabled: Boolean = true,
-    loading: Boolean = false,
-    loadingText: String? = null,
-    fullWidth: Boolean = false,
-    leftIcon: (@Composable () -> Unit)? = null,
-    rightIcon: (@Composable () -> Unit)? = null,
-    content: @Composable () -> Unit,
-) {
-    ButtonLayout(
-        onClick = onClick,
-        colors = ButtonColors(background = Red500, contentColor = Color.White, borderColor = null),
-        behavior = ButtonBehavior.Solid,
-        modifier = modifier, size = size, enabled = enabled, loading = loading,
-        loadingText = loadingText, fullWidth = fullWidth, leftIcon = leftIcon, rightIcon = rightIcon,
-        content = content,
-    )
-}
-
-@Composable
-fun DestructiveButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
-    enabled: Boolean = true,
-    loading: Boolean = false,
-    loadingText: String? = null,
-    fullWidth: Boolean = false,
-    leftIcon: (@Composable () -> Unit)? = null,
-    rightIcon: (@Composable () -> Unit)? = null,
-) {
-    DestructiveButton(onClick, modifier, size, enabled, loading, loadingText, fullWidth, leftIcon, rightIcon) { Text(text) }
-}
-
-// ===========================================================================
-// OutlineButton
-// ===========================================================================
-
-@Composable
-fun OutlineButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
-    enabled: Boolean = true,
-    loading: Boolean = false,
-    loadingText: String? = null,
-    fullWidth: Boolean = false,
-    leftIcon: (@Composable () -> Unit)? = null,
-    rightIcon: (@Composable () -> Unit)? = null,
-    content: @Composable () -> Unit,
-) {
-    val isDark = DarwinTheme.colors.isDark
-    ButtonLayout(
-        onClick = onClick,
-        colors = ButtonColors(
-            background = Color.Transparent,
-            contentColor = if (isDark) Zinc200 else Zinc800,
-            borderColor = if (isDark) Zinc500 else Zinc400,
-            borderWidth = 2.dp,
-        ),
+        modifier = modifier,
+        enabled = enabled,
+        shape = shape,
+        colors = colors,
+        border = border,
+        contentPadding = contentPadding,
+        interactionSource = interactionSource,
         behavior = ButtonBehavior.Outline,
-        modifier = modifier, size = size, enabled = enabled, loading = loading,
-        loadingText = loadingText, fullWidth = fullWidth, leftIcon = leftIcon, rightIcon = rightIcon,
         content = content,
     )
+}
+
+// ===========================================================================
+// TextButton
+// ===========================================================================
+
+@Composable
+fun TextButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: Shape = DarwinTheme.shapes.medium,
+    colors: ButtonColors = ButtonDefaults.textButtonColors(),
+    elevation: ButtonElevation? = null,
+    border: BorderStroke? = null,
+    contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    content: @Composable RowScope.() -> Unit,
+) {
+    ButtonImpl(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        shape = shape,
+        colors = colors,
+        border = border,
+        contentPadding = contentPadding,
+        interactionSource = interactionSource,
+        behavior = ButtonBehavior.Ghost,
+        content = content,
+    )
+}
+
+// ===========================================================================
+// ElevatedButton
+// ===========================================================================
+
+@Composable
+fun ElevatedButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: Shape = DarwinTheme.shapes.medium,
+    colors: ButtonColors = ButtonDefaults.elevatedButtonColors(),
+    elevation: ButtonElevation? = ButtonDefaults.buttonElevation(defaultElevation = 1f),
+    border: BorderStroke? = null,
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    content: @Composable RowScope.() -> Unit,
+) {
+    ButtonImpl(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        shape = shape,
+        colors = colors,
+        border = border,
+        contentPadding = contentPadding,
+        interactionSource = interactionSource,
+        content = content,
+    )
+}
+
+// ===========================================================================
+// FilledTonalButton
+// ===========================================================================
+
+@Composable
+fun FilledTonalButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: Shape = DarwinTheme.shapes.medium,
+    colors: ButtonColors = ButtonDefaults.filledTonalButtonColors(),
+    elevation: ButtonElevation? = null,
+    border: BorderStroke? = null,
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    content: @Composable RowScope.() -> Unit,
+) {
+    ButtonImpl(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        shape = shape,
+        colors = colors,
+        border = border,
+        contentPadding = contentPadding,
+        interactionSource = interactionSource,
+        content = content,
+    )
+}
+
+// ===========================================================================
+// Darwin-specific convenience wrappers
+// ===========================================================================
+
+@Composable
+fun PrimaryButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+    loadingText: String? = null,
+    leftIcon: (@Composable () -> Unit)? = null,
+    rightIcon: (@Composable () -> Unit)? = null,
+    content: @Composable RowScope.() -> Unit,
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled && !loading,
+        colors = ButtonColors(Blue500, Color.White, Blue500.copy(0.5f), Color.White.copy(0.5f)),
+    ) {
+        if (loading) {
+            Spinner(modifier = Modifier.size(16.dp), color = Color.White)
+            if (loadingText != null) { Spacer(Modifier.width(8.dp)); Text(loadingText) }
+        } else {
+            if (leftIcon != null) { leftIcon(); Spacer(Modifier.width(8.dp)) }
+            content()
+            if (rightIcon != null) { Spacer(Modifier.width(8.dp)); rightIcon() }
+        }
+    }
+}
+
+@Composable
+fun PrimaryButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+    loadingText: String? = null,
+    leftIcon: (@Composable () -> Unit)? = null,
+    rightIcon: (@Composable () -> Unit)? = null,
+) {
+    PrimaryButton(onClick, modifier, enabled, loading, loadingText, leftIcon, rightIcon) { Text(text) }
+}
+
+@Composable
+fun SecondaryButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+    loadingText: String? = null,
+    leftIcon: (@Composable () -> Unit)? = null,
+    rightIcon: (@Composable () -> Unit)? = null,
+    content: @Composable RowScope.() -> Unit,
+) {
+    val isDark = DarwinTheme.colors.isDark
+    Button(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled && !loading,
+        colors = ButtonColors(
+            containerColor = if (isDark) Color.White.copy(alpha = 0.05f) else Zinc100,
+            contentColor = if (isDark) Zinc300 else Zinc800,
+            disabledContainerColor = if (isDark) Color.White.copy(alpha = 0.025f) else Zinc100.copy(0.5f),
+            disabledContentColor = if (isDark) Zinc300.copy(0.5f) else Zinc800.copy(0.5f),
+        ),
+        border = BorderStroke(1.dp, if (isDark) Color.White.copy(0.10f) else Zinc200),
+    ) {
+        if (loading) {
+            Spinner(modifier = Modifier.size(16.dp), color = if (isDark) Zinc300 else Zinc800)
+            if (loadingText != null) { Spacer(Modifier.width(8.dp)); Text(loadingText) }
+        } else {
+            if (leftIcon != null) { leftIcon(); Spacer(Modifier.width(8.dp)) }
+            content()
+            if (rightIcon != null) { Spacer(Modifier.width(8.dp)); rightIcon() }
+        }
+    }
+}
+
+@Composable
+fun SecondaryButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+    loadingText: String? = null,
+    leftIcon: (@Composable () -> Unit)? = null,
+    rightIcon: (@Composable () -> Unit)? = null,
+) {
+    SecondaryButton(onClick, modifier, enabled, loading, loadingText, leftIcon, rightIcon) { Text(text) }
+}
+
+@Composable
+fun DestructiveButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+    loadingText: String? = null,
+    leftIcon: (@Composable () -> Unit)? = null,
+    rightIcon: (@Composable () -> Unit)? = null,
+    content: @Composable RowScope.() -> Unit,
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier,
+        enabled = enabled && !loading,
+        colors = ButtonColors(Red500, Color.White, Red500.copy(0.5f), Color.White.copy(0.5f)),
+    ) {
+        if (loading) {
+            Spinner(modifier = Modifier.size(16.dp), color = Color.White)
+            if (loadingText != null) { Spacer(Modifier.width(8.dp)); Text(loadingText) }
+        } else {
+            if (leftIcon != null) { leftIcon(); Spacer(Modifier.width(8.dp)) }
+            content()
+            if (rightIcon != null) { Spacer(Modifier.width(8.dp)); rightIcon() }
+        }
+    }
+}
+
+@Composable
+fun DestructiveButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+    loadingText: String? = null,
+    leftIcon: (@Composable () -> Unit)? = null,
+    rightIcon: (@Composable () -> Unit)? = null,
+) {
+    DestructiveButton(onClick, modifier, enabled, loading, loadingText, leftIcon, rightIcon) { Text(text) }
+}
+
+@Composable
+fun SuccessButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+    loadingText: String? = null,
+    leftIcon: (@Composable () -> Unit)? = null,
+    rightIcon: (@Composable () -> Unit)? = null,
+    content: @Composable RowScope.() -> Unit,
+) {
+    val c = DarwinTheme.colors
+    Button(
+        onClick = onClick, modifier = modifier, enabled = enabled && !loading,
+        colors = ButtonColors(c.success, c.onSuccess, c.success.copy(0.5f), c.onSuccess.copy(0.5f)),
+    ) {
+        if (loading) {
+            Spinner(Modifier.size(16.dp), color = c.onSuccess)
+            if (loadingText != null) { Spacer(Modifier.width(8.dp)); Text(loadingText) }
+        } else {
+            if (leftIcon != null) { leftIcon(); Spacer(Modifier.width(8.dp)) }
+            content()
+            if (rightIcon != null) { Spacer(Modifier.width(8.dp)); rightIcon() }
+        }
+    }
+}
+
+@Composable
+fun SuccessButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+    loadingText: String? = null,
+    leftIcon: (@Composable () -> Unit)? = null,
+    rightIcon: (@Composable () -> Unit)? = null,
+) {
+    SuccessButton(onClick, modifier, enabled, loading, loadingText, leftIcon, rightIcon) { Text(text) }
+}
+
+@Composable
+fun WarningButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+    loadingText: String? = null,
+    leftIcon: (@Composable () -> Unit)? = null,
+    rightIcon: (@Composable () -> Unit)? = null,
+    content: @Composable RowScope.() -> Unit,
+) {
+    val c = DarwinTheme.colors
+    Button(
+        onClick = onClick, modifier = modifier, enabled = enabled && !loading,
+        colors = ButtonColors(c.warning, c.onWarning, c.warning.copy(0.5f), c.onWarning.copy(0.5f)),
+    ) {
+        if (loading) {
+            Spinner(Modifier.size(16.dp), color = c.onWarning)
+            if (loadingText != null) { Spacer(Modifier.width(8.dp)); Text(loadingText) }
+        } else {
+            if (leftIcon != null) { leftIcon(); Spacer(Modifier.width(8.dp)) }
+            content()
+            if (rightIcon != null) { Spacer(Modifier.width(8.dp)); rightIcon() }
+        }
+    }
+}
+
+@Composable
+fun WarningButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+    loadingText: String? = null,
+    leftIcon: (@Composable () -> Unit)? = null,
+    rightIcon: (@Composable () -> Unit)? = null,
+) {
+    WarningButton(onClick, modifier, enabled, loading, loadingText, leftIcon, rightIcon) { Text(text) }
+}
+
+@Composable
+fun InfoButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+    loadingText: String? = null,
+    leftIcon: (@Composable () -> Unit)? = null,
+    rightIcon: (@Composable () -> Unit)? = null,
+    content: @Composable RowScope.() -> Unit,
+) {
+    val c = DarwinTheme.colors
+    Button(
+        onClick = onClick, modifier = modifier, enabled = enabled && !loading,
+        colors = ButtonColors(c.info, c.onInfo, c.info.copy(0.5f), c.onInfo.copy(0.5f)),
+    ) {
+        if (loading) {
+            Spinner(Modifier.size(16.dp), color = c.onInfo)
+            if (loadingText != null) { Spacer(Modifier.width(8.dp)); Text(loadingText) }
+        } else {
+            if (leftIcon != null) { leftIcon(); Spacer(Modifier.width(8.dp)) }
+            content()
+            if (rightIcon != null) { Spacer(Modifier.width(8.dp)); rightIcon() }
+        }
+    }
+}
+
+@Composable
+fun InfoButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+    loadingText: String? = null,
+    leftIcon: (@Composable () -> Unit)? = null,
+    rightIcon: (@Composable () -> Unit)? = null,
+) {
+    InfoButton(onClick, modifier, enabled, loading, loadingText, leftIcon, rightIcon) { Text(text) }
+}
+
+@Composable
+fun OutlineButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    loading: Boolean = false,
+    loadingText: String? = null,
+    leftIcon: (@Composable () -> Unit)? = null,
+    rightIcon: (@Composable () -> Unit)? = null,
+    content: @Composable RowScope.() -> Unit,
+) {
+    val isDark = DarwinTheme.colors.isDark
+    OutlinedButton(
+        onClick = onClick, modifier = modifier, enabled = enabled && !loading,
+        colors = ButtonColors(
+            Color.Transparent, if (isDark) Zinc200 else Zinc800,
+            Color.Transparent, if (isDark) Zinc200.copy(0.5f) else Zinc800.copy(0.5f),
+        ),
+        border = BorderStroke(2.dp, if (isDark) Zinc500 else Zinc400),
+    ) {
+        if (loading) {
+            Spinner(Modifier.size(16.dp), color = if (isDark) Zinc200 else Zinc800)
+            if (loadingText != null) { Spacer(Modifier.width(8.dp)); Text(loadingText) }
+        } else {
+            if (leftIcon != null) { leftIcon(); Spacer(Modifier.width(8.dp)) }
+            content()
+            if (rightIcon != null) { Spacer(Modifier.width(8.dp)); rightIcon() }
+        }
+    }
 }
 
 @Composable
@@ -569,47 +712,43 @@ fun OutlineButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
     enabled: Boolean = true,
     loading: Boolean = false,
     loadingText: String? = null,
-    fullWidth: Boolean = false,
     leftIcon: (@Composable () -> Unit)? = null,
     rightIcon: (@Composable () -> Unit)? = null,
 ) {
-    OutlineButton(onClick, modifier, size, enabled, loading, loadingText, fullWidth, leftIcon, rightIcon) { Text(text) }
+    OutlineButton(onClick, modifier, enabled, loading, loadingText, leftIcon, rightIcon) { Text(text) }
 }
-
-// ===========================================================================
-// SubtleButton (ghost)
-// ===========================================================================
 
 @Composable
 fun SubtleButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
     enabled: Boolean = true,
     loading: Boolean = false,
     loadingText: String? = null,
-    fullWidth: Boolean = false,
     leftIcon: (@Composable () -> Unit)? = null,
     rightIcon: (@Composable () -> Unit)? = null,
-    content: @Composable () -> Unit,
+    content: @Composable RowScope.() -> Unit,
 ) {
     val isDark = DarwinTheme.colors.isDark
-    ButtonLayout(
-        onClick = onClick,
+    TextButton(
+        onClick = onClick, modifier = modifier, enabled = enabled && !loading,
         colors = ButtonColors(
-            background = Color.Transparent,
-            contentColor = if (isDark) Zinc300 else Zinc800,
-            borderColor = null,
+            Color.Transparent, if (isDark) Zinc300 else Zinc800,
+            Color.Transparent, if (isDark) Zinc300.copy(0.5f) else Zinc800.copy(0.5f),
         ),
-        behavior = ButtonBehavior.Ghost,
-        modifier = modifier, size = size, enabled = enabled, loading = loading,
-        loadingText = loadingText, fullWidth = fullWidth, leftIcon = leftIcon, rightIcon = rightIcon,
-        content = content,
-    )
+    ) {
+        if (loading) {
+            Spinner(Modifier.size(16.dp), color = if (isDark) Zinc300 else Zinc800)
+            if (loadingText != null) { Spacer(Modifier.width(8.dp)); Text(loadingText) }
+        } else {
+            if (leftIcon != null) { leftIcon(); Spacer(Modifier.width(8.dp)) }
+            content()
+            if (rightIcon != null) { Spacer(Modifier.width(8.dp)); rightIcon() }
+        }
+    }
 }
 
 @Composable
@@ -617,40 +756,37 @@ fun SubtleButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
     enabled: Boolean = true,
     loading: Boolean = false,
     loadingText: String? = null,
-    fullWidth: Boolean = false,
     leftIcon: (@Composable () -> Unit)? = null,
     rightIcon: (@Composable () -> Unit)? = null,
 ) {
-    SubtleButton(onClick, modifier, size, enabled, loading, loadingText, fullWidth, leftIcon, rightIcon) { Text(text) }
+    SubtleButton(onClick, modifier, enabled, loading, loadingText, leftIcon, rightIcon) { Text(text) }
 }
-
-// ===========================================================================
-// HyperlinkButton (link)
-// ===========================================================================
 
 @Composable
 fun HyperlinkButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
     enabled: Boolean = true,
-    content: @Composable () -> Unit,
+    content: @Composable RowScope.() -> Unit,
 ) {
     val isDark = DarwinTheme.colors.isDark
-    ButtonLayout(
+    val interactionSource = remember { MutableInteractionSource() }
+    ButtonImpl(
         onClick = onClick,
+        modifier = modifier,
+        enabled = enabled,
+        shape = DarwinTheme.shapes.medium,
         colors = ButtonColors(
-            background = Color.Transparent,
-            contentColor = if (isDark) Color(0xFF60A5FA) else Blue600,
-            borderColor = null,
+            Color.Transparent, if (isDark) Color(0xFF60A5FA) else Blue600,
+            Color.Transparent, if (isDark) Color(0xFF60A5FA).copy(0.5f) else Blue600.copy(0.5f),
         ),
+        border = null,
+        contentPadding = ButtonDefaults.TextButtonContentPadding,
+        interactionSource = interactionSource,
         behavior = ButtonBehavior.Link,
-        modifier = modifier, size = size, enabled = enabled, loading = false,
-        loadingText = null, fullWidth = false, leftIcon = null, rightIcon = null,
         content = content,
     )
 }
@@ -660,37 +796,35 @@ fun HyperlinkButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
     enabled: Boolean = true,
 ) {
-    HyperlinkButton(onClick, modifier, size, enabled) { Text(text) }
+    HyperlinkButton(onClick, modifier, enabled) { Text(text) }
 }
-
-// ===========================================================================
-// AccentButton
-// ===========================================================================
 
 @Composable
 fun AccentButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
     enabled: Boolean = true,
     loading: Boolean = false,
     loadingText: String? = null,
-    fullWidth: Boolean = false,
     leftIcon: (@Composable () -> Unit)? = null,
     rightIcon: (@Composable () -> Unit)? = null,
-    content: @Composable () -> Unit,
+    content: @Composable RowScope.() -> Unit,
 ) {
-    ButtonLayout(
-        onClick = onClick,
-        colors = ButtonColors(background = Purple500, contentColor = Color.White, borderColor = null),
-        behavior = ButtonBehavior.Solid,
-        modifier = modifier, size = size, enabled = enabled, loading = loading,
-        loadingText = loadingText, fullWidth = fullWidth, leftIcon = leftIcon, rightIcon = rightIcon,
-        content = content,
-    )
+    Button(
+        onClick = onClick, modifier = modifier, enabled = enabled && !loading,
+        colors = ButtonColors(Purple500, Color.White, Purple500.copy(0.5f), Color.White.copy(0.5f)),
+    ) {
+        if (loading) {
+            Spinner(Modifier.size(16.dp), color = Color.White)
+            if (loadingText != null) { Spacer(Modifier.width(8.dp)); Text(loadingText) }
+        } else {
+            if (leftIcon != null) { leftIcon(); Spacer(Modifier.width(8.dp)) }
+            content()
+            if (rightIcon != null) { Spacer(Modifier.width(8.dp)); rightIcon() }
+        }
+    }
 }
 
 @Composable
@@ -698,15 +832,13 @@ fun AccentButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: ButtonSize = ButtonSize.Default,
     enabled: Boolean = true,
     loading: Boolean = false,
     loadingText: String? = null,
-    fullWidth: Boolean = false,
     leftIcon: (@Composable () -> Unit)? = null,
     rightIcon: (@Composable () -> Unit)? = null,
 ) {
-    AccentButton(onClick, modifier, size, enabled, loading, loadingText, fullWidth, leftIcon, rightIcon) { Text(text) }
+    AccentButton(onClick, modifier, enabled, loading, loadingText, leftIcon, rightIcon) { Text(text) }
 }
 
 // ===========================================================================

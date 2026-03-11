@@ -619,6 +619,112 @@ private fun DrawScope.drawAlertCloseIcon(color: Color) {
     )
 }
 
+// ===========================================================================
+// AlertDialog — M3-compatible overload with composable slots
+// ===========================================================================
+
+/**
+ * A modal alert dialog — mirrors Material3's AlertDialog with composable slots.
+ *
+ * @param onDismissRequest Callback when the dialog should close.
+ * @param confirmButton The confirm action button composable.
+ * @param modifier Modifier for the dialog container.
+ * @param dismissButton Optional dismiss/cancel button composable.
+ * @param icon Optional icon displayed above the title.
+ * @param title Optional title composable.
+ * @param text Optional body text composable.
+ * @param shape Dialog container shape.
+ * @param containerColor Background color of the dialog.
+ * @param iconContentColor Tint color for the icon.
+ * @param titleContentColor Color for the title content.
+ * @param textContentColor Color for the text content.
+ * @param tonalElevation Elevation for tonal color.
+ */
+@Composable
+fun AlertDialog(
+    onDismissRequest: () -> Unit,
+    confirmButton: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    dismissButton: (@Composable () -> Unit)? = null,
+    icon: (@Composable () -> Unit)? = null,
+    title: (@Composable () -> Unit)? = null,
+    text: (@Composable () -> Unit)? = null,
+    shape: androidx.compose.ui.graphics.Shape = DarwinTheme.shapes.extraLarge,
+    containerColor: Color = DarwinTheme.colors.card,
+    iconContentColor: Color = DarwinTheme.colors.primary,
+    titleContentColor: Color = DarwinTheme.colors.textPrimary,
+    textContentColor: Color = DarwinTheme.colors.textSecondary,
+    tonalElevation: androidx.compose.ui.unit.Dp = 0.dp,
+) {
+    Popup(
+        alignment = Alignment.Center,
+        onDismissRequest = onDismissRequest,
+        properties = PopupProperties(focusable = true),
+    ) {
+        val colors = DarwinTheme.colors
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.scrim)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onDismissRequest,
+                ),
+        )
+
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Column(
+                modifier = modifier
+                    .width(400.dp)
+                    .shadow(elevation = 16.dp, shape = shape, clip = false)
+                    .clip(shape)
+                    .background(containerColor, shape)
+                    .border(width = 1.dp, color = colors.border, shape = shape)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = {},
+                    )
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                if (icon != null) {
+                    androidx.compose.runtime.CompositionLocalProvider(
+                        io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides iconContentColor,
+                    ) {
+                        Box(modifier = Modifier.padding(bottom = 16.dp)) { icon() }
+                    }
+                }
+                if (title != null) {
+                    androidx.compose.runtime.CompositionLocalProvider(
+                        io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides DarwinTheme.typography.headlineSmall.copy(color = titleContentColor),
+                        io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides titleContentColor,
+                    ) {
+                        Box(modifier = Modifier.padding(bottom = 8.dp)) { title() }
+                    }
+                }
+                if (text != null) {
+                    androidx.compose.runtime.CompositionLocalProvider(
+                        io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides DarwinTheme.typography.bodyMedium.copy(color = textContentColor),
+                        io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides textContentColor,
+                    ) {
+                        Box(modifier = Modifier.padding(bottom = 24.dp)) { text() }
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
+                ) {
+                    dismissButton?.invoke()
+                    confirmButton()
+                }
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 private fun AlertPreview() {

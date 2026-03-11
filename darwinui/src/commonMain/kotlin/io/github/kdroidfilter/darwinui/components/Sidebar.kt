@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -427,8 +428,8 @@ private fun SidebarItemRow(
         if (icon != null) {
             Icon(
                 imageVector = icon,
-                size = iconSize,
                 tint = iconColor,
+                modifier = Modifier.size(iconSize),
             )
             Spacer(modifier = Modifier.width(iconLabelGap))
         }
@@ -514,9 +515,8 @@ private fun CollapseToggle(
     ) {
         Icon(
             imageVector = LucideChevronsLeft,
-            size = iconSize,
             tint = textColor,
-            modifier = Modifier.graphicsLayer { rotationZ = iconRotation },
+            modifier = Modifier.size(iconSize).graphicsLayer { rotationZ = iconRotation },
         )
 
         Spacer(modifier = Modifier.width(iconLabelGap))

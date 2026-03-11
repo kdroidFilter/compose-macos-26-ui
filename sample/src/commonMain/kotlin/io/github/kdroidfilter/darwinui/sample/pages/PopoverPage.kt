@@ -10,7 +10,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.ButtonSize
 import io.github.kdroidfilter.darwinui.components.OutlineButton
 import io.github.kdroidfilter.darwinui.components.SecondaryButton
 import io.github.kdroidfilter.darwinui.components.SubtleButton
@@ -44,12 +43,10 @@ fun PopoverDefaultExample() {
                 SecondaryButton(
                     text = "Edit",
                     onClick = { popoverExpanded = false },
-                    size = ButtonSize.Small,
                 )
                 SubtleButton(
                     text = "Copy",
                     onClick = { popoverExpanded = false },
-                    size = ButtonSize.Small,
                 )
             }
         }

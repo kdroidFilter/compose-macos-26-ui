@@ -5,35 +5,34 @@ import androidx.compose.runtime.*
 
 /**
  * Darwin UI Theme — a macOS-inspired design system for Compose Multiplatform.
+ * The API mirrors Material3's MaterialTheme for familiarity.
  *
  * Usage:
  * ```
- * DarwinTheme(darkTheme = true) {
- *     // Your content here
- *     // Access tokens via DarwinTheme.colors, DarwinTheme.typography, etc.
+ * DarwinTheme {
+ *     // Access tokens via DarwinTheme.colorScheme, DarwinTheme.typography, etc.
  * }
  * ```
  */
 @Composable
 fun DarwinTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    colors: DarwinColors = if (darkTheme) darkDarwinColors() else lightDarwinColors(),
+    colorScheme: ColorScheme = if (darkTheme) darkColorScheme() else lightColorScheme(),
     typography: DarwinTypography = DarwinTypography(),
     shapes: DarwinShapes = DarwinShapes(),
     animations: DarwinAnimations = DarwinAnimations(),
     content: @Composable () -> Unit,
 ) {
-    // Apply Manrope font family to all text styles
     val manrope = ManropeFontFamily()
     val resolvedTypography = typography.withFontFamily(manrope)
 
     CompositionLocalProvider(
-        LocalDarwinColors provides colors,
+        LocalDarwinColors provides colorScheme,
         LocalDarwinTypography provides resolvedTypography,
         LocalDarwinShapes provides shapes,
         LocalDarwinAnimations provides animations,
         LocalDarwinTextStyle provides resolvedTypography.bodyMedium,
-        LocalDarwinContentColor provides colors.textPrimary,
+        LocalDarwinContentColor provides colorScheme.textPrimary,
     ) {
         PlatformContextMenuOverride {
             content()
@@ -43,12 +42,19 @@ fun DarwinTheme(
 
 /**
  * Entry point for accessing Darwin UI design tokens.
+ * Mirrors Material3's MaterialTheme object API.
  */
 object DarwinTheme {
-    val colors: DarwinColors
+    val colorScheme: ColorScheme
         @Composable
         @ReadOnlyComposable
         get() = LocalDarwinColors.current
+
+    /** Backward-compatible alias for [colorScheme]. */
+    val colors: ColorScheme
+        @Composable
+        @ReadOnlyComposable
+        get() = colorScheme
 
     val typography: DarwinTypography
         @Composable

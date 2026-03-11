@@ -44,8 +44,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -75,14 +73,16 @@ import io.github.kdroidfilter.darwinui.theme.Zinc900
 /**
  * A dropdown menu component for Darwin UI.
  *
- * Displays a list of actions or options anchored to a trigger element. The menu
- * appears when [expanded] is true with a scale and fade animation, and dismisses
- * when the user clicks outside of it.
+ * Displays a list of actions or options anchored to an external trigger element.
+ * The menu appears when [expanded] is true with a scale and fade animation, and
+ * dismisses when the user clicks outside of it.
+ *
+ * Wrap the trigger composable and this [DropdownMenu] together in a [Box] to anchor
+ * the popup relative to your trigger element.
  *
  * @param expanded Whether the dropdown menu is currently visible.
  * @param onDismissRequest Callback invoked when the user clicks outside the menu.
- * @param modifier Modifier applied to the root container.
- * @param trigger The composable element that acts as the menu anchor.
+ * @param modifier Modifier applied to the menu container.
  * @param content The menu content.
  */
 @Composable
@@ -90,7 +90,6 @@ fun DropdownMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
-    trigger: @Composable () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = DarwinTheme.colors
@@ -100,54 +99,44 @@ fun DropdownMenu(
     val backgroundColor = if (isDark) Zinc900.copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
     val borderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 
-    val density = LocalDensity.current
-    var triggerHeightPx by remember { mutableStateOf(0) }
-
-    Box(modifier = modifier) {
-        Box(modifier = Modifier.onGloballyPositioned { triggerHeightPx = it.size.height }) {
-            trigger()
-        }
-
-        if (expanded) {
-            val gapPx = with(density) { 4.dp.roundToPx() } // sideOffset = 4
-            Popup(
-                offset = IntOffset(0, triggerHeightPx + gapPx),
-                onDismissRequest = onDismissRequest,
-                properties = PopupProperties(focusable = true),
+    if (expanded) {
+        Popup(
+            offset = IntOffset(0, 0),
+            onDismissRequest = onDismissRequest,
+            properties = PopupProperties(focusable = true),
+        ) {
+            AnimatedVisibility(
+                visible = expanded,
+                enter = fadeIn(tween(150)) +
+                        scaleIn(
+                            initialScale = 0.95f,
+                            transformOrigin = TransformOrigin(0.5f, 0f),
+                            animationSpec = tween(150),
+                        ) +
+                        slideInVertically(tween(150)) { -20 },
+                exit = fadeOut(tween(100)) +
+                        scaleOut(
+                            targetScale = 0.95f,
+                            transformOrigin = TransformOrigin(0.5f, 0f),
+                            animationSpec = tween(100),
+                        ) +
+                        slideOutVertically(tween(100)) { -20 },
             ) {
-                AnimatedVisibility(
-                    visible = expanded,
-                    enter = fadeIn(tween(150)) +
-                            scaleIn(
-                                initialScale = 0.95f,
-                                transformOrigin = TransformOrigin(0.5f, 0f),
-                                animationSpec = tween(150),
-                            ) +
-                            slideInVertically(tween(150)) { -20 },
-                    exit = fadeOut(tween(100)) +
-                            scaleOut(
-                                targetScale = 0.95f,
-                                transformOrigin = TransformOrigin(0.5f, 0f),
-                                animationSpec = tween(100),
-                            ) +
-                            slideOutVertically(tween(100)) { -20 },
-                ) {
-                    val scrollState = rememberScrollState()
+                val scrollState = rememberScrollState()
 
-                    Column(
-                        modifier = Modifier
-                            .width(IntrinsicSize.Max)
-                            .widthIn(min = 180.dp)
-                            .shadow(elevation = 8.dp, shape = shapes.large)
-                            .clip(shapes.large)
-                            .background(backgroundColor, shapes.large)
-                            .border(1.dp, borderColor, shapes.large)
-                            .heightIn(max = 360.dp)
-                            .verticalScroll(scrollState)
-                            .padding(vertical = 4.dp), // p-1 top/bottom
-                        content = content,
-                    )
-                }
+                Column(
+                    modifier = modifier
+                        .width(IntrinsicSize.Max)
+                        .widthIn(min = 180.dp)
+                        .shadow(elevation = 8.dp, shape = shapes.large)
+                        .clip(shapes.large)
+                        .background(backgroundColor, shapes.large)
+                        .border(1.dp, borderColor, shapes.large)
+                        .heightIn(max = 360.dp)
+                        .verticalScroll(scrollState)
+                        .padding(vertical = 4.dp), // p-1 top/bottom
+                    content = content,
+                )
             }
         }
     }
@@ -281,7 +270,7 @@ fun DropdownMenuCheckboxItem(
                 if (checked) {
                     Icon(
                         imageVector = LucideCheck,
-                        size = 12.dp,
+                        modifier = Modifier.size(12.dp),
                         tint = if (DarwinTheme.colors.isDark) Zinc300 else Zinc700,
                     )
                 }
@@ -390,15 +379,15 @@ fun DropdownMenuShortcut(
 private fun DropdownMenuPreview() {
     DarwinTheme {
         var expanded by remember { mutableStateOf(false) }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            trigger = {
-                Button(onClick = { expanded = !expanded }) { Text("Menu") }
-            },
-        ) {
-            DropdownMenuItem(onClick = {}) { Text("Item 1") }
-            DropdownMenuItem(onClick = {}) { Text("Item 2") }
+        Box {
+            Button(onClick = { expanded = !expanded }) { Text("Menu") }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
+                DropdownMenuItem(onClick = {}) { Text("Item 1") }
+                DropdownMenuItem(onClick = {}) { Text("Item 2") }
+            }
         }
     }
 }

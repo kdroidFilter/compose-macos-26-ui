@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.ButtonSize
 import io.github.kdroidfilter.darwinui.components.PrimaryButton
 import io.github.kdroidfilter.darwinui.components.SubtleButton
 import io.github.kdroidfilter.darwinui.components.Card
@@ -40,8 +39,8 @@ fun CardDefaultExample() {
             )
         }
         CardFooter {
-            PrimaryButton(text = "Action", onClick = {}, size = ButtonSize.Small)
-            SubtleButton(text = "Cancel", onClick = {}, size = ButtonSize.Small)
+            PrimaryButton(text = "Action", onClick = {})
+            SubtleButton(text = "Cancel", onClick = {})
         }
     }
 }

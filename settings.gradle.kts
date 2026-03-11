@@ -1,4 +1,4 @@
-rootProject.name = "DarwinUI"
+rootProject.name = "ComposeDarwinUi"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {

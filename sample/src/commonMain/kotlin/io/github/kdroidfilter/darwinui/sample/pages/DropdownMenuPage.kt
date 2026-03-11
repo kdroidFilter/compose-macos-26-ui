@@ -1,5 +1,6 @@
 package io.github.kdroidfilter.darwinui.sample.pages
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,21 +24,21 @@ import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 @Composable
 fun DropdownMenuDefaultExample() {
     var dropdownExpanded by remember { mutableStateOf(false) }
-    DropdownMenu(
-        expanded = dropdownExpanded,
-        onDismissRequest = { dropdownExpanded = false },
-        trigger = {
-            OutlineButton(
-                text = "Open Menu",
-                onClick = { dropdownExpanded = !dropdownExpanded },
-            )
-        },
-    ) {
-        DropdownMenuItem(onClick = { dropdownExpanded = false }) { Text("Profile") }
-        DropdownMenuItem(onClick = { dropdownExpanded = false }) { Text("Settings") }
-        DropdownMenuItem(onClick = { dropdownExpanded = false }) { Text("Preferences") }
-        DropdownMenuSeparator()
-        DropdownMenuItem(onClick = { dropdownExpanded = false }, destructive = true) { Text("Log out") }
+    Box {
+        OutlineButton(
+            text = "Open Menu",
+            onClick = { dropdownExpanded = !dropdownExpanded },
+        )
+        DropdownMenu(
+            expanded = dropdownExpanded,
+            onDismissRequest = { dropdownExpanded = false },
+        ) {
+            DropdownMenuItem(onClick = { dropdownExpanded = false }) { Text("Profile") }
+            DropdownMenuItem(onClick = { dropdownExpanded = false }) { Text("Settings") }
+            DropdownMenuItem(onClick = { dropdownExpanded = false }) { Text("Preferences") }
+            DropdownMenuSeparator()
+            DropdownMenuItem(onClick = { dropdownExpanded = false }, destructive = true) { Text("Log out") }
+        }
     }
 }
 
@@ -46,30 +47,30 @@ fun DropdownMenuDefaultExample() {
 fun DropdownMenuLabelsExample() {
     var dropdownExpanded by remember { mutableStateOf(false) }
     var checkboxState by remember { mutableStateOf(false) }
-    DropdownMenu(
-        expanded = dropdownExpanded,
-        onDismissRequest = { dropdownExpanded = false },
-        trigger = {
-            OutlineButton(
-                text = "Actions",
-                onClick = { dropdownExpanded = !dropdownExpanded },
-            )
-        },
-    ) {
-        DropdownMenuLabel(text = "Actions")
-        DropdownMenuItem(
-            onClick = { dropdownExpanded = false },
-            trailingContent = { DropdownMenuShortcut(text = "Cmd+N") },
-        ) { Text("New File") }
-        DropdownMenuItem(
-            onClick = { dropdownExpanded = false },
-            trailingContent = { DropdownMenuShortcut(text = "Cmd+O") },
-        ) { Text("Open") }
-        DropdownMenuSeparator()
-        DropdownMenuLabel(text = "Options")
-        DropdownMenuCheckboxItem(checked = checkboxState, onCheckedChange = { checkboxState = it }) { Text("Auto-save") }
-        DropdownMenuSeparator()
-        DropdownMenuItem(onClick = { dropdownExpanded = false }, enabled = false) { Text("Disabled item") }
+    Box {
+        OutlineButton(
+            text = "Actions",
+            onClick = { dropdownExpanded = !dropdownExpanded },
+        )
+        DropdownMenu(
+            expanded = dropdownExpanded,
+            onDismissRequest = { dropdownExpanded = false },
+        ) {
+            DropdownMenuLabel(text = "Actions")
+            DropdownMenuItem(
+                onClick = { dropdownExpanded = false },
+                trailingContent = { DropdownMenuShortcut(text = "Cmd+N") },
+            ) { Text("New File") }
+            DropdownMenuItem(
+                onClick = { dropdownExpanded = false },
+                trailingContent = { DropdownMenuShortcut(text = "Cmd+O") },
+            ) { Text("Open") }
+            DropdownMenuSeparator()
+            DropdownMenuLabel(text = "Options")
+            DropdownMenuCheckboxItem(checked = checkboxState, onCheckedChange = { checkboxState = it }) { Text("Auto-save") }
+            DropdownMenuSeparator()
+            DropdownMenuItem(onClick = { dropdownExpanded = false }, enabled = false) { Text("Disabled item") }
+        }
     }
 }
 

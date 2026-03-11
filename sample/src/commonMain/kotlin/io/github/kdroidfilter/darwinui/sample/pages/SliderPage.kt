@@ -43,7 +43,7 @@ fun SliderVolumeExample() {
                 color = Color(0xFF60A5FA), // blue-400
             )
         }
-        Slider(value = value, onValueChange = { value = it }, min = 0f, max = 100f)
+        Slider(value = value, onValueChange = { value = it }, valueRange = 0f..100f)
     }
 }
 
@@ -57,7 +57,7 @@ fun SliderWithValueExample() {
             style = DarwinTheme.typography.bodySmall,
             color = DarwinTheme.colors.textTertiary,
         )
-        Slider(value = value, onValueChange = { value = it }, min = 0f, max = 100f, showValue = true)
+        Slider(value = value, onValueChange = { value = it }, valueRange = 0f..100f, showValue = true)
     }
 }
 

@@ -319,6 +319,70 @@ fun ProgressRing(
     }
 }
 
+// ===========================================================================
+// M3-named aliases
+// ===========================================================================
+
+/**
+ * Determinate linear progress indicator — mirrors M3's LinearProgressIndicator.
+ */
+@Composable
+fun LinearProgressIndicator(
+    progress: () -> Float,
+    modifier: Modifier = Modifier,
+    color: Color = Blue500,
+    trackColor: Color = if (DarwinTheme.colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
+    strokeCap: androidx.compose.ui.graphics.StrokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
+) {
+    LinearProgress(
+        value = progress() * 100f,
+        max = 100f,
+        modifier = modifier,
+    )
+}
+
+/**
+ * Indeterminate linear progress indicator — mirrors M3's LinearProgressIndicator.
+ */
+@Composable
+fun LinearProgressIndicator(
+    modifier: Modifier = Modifier,
+    color: Color = Blue500,
+    trackColor: Color = if (DarwinTheme.colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
+    strokeCap: androidx.compose.ui.graphics.StrokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
+) {
+    LinearProgress(indeterminate = true, modifier = modifier)
+}
+
+/**
+ * Determinate circular progress indicator — mirrors M3's CircularProgressIndicator.
+ */
+@Composable
+fun CircularProgressIndicator(
+    progress: () -> Float,
+    modifier: Modifier = Modifier,
+    color: Color = Blue500,
+    strokeWidth: Dp = 4.dp,
+    trackColor: Color = if (DarwinTheme.colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
+    strokeCap: androidx.compose.ui.graphics.StrokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
+) {
+    ProgressRing(progress = progress(), color = color, modifier = modifier)
+}
+
+/**
+ * Indeterminate circular progress indicator — mirrors M3's CircularProgressIndicator.
+ */
+@Composable
+fun CircularProgressIndicator(
+    modifier: Modifier = Modifier,
+    color: Color = Blue500,
+    strokeWidth: Dp = 4.dp,
+    trackColor: Color = if (DarwinTheme.colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
+    strokeCap: androidx.compose.ui.graphics.StrokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
+) {
+    ProgressRing(color = color, modifier = modifier)
+}
+
 @Preview
 @Composable
 private fun ProgressPreview() {

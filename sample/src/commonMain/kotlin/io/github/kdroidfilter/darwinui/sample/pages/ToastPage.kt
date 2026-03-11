@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.ButtonSize
 import io.github.kdroidfilter.darwinui.components.DestructiveButton
 import io.github.kdroidfilter.darwinui.components.InfoButton
 import io.github.kdroidfilter.darwinui.components.SuccessButton
@@ -28,28 +27,24 @@ fun ToastClickToShowExample(toastState: ToastState) {
             onClick = {
                 toastState.show("This is an info message", title = "Info", type = ToastType.Info)
             },
-            size = ButtonSize.Small,
         )
         SuccessButton(
             text = "Success Toast",
             onClick = {
                 toastState.show("Operation completed!", title = "Success", type = ToastType.Success)
             },
-            size = ButtonSize.Small,
         )
         WarningButton(
             text = "Warning Toast",
             onClick = {
                 toastState.show("Proceed with caution", title = "Warning", type = ToastType.Warning)
             },
-            size = ButtonSize.Small,
         )
         DestructiveButton(
             text = "Error Toast",
             onClick = {
                 toastState.show("Something went wrong", title = "Error", type = ToastType.Error)
             },
-            size = ButtonSize.Small,
         )
     }
 }
