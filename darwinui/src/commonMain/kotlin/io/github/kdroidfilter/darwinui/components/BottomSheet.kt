@@ -1,8 +1,6 @@
 package io.github.kdroidfilter.darwinui.components
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -15,9 +13,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -96,7 +96,7 @@ fun ModalBottomSheet(
 
     // Animate in on first composition
     LaunchedEffect(Unit) {
-        offsetY.animateTo(0f, animationSpec = darwinSpring<Float>(DarwinSpringPreset.Gentle))
+        offsetY.animateTo(0f, animationSpec = darwinSpring<Float>(DarwinSpringPreset.Snappy))
     }
 
     // Dismiss animation helper
@@ -109,12 +109,8 @@ fun ModalBottomSheet(
         }
     }
 
-    // Scrim alpha follows sheet position
-    val scrimAlpha by animateFloatAsState(
-        targetValue = if (dismissing) 0f else 1f - offsetY.value,
-        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
-        label = "scrimAlpha",
-    )
+    // Scrim alpha directly tracks sheet offset for instant feedback
+    val scrimAlpha = (1f - offsetY.value).coerceIn(0f, 1f)
 
     Popup(
         alignment = Alignment.BottomCenter,
@@ -145,10 +141,12 @@ fun ModalBottomSheet(
                 }
             }
 
-            // Sheet content
+            // Sheet content — wraps content, capped at 70% screen height like M3
             Column(
                 modifier = modifier
                     .fillMaxWidth()
+                    .wrapContentHeight()
+                    .heightIn(max = maxHeight * 0.7f)
                     .onSizeChanged { size ->
                         sheetHeightPx = size.height.toFloat()
                     }
