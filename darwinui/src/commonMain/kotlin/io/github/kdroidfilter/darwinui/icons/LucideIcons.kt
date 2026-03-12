@@ -827,3 +827,112 @@ val LucidePanelLeft: ImageVector
         return _LucidePanelLeft!!
     }
 private var _LucidePanelLeft: ImageVector? = null
+
+// =============================================================================
+// LayoutGrid
+// =============================================================================
+
+val LucideLayoutGrid: ImageVector
+    get() {
+        if (_LucideLayoutGrid != null) return _LucideLayoutGrid!!
+        _LucideLayoutGrid = ImageVector.Builder(
+            name = "layout-grid", defaultWidth = 24.dp, defaultHeight = 24.dp,
+            viewportWidth = 24f, viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(4f, 3f); horizontalLineTo(9f); arcTo(1f, 1f, 0f, false, true, 10f, 4f); verticalLineTo(9f); arcTo(1f, 1f, 0f, false, true, 9f, 10f); horizontalLineTo(4f); arcTo(1f, 1f, 0f, false, true, 3f, 9f); verticalLineTo(4f); arcTo(1f, 1f, 0f, false, true, 4f, 3f); close()
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(15f, 3f); horizontalLineTo(20f); arcTo(1f, 1f, 0f, false, true, 21f, 4f); verticalLineTo(9f); arcTo(1f, 1f, 0f, false, true, 20f, 10f); horizontalLineTo(15f); arcTo(1f, 1f, 0f, false, true, 14f, 9f); verticalLineTo(4f); arcTo(1f, 1f, 0f, false, true, 15f, 3f); close()
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(15f, 14f); horizontalLineTo(20f); arcTo(1f, 1f, 0f, false, true, 21f, 15f); verticalLineTo(20f); arcTo(1f, 1f, 0f, false, true, 20f, 21f); horizontalLineTo(15f); arcTo(1f, 1f, 0f, false, true, 14f, 20f); verticalLineTo(15f); arcTo(1f, 1f, 0f, false, true, 15f, 14f); close()
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(4f, 14f); horizontalLineTo(9f); arcTo(1f, 1f, 0f, false, true, 10f, 15f); verticalLineTo(20f); arcTo(1f, 1f, 0f, false, true, 9f, 21f); horizontalLineTo(4f); arcTo(1f, 1f, 0f, false, true, 3f, 20f); verticalLineTo(15f); arcTo(1f, 1f, 0f, false, true, 4f, 14f); close()
+            }
+        }.build()
+        return _LucideLayoutGrid!!
+    }
+private var _LucideLayoutGrid: ImageVector? = null
+
+// =============================================================================
+// List
+// =============================================================================
+
+val LucideList: ImageVector
+    get() {
+        if (_LucideList != null) return _LucideList!!
+        _LucideList = ImageVector.Builder(
+            name = "list", defaultWidth = 24.dp, defaultHeight = 24.dp,
+            viewportWidth = 24f, viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(8f, 6f); horizontalLineTo(21f)
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(8f, 12f); horizontalLineTo(21f)
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(8f, 18f); horizontalLineTo(21f)
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(3f, 6f); horizontalLineToRelative(0.01f)
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(3f, 12f); horizontalLineToRelative(0.01f)
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(3f, 18f); horizontalLineToRelative(0.01f)
+            }
+        }.build()
+        return _LucideList!!
+    }
+private var _LucideList: ImageVector? = null
+
+// =============================================================================
+// Ellipsis
+// =============================================================================
+
+val LucideEllipsis: ImageVector
+    get() {
+        if (_LucideEllipsis != null) return _LucideEllipsis!!
+        _LucideEllipsis = ImageVector.Builder(
+            name = "ellipsis", defaultWidth = 24.dp, defaultHeight = 24.dp,
+            viewportWidth = 24f, viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.Black), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(6f, 12f); arcTo(1f, 1f, 0f, false, true, 4f, 12f); arcTo(1f, 1f, 0f, false, true, 6f, 12f); close()
+            }
+            path(fill = SolidColor(Color.Black), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(13f, 12f); arcTo(1f, 1f, 0f, false, true, 11f, 12f); arcTo(1f, 1f, 0f, false, true, 13f, 12f); close()
+            }
+            path(fill = SolidColor(Color.Black), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(20f, 12f); arcTo(1f, 1f, 0f, false, true, 18f, 12f); arcTo(1f, 1f, 0f, false, true, 20f, 12f); close()
+            }
+        }.build()
+        return _LucideEllipsis!!
+    }
+private var _LucideEllipsis: ImageVector? = null
+
+// =============================================================================
+// Tag
+// =============================================================================
+
+val LucideTag: ImageVector
+    get() {
+        if (_LucideTag != null) return _LucideTag!!
+        _LucideTag = ImageVector.Builder(
+            name = "tag", defaultWidth = 24.dp, defaultHeight = 24.dp,
+            viewportWidth = 24f, viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(12.586f, 2.586f); arcTo(2f, 2f, 0f, false, false, 11.172f, 2f); horizontalLineTo(4f); arcTo(2f, 2f, 0f, false, false, 2f, 4f); verticalLineTo(11.172f); arcTo(2f, 2f, 0f, false, false, 2.586f, 12.586f); lineToRelative(8.704f, 8.704f); arcToRelative(2.426f, 2.426f, 0f, false, false, 3.42f, 0f); lineToRelative(6.58f, -6.58f); arcToRelative(2.426f, 2.426f, 0f, false, false, 0f, -3.42f); close()
+            }
+            path(fill = SolidColor(Color.Black), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(8f, 7.5f); arcTo(0.5f, 0.5f, 0f, false, true, 7f, 7.5f); arcTo(0.5f, 0.5f, 0f, false, true, 8f, 7.5f); close()
+            }
+        }.build()
+        return _LucideTag!!
+    }
+private var _LucideTag: ImageVector? = null

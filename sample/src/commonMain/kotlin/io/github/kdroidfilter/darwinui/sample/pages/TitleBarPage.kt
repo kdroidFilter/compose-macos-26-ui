@@ -13,19 +13,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.AddressBar
 import io.github.kdroidfilter.darwinui.components.DropdownMenuItem
+import io.github.kdroidfilter.darwinui.components.IconButton
 import io.github.kdroidfilter.darwinui.components.NavigationButtons
+import io.github.kdroidfilter.darwinui.components.SearchSuggestionHeader
+import io.github.kdroidfilter.darwinui.components.SearchSuggestionItem
+import io.github.kdroidfilter.darwinui.components.SearchSuggestionSeparator
 import io.github.kdroidfilter.darwinui.components.SidebarButton
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.components.TitleBar
 import io.github.kdroidfilter.darwinui.components.TitleBarButtonGroup
 import io.github.kdroidfilter.darwinui.components.TitleBarGroupButton
 import io.github.kdroidfilter.darwinui.components.TitleBarGroupDivider
-import io.github.kdroidfilter.darwinui.components.Text
+import io.github.kdroidfilter.darwinui.components.ToolbarSearchField
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.icons.Icon
+import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.icons.LucideCopy
 import io.github.kdroidfilter.darwinui.icons.LucideDownload
+import io.github.kdroidfilter.darwinui.icons.LucideEllipsis
+import io.github.kdroidfilter.darwinui.icons.LucideLayoutGrid
+import io.github.kdroidfilter.darwinui.icons.LucideList
 import io.github.kdroidfilter.darwinui.icons.LucidePlus
 import io.github.kdroidfilter.darwinui.icons.LucideSearch
+import io.github.kdroidfilter.darwinui.icons.LucideShare2
+import io.github.kdroidfilter.darwinui.icons.LucideTag
 import io.github.kdroidfilter.darwinui.icons.LucideUpload
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -85,6 +96,79 @@ fun TitleBarBrowserExample() {
     )
 }
 
+@GalleryExample("TitleBar", "Finder")
+@Composable
+fun TitleBarFinderExample() {
+    var searchQuery by remember { mutableStateOf("") }
+    var searchExpanded by remember { mutableStateOf(false) }
+
+    TitleBar(
+        navigationActions = {
+            NavigationButtons(
+                onBack = {},
+                onForward = {},
+                backEnabled = true,
+                forwardEnabled = false,
+            )
+        },
+        title = {
+            Text("Documents")
+        },
+        actions = {
+            // View mode group
+            TitleBarButtonGroup {
+                TitleBarGroupButton(onClick = {}) {
+                    Icon(LucideLayoutGrid, modifier = Modifier.size(14.dp))
+                }
+                TitleBarGroupDivider()
+                TitleBarGroupButton(onClick = {}) {
+                    Icon(LucideList, modifier = Modifier.size(14.dp))
+                }
+                TitleBarGroupDivider()
+                TitleBarGroupButton(onClick = {}) {
+                    Icon(LucideChevronDown, modifier = Modifier.size(10.dp))
+                }
+            }
+
+            // Action buttons
+            IconButton(onClick = {}) {
+                Icon(LucideShare2, modifier = Modifier.size(14.dp))
+            }
+            IconButton(onClick = {}) {
+                Icon(LucideTag, modifier = Modifier.size(14.dp))
+            }
+            IconButton(onClick = {}) {
+                Icon(LucideEllipsis, modifier = Modifier.size(14.dp))
+            }
+
+            // Expandable search
+            ToolbarSearchField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                expanded = searchExpanded,
+                onExpandedChange = { searchExpanded = it },
+                expandedWidth = 220.dp,
+                suggestions = {
+                    SearchSuggestionHeader("File names")
+                    SearchSuggestionItem(onClick = {}) {
+                        Text("Name contains \"$searchQuery\"")
+                    }
+                    SearchSuggestionSeparator()
+                    SearchSuggestionHeader("Content")
+                    SearchSuggestionItem(onClick = {}) {
+                        Text("Contains \"$searchQuery\"")
+                    }
+                    SearchSuggestionSeparator()
+                    SearchSuggestionHeader("Types")
+                    SearchSuggestionItem(onClick = {}) { Text("SVG Document") }
+                    SearchSuggestionItem(onClick = {}) { Text("Source Code") }
+                    SearchSuggestionItem(onClick = {}) { Text("PDF Document") }
+                },
+            )
+        },
+    )
+}
+
 @Composable
 internal fun TitleBarPage() {
     GalleryPage("TitleBar", "macOS-style title bar with window controls, navigation, and grouped toolbar actions.") {
@@ -94,5 +178,10 @@ internal fun TitleBarPage() {
             description = "Safari-style toolbar: back/forward navigation, URL field, and action group",
             sourceCode = GallerySources.TitleBarBrowserExample,
         ) { TitleBarBrowserExample() }
+        ExampleCard(
+            title = "Finder",
+            description = "Finder-style toolbar: navigation, title, view mode group, actions, and expandable search with suggestions",
+            sourceCode = GallerySources.TitleBarFinderExample,
+        ) { TitleBarFinderExample() }
     }
 }
