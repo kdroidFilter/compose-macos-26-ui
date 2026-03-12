@@ -19,6 +19,9 @@ import io.github.kdroidfilter.darwinui.components.DisclosureButton
 import io.github.kdroidfilter.darwinui.components.MacNativeAccentButton
 import io.github.kdroidfilter.darwinui.components.MacNativeDestructiveButton
 import io.github.kdroidfilter.darwinui.components.MacNativeSecondaryButton
+import io.github.kdroidfilter.darwinui.components.PanelAccentButton
+import io.github.kdroidfilter.darwinui.components.PanelDestructiveButton
+import io.github.kdroidfilter.darwinui.components.PanelSecondaryButton
 import io.github.kdroidfilter.darwinui.components.PulldownButton
 import io.github.kdroidfilter.darwinui.components.PushButton
 import io.github.kdroidfilter.darwinui.components.Text
@@ -119,6 +122,33 @@ fun ButtonAlertSheetFooterExample() {
     }
 }
 
+@GalleryExample("Button", "Panel")
+@Composable
+fun ButtonPanelExample() {
+    Column(
+        modifier = Modifier.widthIn(max = 260.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        PanelAccentButton(text = "Save", onClick = {}, fillWidth = true)
+        PanelDestructiveButton(text = "Delete", onClick = {}, fillWidth = true)
+        PanelSecondaryButton(text = "Cancel", onClick = {}, fillWidth = true)
+    }
+}
+
+@GalleryExample("Button", "Panel Footer")
+@Composable
+fun ButtonPanelFooterExample() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+    ) {
+        PanelDestructiveButton(text = "Delete", onClick = {})
+        Spacer(modifier = Modifier.weight(1f))
+        PanelSecondaryButton(text = "Cancel", onClick = {})
+        PanelAccentButton(text = "Save", onClick = {})
+    }
+}
+
 @Composable
 internal fun ButtonPage() {
     GalleryPage("Button", "Native macOS button controls with idiomatic Compose APIs.") {
@@ -155,5 +185,17 @@ internal fun ButtonPage() {
             description = "Horizontal layout: destructive left, cancel + confirm right",
             sourceCode = GallerySources.ButtonAlertSheetFooterExample,
         ) { ButtonAlertSheetFooterExample() }
+
+        SectionHeader("Panel")
+        ExampleCard(
+            title = "Panel",
+            description = "NSSavePanel-style buttons with squarish rounded corners",
+            sourceCode = GallerySources.ButtonPanelExample,
+        ) { ButtonPanelExample() }
+        ExampleCard(
+            title = "Panel Footer",
+            description = "Horizontal panel footer: delete left, cancel + save right",
+            sourceCode = GallerySources.ButtonPanelFooterExample,
+        ) { ButtonPanelFooterExample() }
     }
 }

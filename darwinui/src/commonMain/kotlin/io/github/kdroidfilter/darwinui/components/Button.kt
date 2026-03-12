@@ -399,6 +399,204 @@ fun ArrowButton(
 }
 
 // ===========================================================================
+// macOS-native panel button styles — NSSavePanel / sheet footer buttons
+// ===========================================================================
+
+/**
+ * macOS-native accent panel button for save dialogs and sheet footers.
+ * 24dp tall, squarish rounded corners (rx≈7.69dp), solid blue (#0088FF) background.
+ */
+@Composable
+fun PanelAccentButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    fillWidth: Boolean = false,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val isHovered by interactionSource.collectIsHoveredAsState()
+    val isDark = DarwinTheme.colors.isDark
+
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed && enabled) 0.97f else 1f,
+        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+        label = "panel_accent_scale",
+    )
+    val hoverOverlay by animateColorAsState(
+        targetValue = when {
+            !isHovered || !enabled -> Color.Transparent
+            else -> Color.White.copy(alpha = 0.10f)
+        },
+        animationSpec = darwinTween(DarwinDuration.Fast),
+        label = "panel_accent_hover",
+    )
+
+    val shape = RoundedCornerShape(7.69.dp)
+
+    Box(
+        modifier = modifier
+            .scale(scale)
+            .then(if (fillWidth) Modifier.fillMaxWidth() else Modifier.defaultMinSize(minWidth = 76.dp))
+            .height(24.dp)
+            .clip(shape)
+            .background(Color(0xFF0088FF), shape)
+            .background(hoverOverlay, shape)
+            .hoverable(interactionSource = interactionSource, enabled = enabled)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                enabled = enabled,
+                role = Role.Button,
+                onClick = onClick,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        CompositionLocalProvider(
+            LocalDarwinContentColor provides Color.White,
+            LocalDarwinTextStyle provides DarwinTheme.typography.bodySmall.copy(
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                fontSize = 13.sp,
+            ),
+        ) {
+            Text(text)
+        }
+    }
+}
+
+/**
+ * macOS-native destructive panel button for save dialogs and sheet footers.
+ * 24dp tall, squarish rounded corners (rx≈7.69dp), red tinted background (#FF383C at 25%).
+ */
+@Composable
+fun PanelDestructiveButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    fillWidth: Boolean = false,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val isHovered by interactionSource.collectIsHoveredAsState()
+    val isDark = DarwinTheme.colors.isDark
+
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed && enabled) 0.97f else 1f,
+        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+        label = "panel_dest_scale",
+    )
+    val hoverOverlay by animateColorAsState(
+        targetValue = when {
+            !isHovered || !enabled -> Color.Transparent
+            isDark -> Color(0xFFFF383C).copy(alpha = 0.08f)
+            else -> Color(0xFFFF383C).copy(alpha = 0.06f)
+        },
+        animationSpec = darwinTween(DarwinDuration.Fast),
+        label = "panel_dest_hover",
+    )
+
+    val shape = RoundedCornerShape(7.69.dp)
+
+    Box(
+        modifier = modifier
+            .scale(scale)
+            .then(if (fillWidth) Modifier.fillMaxWidth() else Modifier.defaultMinSize(minWidth = 76.dp))
+            .height(24.dp)
+            .clip(shape)
+            .background(Color(0xFFFF383C).copy(alpha = 0.25f), shape)
+            .background(hoverOverlay, shape)
+            .hoverable(interactionSource = interactionSource, enabled = enabled)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                enabled = enabled,
+                role = Role.Button,
+                onClick = onClick,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        CompositionLocalProvider(
+            LocalDarwinContentColor provides Color(0xFFFF383C),
+            LocalDarwinTextStyle provides DarwinTheme.typography.bodySmall.copy(
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                fontSize = 13.sp,
+            ),
+        ) {
+            Text(text)
+        }
+    }
+}
+
+/**
+ * macOS-native secondary panel button for save dialogs and sheet footers.
+ * 24dp tall, squarish rounded corners (rx≈7.69dp), subtle 5% black background.
+ */
+@Composable
+fun PanelSecondaryButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    fillWidth: Boolean = false,
+) {
+    val isDark = DarwinTheme.colors.isDark
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val isHovered by interactionSource.collectIsHoveredAsState()
+
+    val backgroundColor = if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.05f)
+    val textColor = if (isDark) Color.White else Color(0xFF1A1A1A)
+
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed && enabled) 0.97f else 1f,
+        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+        label = "panel_sec_scale",
+    )
+    val hoverOverlay by animateColorAsState(
+        targetValue = when {
+            !isHovered || !enabled -> Color.Transparent
+            isDark -> Color.White.copy(alpha = 0.05f)
+            else -> Color.Black.copy(alpha = 0.04f)
+        },
+        animationSpec = darwinTween(DarwinDuration.Fast),
+        label = "panel_sec_hover",
+    )
+
+    val shape = RoundedCornerShape(7.69.dp)
+
+    Box(
+        modifier = modifier
+            .scale(scale)
+            .then(if (fillWidth) Modifier.fillMaxWidth() else Modifier.defaultMinSize(minWidth = 76.dp))
+            .height(24.dp)
+            .clip(shape)
+            .background(backgroundColor, shape)
+            .background(hoverOverlay, shape)
+            .hoverable(interactionSource = interactionSource, enabled = enabled)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                enabled = enabled,
+                role = Role.Button,
+                onClick = onClick,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        CompositionLocalProvider(
+            LocalDarwinContentColor provides textColor,
+            LocalDarwinTextStyle provides DarwinTheme.typography.bodySmall.copy(
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                fontSize = 13.sp,
+            ),
+        ) {
+            Text(text)
+        }
+    }
+}
+
+// ===========================================================================
 // macOS-native alert pill button styles
 // ===========================================================================
 

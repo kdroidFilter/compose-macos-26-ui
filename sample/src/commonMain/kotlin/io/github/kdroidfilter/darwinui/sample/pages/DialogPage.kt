@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.AlertDialog
 import io.github.kdroidfilter.darwinui.components.AlertType
 import io.github.kdroidfilter.darwinui.components.PushButton
+import io.github.kdroidfilter.darwinui.components.SaveDialog
 import io.github.kdroidfilter.darwinui.components.SmallDialog
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
@@ -84,6 +85,56 @@ fun SmallDialogDestructiveExample() {
             }
         }
     }
+}
+
+@GalleryExample("Dialog", "Save Dialog")
+@Composable
+fun SaveDialogExample() {
+    var showDialog by remember { mutableStateOf(false) }
+    var fileName by remember { mutableStateOf("Untitled") }
+    var tags by remember { mutableStateOf("") }
+    var selectedLocation by remember { mutableStateOf(0) }
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        PushButton(text = "Open Save Dialog", onClick = { showDialog = true })
+    }
+    SaveDialog(
+        visible = showDialog,
+        onDismissRequest = { showDialog = false },
+        title = "Do you want to keep this new document \"Untitled\"?",
+        message = "You can choose to save your changes, or delete this document immediately. You can't undo this action.",
+        fileName = fileName,
+        onFileNameChange = { fileName = it },
+        onSave = { showDialog = false },
+        tags = tags,
+        onTagsChange = { tags = it },
+        locations = listOf("Desktop", "Documents", "Downloads"),
+        selectedLocationIndex = selectedLocation,
+        onLocationChange = { index, _ -> selectedLocation = index },
+    )
+}
+
+@GalleryExample("Dialog", "Save Dialog with Delete")
+@Composable
+fun SaveDialogWithDeleteExample() {
+    var showDialog by remember { mutableStateOf(false) }
+    var fileName by remember { mutableStateOf("Report.pdf") }
+    var selectedLocation by remember { mutableStateOf(0) }
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        PushButton(text = "Open Save Dialog with Delete", onClick = { showDialog = true })
+    }
+    SaveDialog(
+        visible = showDialog,
+        onDismissRequest = { showDialog = false },
+        title = "Do you want to keep this new document \"Report.pdf\"?",
+        message = "You can choose to save your changes, or delete this document immediately. You can't undo this action.",
+        fileName = fileName,
+        onFileNameChange = { fileName = it },
+        onSave = { showDialog = false },
+        locations = listOf("Desktop", "Documents"),
+        selectedLocationIndex = selectedLocation,
+        onLocationChange = { index, _ -> selectedLocation = index },
+        onDelete = { showDialog = false },
+    )
 }
 
 @GalleryExample("Dialog", "Alert Dialog — Save")
@@ -162,6 +213,18 @@ internal fun DialogPage() {
             description = "Small dialog with destructive action on the left",
             sourceCode = GallerySources.SmallDialogDestructiveExample,
         ) { SmallDialogDestructiveExample() }
+
+        SectionHeader("Save Dialog")
+        ExampleCard(
+            title = "Save Dialog",
+            description = "macOS-native NSSavePanel-style save dialog with form fields",
+            sourceCode = GallerySources.SaveDialogExample,
+        ) { SaveDialogExample() }
+        ExampleCard(
+            title = "With Delete",
+            description = "Save dialog with destructive delete action",
+            sourceCode = GallerySources.SaveDialogWithDeleteExample,
+        ) { SaveDialogWithDeleteExample() }
 
         SectionHeader("Alert Dialog")
         ExampleCard(
