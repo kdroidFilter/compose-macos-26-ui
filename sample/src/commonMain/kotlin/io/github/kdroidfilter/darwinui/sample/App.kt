@@ -40,6 +40,7 @@ import com.composables.icons.lucide.Columns3
 import com.composables.icons.lucide.CreditCard
 import com.composables.icons.lucide.Ellipsis
 import com.composables.icons.lucide.ListChecks
+import com.composables.icons.lucide.LayoutList
 import com.composables.icons.lucide.Loader
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Menu
@@ -94,6 +95,7 @@ import io.github.kdroidfilter.darwinui.sample.pages.ContextMenuPage
 import io.github.kdroidfilter.darwinui.sample.pages.DialogPage
 import io.github.kdroidfilter.darwinui.sample.pages.DropdownMenuPage
 import io.github.kdroidfilter.darwinui.sample.pages.GroupBoxPage
+import io.github.kdroidfilter.darwinui.sample.pages.FormPage
 import io.github.kdroidfilter.darwinui.sample.pages.GroupedListPage
 import io.github.kdroidfilter.darwinui.sample.pages.IconButtonPage
 import io.github.kdroidfilter.darwinui.sample.pages.InputPage
@@ -136,6 +138,7 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("colorwell", "Color Well", "FORM CONTROLS", Lucide.Scan),
     SidebarEntryDef("groupbox", "Group Box", "DATA DISPLAY", Lucide.SquareDashed),
     SidebarEntryDef("groupedlist", "Grouped List", "DATA DISPLAY", Lucide.ListChecks),
+    SidebarEntryDef("form", "Form", "DATA DISPLAY", Lucide.LayoutList),
     SidebarEntryDef("badge", "Badge", "DATA DISPLAY", Lucide.Tag),
     SidebarEntryDef("avatar", "Avatar", "DATA DISPLAY", Lucide.CircleUser),
     SidebarEntryDef("card", "Card", "DATA DISPLAY", Lucide.CreditCard),
@@ -351,6 +354,7 @@ fun App() {
                         "slider" -> SliderPage()
                         "groupbox" -> GroupBoxPage()
                         "groupedlist" -> GroupedListPage()
+                        "form" -> FormPage()
                         "badge" -> BadgePage()
                         "avatar" -> AvatarPage()
                         "card" -> CardPage()

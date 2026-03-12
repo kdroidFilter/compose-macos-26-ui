@@ -12,6 +12,7 @@ import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -45,15 +46,16 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
+import io.github.kdroidfilter.darwinui.theme.darwinGlass
 import io.github.kdroidfilter.darwinui.theme.darwinTween
 
 // ===========================================================================
-// PulldownButton — macOS-native pulldown/popup button with glass appearance
+// PulldownButton — macOS-native pulldown/popup button (flat bezel style)
 // ===========================================================================
 
 /**
- * macOS-native pulldown button: frosted glass background, drop shadow, label + chevron-down.
- * Matches the visual style of NSPopUpButton in pull-down mode.
+ * macOS-native pulldown button: 24dp tall, rounded corners (rx≈9.6dp), subtle 5% background.
+ * Displays content + up/down chevron arrows. Matches NSPopUpButton flat bezel style.
  */
 @Composable
 fun PulldownButton(
@@ -80,22 +82,113 @@ fun PulldownButton(
     val hoverOverlay by animateColorAsState(
         targetValue = when {
             !isHovered || !enabled -> Color.Transparent
-            isDark -> Color.White.copy(alpha = 0.06f)
+            isDark -> Color.White.copy(alpha = 0.05f)
             else -> Color.Black.copy(alpha = 0.04f)
         },
         animationSpec = darwinTween(DarwinDuration.Fast),
         label = "pulldown_hover",
     )
 
-    val containerColor = if (isDark) Color.White.copy(alpha = 0.12f) else Color.White
-    val borderColor = if (isDark) Color.White.copy(alpha = 0.15f) else Color.Black.copy(alpha = 0.12f)
+    val bgColor = if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.05f)
     val contentColor = if (isDark) Color.White else Color(0xFF1A1A1A)
-    val shape = DarwinTheme.shapes.medium
-    val textStyle = DarwinTheme.typography.labelMedium
+    val shape = RoundedCornerShape(9.6.dp)
 
     CompositionLocalProvider(
         LocalDarwinContentColor provides contentColor,
-        LocalDarwinTextStyle provides textStyle,
+        LocalDarwinTextStyle provides DarwinTheme.typography.labelMedium,
+    ) {
+        Box(
+            modifier = modifier
+                .scale(scale)
+                .alpha(alpha)
+                .height(24.dp)
+                .clip(shape)
+                .background(bgColor, shape)
+                .background(hoverOverlay, shape)
+                .hoverable(interactionSource = interactionSource, enabled = enabled)
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    enabled = enabled,
+                    role = Role.Button,
+                    onClick = onClick,
+                )
+                .padding(horizontal = 12.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                content()
+                Spacer(Modifier.width(4.dp))
+                PulldownChevrons(tint = contentColor)
+            }
+        }
+    }
+}
+
+@Composable
+fun PulldownButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+) {
+    PulldownButton(onClick, modifier, enabled, interactionSource) {
+        Text(text)
+    }
+}
+
+// ===========================================================================
+// GlassPulldownButton — macOS-native pulldown button with glass appearance
+// ===========================================================================
+
+/**
+ * macOS-native pulldown button with frosted glass background: 36dp tall, capsule shape,
+ * drop shadow. Displays content + up/down chevron arrows.
+ */
+@Composable
+fun GlassPulldownButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    content: @Composable RowScope.() -> Unit,
+) {
+    val isDark = DarwinTheme.colors.isDark
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val isHovered by interactionSource.collectIsHoveredAsState()
+
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed && enabled) 0.97f else 1f,
+        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+        label = "glass_pulldown_scale",
+    )
+    val alpha by animateFloatAsState(
+        targetValue = if (!enabled) 0.5f else 1f,
+        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+        label = "glass_pulldown_alpha",
+    )
+    val hoverOverlay by animateColorAsState(
+        targetValue = when {
+            !isHovered || !enabled -> Color.Transparent
+            isDark -> Color.White.copy(alpha = 0.06f)
+            else -> Color.Black.copy(alpha = 0.04f)
+        },
+        animationSpec = darwinTween(DarwinDuration.Fast),
+        label = "glass_pulldown_hover",
+    )
+
+    val fallbackColor = if (isDark) Color.White.copy(alpha = 0.12f) else Color.White
+    val borderColor = if (isDark) Color.White.copy(alpha = 0.15f) else Color.Black.copy(alpha = 0.12f)
+    val contentColor = if (isDark) Color.White else Color(0xFF1A1A1A)
+    val capsuleShape = RoundedCornerShape(50)
+
+    CompositionLocalProvider(
+        LocalDarwinContentColor provides contentColor,
+        LocalDarwinTextStyle provides DarwinTheme.typography.labelMedium,
     ) {
         Box(
             modifier = modifier
@@ -103,14 +196,16 @@ fun PulldownButton(
                 .alpha(alpha)
                 .shadow(
                     elevation = 4.dp,
-                    shape = shape,
+                    shape = capsuleShape,
                     spotColor = Color.Black.copy(alpha = 0.12f),
                     ambientColor = Color.Black.copy(alpha = 0.06f),
                 )
-                .clip(shape)
-                .background(containerColor, shape)
-                .border(BorderStroke(0.5.dp, borderColor), shape)
-                .background(hoverOverlay, shape)
+                .darwinGlass(
+                    shape = capsuleShape,
+                    fallbackColor = fallbackColor,
+                )
+                .border(BorderStroke(0.5.dp, borderColor), capsuleShape)
+                .background(hoverOverlay, capsuleShape)
                 .hoverable(interactionSource = interactionSource, enabled = enabled)
                 .clickable(
                     interactionSource = interactionSource,
@@ -129,25 +224,44 @@ fun PulldownButton(
             ) {
                 content()
                 Spacer(Modifier.width(6.dp))
-                Icon(
-                    imageVector = LucideChevronDown,
-                    modifier = Modifier.size(14.dp),
-                )
+                PulldownChevrons(tint = contentColor)
             }
         }
     }
 }
 
 @Composable
-fun PulldownButton(
+fun GlassPulldownButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    PulldownButton(onClick, modifier, enabled, interactionSource) {
+    GlassPulldownButton(onClick, modifier, enabled, interactionSource) {
         Text(text)
+    }
+}
+
+// ===========================================================================
+// PulldownChevrons — shared up/down chevron pair for pulldown buttons
+// ===========================================================================
+
+@Composable
+private fun PulldownChevrons(tint: Color) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(
+            imageVector = LucideChevronDown,
+            modifier = Modifier.size(8.dp).rotate(180f),
+            tint = tint,
+        )
+        Icon(
+            imageVector = LucideChevronDown,
+            modifier = Modifier.size(8.dp),
+            tint = tint,
+        )
     }
 }
 

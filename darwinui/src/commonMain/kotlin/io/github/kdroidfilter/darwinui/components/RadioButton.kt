@@ -202,7 +202,13 @@ fun RadioButton(
             )
         }
     } else {
-        RadioButton(selected = selected, onClick = onClick, modifier = modifier, enabled = enabled)
+        RadioButton(
+            selected = selected,
+            onClick = onClick,
+            modifier = modifier,
+            enabled = enabled,
+            colors = RadioButtonDefaults.colors(),
+        )
     }
 }
 
