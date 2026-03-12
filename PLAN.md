@@ -60,11 +60,20 @@ Remplacer les styles Material-like par la vraie échelle typographique macOS :
 ## Phase 2 — Composants manquants (priorité haute)
 
 ### 2.1 Variantes de boutons
-- [ ] `DefaultButton` — bouton standard macOS
-- [ ] `OutlinedButton` — bouton avec bordure
-- [ ] `TintedButton` — bouton avec teinte accent
-- [ ] `PlainButton` — bouton texte sans fond
-- [ ] `SplitButton` — action principale + dropdown secondaire
+Implémentés (nommage macOS natif, pas Jewel) :
+- [x] `PushButton` — bouton standard neutre (bezel/rounded) — `components/Button.kt`
+- [x] `PulldownButton` — popup/pulldown flat style — `components/Button.kt`
+- [x] `GlassPulldownButton` — pulldown avec fond glass + shadow — `components/Button.kt`
+- [x] `DisclosureButton` — toggle circulaire expand/collapse — `components/Button.kt`
+- [x] `ArrowButton` — stepper NSStepper-like (haut/bas) — `components/Button.kt`
+- [x] `PanelAccentButton` / `PanelDestructiveButton` / `PanelSecondaryButton` — boutons footer NSSavePanel — `components/Button.kt`
+- [x] `MacNativeAccentButton` / `MacNativeDestructiveButton` / `MacNativeSecondaryButton` — boutons pill alert — `components/Button.kt`
+
+Manquants :
+- [ ] `OutlinedButton` — bouton avec bordure visible, fond transparent
+- [ ] `TintedButton` — bouton avec teinte accent (fond coloré semi-transparent)
+- [ ] `PlainButton` — bouton texte sans fond (lien-like)
+- [ ] `SplitButton` — action principale + flèche dropdown séparée
 
 ### 2.2 Link
 - [ ] `Link(text, onClick)` — lien cliquable stylisé

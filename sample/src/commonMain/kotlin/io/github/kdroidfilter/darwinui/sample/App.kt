@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -51,6 +52,7 @@ import com.composables.icons.lucide.PanelLeft
 import com.composables.icons.lucide.PanelTopOpen
 import com.composables.icons.lucide.Scan
 import com.composables.icons.lucide.Search
+import com.composables.icons.lucide.GripVertical
 import com.composables.icons.lucide.SlidersHorizontal
 import com.composables.icons.lucide.SquareCheck
 import com.composables.icons.lucide.SquareDashed
@@ -61,6 +63,9 @@ import com.composables.icons.lucide.TextCursorInput
 import com.composables.icons.lucide.ToggleLeft
 import com.composables.icons.lucide.TriangleAlert
 import io.github.kdroidfilter.darwinui.components.DarwinScaffold
+import io.github.kdroidfilter.darwinui.components.TrackClickBehavior
+import io.github.kdroidfilter.darwinui.components.VerticalScrollbar
+import io.github.kdroidfilter.darwinui.components.rememberScrollbarState
 import io.github.kdroidfilter.darwinui.components.IconButton
 import io.github.kdroidfilter.darwinui.components.NavigationButtons
 import io.github.kdroidfilter.darwinui.components.Popover
@@ -104,6 +109,7 @@ import io.github.kdroidfilter.darwinui.sample.pages.PopoverPage
 import io.github.kdroidfilter.darwinui.sample.pages.ProgressPage
 import io.github.kdroidfilter.darwinui.sample.pages.RadioButtonPage
 import io.github.kdroidfilter.darwinui.sample.pages.ScaffoldPage
+import io.github.kdroidfilter.darwinui.sample.pages.ScrollbarPage
 import io.github.kdroidfilter.darwinui.sample.pages.SearchInputPage
 import io.github.kdroidfilter.darwinui.sample.pages.SegmentedControlPage
 import io.github.kdroidfilter.darwinui.sample.pages.SelectPage
@@ -136,6 +142,7 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("searchinput", "Search Input", "FORM CONTROLS", Lucide.Search),
     SidebarEntryDef("slider", "Slider", "FORM CONTROLS", Lucide.SlidersHorizontal),
     SidebarEntryDef("colorwell", "Color Well", "FORM CONTROLS", Lucide.Scan),
+    SidebarEntryDef("scrollbar", "Scrollbar", "DATA DISPLAY", Lucide.GripVertical),
     SidebarEntryDef("groupbox", "Group Box", "DATA DISPLAY", Lucide.SquareDashed),
     SidebarEntryDef("groupedlist", "Grouped List", "DATA DISPLAY", Lucide.ListChecks),
     SidebarEntryDef("form", "Form", "DATA DISPLAY", Lucide.LayoutList),
@@ -332,10 +339,12 @@ fun App() {
                     )
                 },
             ) { contentPadding ->
+                val contentScrollState = rememberScrollState()
+                Box(modifier = Modifier.fillMaxSize()) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
+                        .verticalScroll(contentScrollState)
                         .padding(contentPadding)
                         .padding(horizontal = 40.dp, vertical = 40.dp),
                     verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -352,6 +361,7 @@ fun App() {
                         "select" -> SelectPage()
                         "multiselect" -> MultiSelectPage()
                         "slider" -> SliderPage()
+                        "scrollbar" -> ScrollbarPage()
                         "groupbox" -> GroupBoxPage()
                         "groupedlist" -> GroupedListPage()
                         "form" -> FormPage()
@@ -378,6 +388,13 @@ fun App() {
                     }
                     Spacer(modifier = Modifier.height(48.dp))
                 }
+                VerticalScrollbar(
+                    state = rememberScrollbarState(contentScrollState),
+                    modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+                    showOnEdgeHover = true,
+                    trackClickBehavior = TrackClickBehavior.Jump,
+                )
+                } // Box
             }
 
             ToastHost(state = toastState)
