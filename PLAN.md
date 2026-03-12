@@ -4,7 +4,7 @@ Comparaison avec Jewel (IntelliJ Compose theme) et composants macOS natifs manqu
 
 ---
 
-## Phase 1 — Fondations architecturales ✅
+## Phase 1 — Fondations architecturales ✅ COMPLÈTE
 
 ### 1.1 Système Style par composant
 Actuellement chaque composant n'a que des `*Colors`. Jewel encapsule Colors + Metrics + Icons dans un objet `*Style` unique.
@@ -22,7 +22,7 @@ Actuellement chaque composant n'a que des `*Colors`. Jewel encapsule Colors + Me
 - [x] Créer `CardStyle(colors, metrics)` — `theme/DarwinComponentStyles.kt`
 - [x] Créer `ComponentStyling` registry + `defaultComponentStyling()` — `theme/DarwinComponentStyling.kt`
 - [x] Exposer via `DarwinTheme.componentStyling` + `LocalDarwinComponentStyling`
-- [ ] Migrer les Defaults existants vers ce pattern (Phase future)
+- [x] Migrer les Defaults existants vers ce pattern — `TextFieldDefaults` et `CheckboxDefaults` lisent depuis `DarwinTheme.componentStyling`
 
 ### 1.2 Hiérarchie d'états d'interaction
 Jewel définit une hiérarchie claire : InteractiveComponentState → FocusableComponentState / SelectableComponentState / ToggleableComponentState.
@@ -32,7 +32,7 @@ Jewel définit une hiérarchie claire : InteractiveComponentState → FocusableC
 - [x] `SelectableComponentState` extends interactive + isSelected — `theme/DarwinComponentStates.kt`
 - [x] `FocusableSelectableComponentState` (combo) — `theme/DarwinComponentStates.kt`
 - [x] `ToggleableComponentState` avec toggleableState (on/off/indeterminate) — `theme/DarwinComponentStates.kt`
-- [ ] Intégrer dans les composants existants (Phase future)
+- [x] Intégrer dans les composants existants — `TextFieldState : FocusableComponentState`, `CheckboxState : ToggleableComponentState` ajoutés
 
 ### 1.3 GlobalColors et GlobalMetrics
 - [x] `GlobalColors` — borders (normal/disabled/focused/strong), outlines (focused/warning/error variants), semantic content tints — `theme/DarwinGlobalColors.kt`
@@ -45,7 +45,7 @@ Jewel définit une hiérarchie claire : InteractiveComponentState → FocusableC
 - [x] `Modifier.focusOutline(shape, color, outlineWidth)` — focus ring macOS standardisé
 - [x] `Modifier.outline(outline, shape, outlines)` — outline de validation
 - [x] `Modifier.focusOrValidationOutline(isFocused, outline, shape, outlines)` — combiné
-- [ ] Intégrer dans TextField, TextArea, ComboBox, SearchField (Phase future)
+- [x] Intégrer dans TextField, TextArea, ComboBox, SearchField — `outline: Outline` param + `focusOrValidationOutline`
 
 ### 1.5 Typography macOS
 Remplacer les styles Material-like par la vraie échelle typographique macOS :

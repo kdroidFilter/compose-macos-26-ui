@@ -24,7 +24,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.Outline
 import io.github.kdroidfilter.darwinui.theme.darwinTween
+import io.github.kdroidfilter.darwinui.theme.focusOrValidationOutline
 
 @Composable
 fun TextArea(
@@ -43,10 +45,12 @@ fun TextArea(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     focusRequester: FocusRequester = remember { FocusRequester() },
     textStyle: TextStyle? = null,
+    outline: Outline = Outline.None,
 ) {
     val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
     val shapes = DarwinTheme.shapes
+    val outlines = DarwinTheme.globalColors.outlines
 
     val resolvedTextStyle = textStyle ?: typography.subheadline.copy(color = colors.textPrimary)
     val mergedTextStyle = resolvedTextStyle.copy(
@@ -127,33 +131,39 @@ fun TextArea(
             keyboardActions = keyboardActions,
             cursorBrush = SolidColor(colors.inputFocusBorder),
             decorationBox = { innerTextField ->
+                // Outer unclipped box carries the focus/validation outline ring (Phase 1.4)
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .defaultMinSize(minHeight = 0.dp)
-                        .clip(shapes.small)
-                        .background(backgroundColor)
-                        .border(
-                            width = resolvedBorderWidth,
-                            color = borderColor,
-                            shape = shapes.small,
-                        )
-                        .then(
-                            if (!enabled) Modifier.graphicsLayer { alpha = 0.5f }
-                            else Modifier
-                        )
-                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                        .focusOrValidationOutline(isFocused, outline, shapes.small, outlines),
                 ) {
-                    // Placeholder
-                    if (value.isEmpty() && placeholder.isNotEmpty()) {
-                        androidx.compose.foundation.text.BasicText(
-                            text = placeholder,
-                            style = typography.subheadline.copy(
-                                color = colors.textTertiary,
-                            ),
-                        )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(shapes.small)
+                            .background(backgroundColor)
+                            .border(
+                                width = resolvedBorderWidth,
+                                color = borderColor,
+                                shape = shapes.small,
+                            )
+                            .then(
+                                if (!enabled) Modifier.graphicsLayer { alpha = 0.5f }
+                                else Modifier
+                            )
+                            .padding(horizontal = 12.dp, vertical = 10.dp),
+                    ) {
+                        if (value.isEmpty() && placeholder.isNotEmpty()) {
+                            androidx.compose.foundation.text.BasicText(
+                                text = placeholder,
+                                style = typography.subheadline.copy(
+                                    color = colors.textTertiary,
+                                ),
+                            )
+                        }
+                        innerTextField()
                     }
-                    innerTextField()
                 }
             },
         )

@@ -29,7 +29,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.FocusableComponentState
+import io.github.kdroidfilter.darwinui.theme.Outline
 import io.github.kdroidfilter.darwinui.theme.darwinTween
+import io.github.kdroidfilter.darwinui.theme.focusOrValidationOutline
 
 // ===========================================================================
 // InputSize — Darwin extension
@@ -37,6 +40,32 @@ import io.github.kdroidfilter.darwinui.theme.darwinTween
 
 enum class InputSize(val height: Dp) {
     Sm(26.dp), Md(32.dp), Lg(40.dp),
+}
+
+// ===========================================================================
+// TextFieldState — implements FocusableComponentState (Phase 1.2)
+// ===========================================================================
+
+/**
+ * State snapshot for a Darwin text field.
+ * Implements [FocusableComponentState] to integrate with the Phase 1.2 state hierarchy.
+ */
+data class TextFieldState(
+    override val isActive: Boolean,
+    override val isEnabled: Boolean,
+    override val isHovered: Boolean,
+    override val isPressed: Boolean,
+    override val isFocused: Boolean,
+) : FocusableComponentState {
+    companion object {
+        fun of(isEnabled: Boolean, isFocused: Boolean): TextFieldState = TextFieldState(
+            isActive = true,
+            isEnabled = isEnabled,
+            isHovered = false,
+            isPressed = false,
+            isFocused = isFocused,
+        )
+    }
 }
 
 // ===========================================================================
@@ -82,45 +111,46 @@ class TextFieldColors(
 
 // ===========================================================================
 // TextFieldDefaults — mirrors M3's TextFieldDefaults
+// Reads defaults from DarwinTheme.componentStyling.textField (Phase 1.1)
 // ===========================================================================
 
 object TextFieldDefaults {
     @Composable
     fun colors(
-        focusedTextColor: Color = DarwinTheme.colorScheme.textPrimary,
-        unfocusedTextColor: Color = DarwinTheme.colorScheme.textPrimary,
-        disabledTextColor: Color = DarwinTheme.colorScheme.textTertiary,
-        errorTextColor: Color = DarwinTheme.colorScheme.textPrimary,
-        focusedContainerColor: Color = DarwinTheme.colorScheme.inputFocusBackground,
-        unfocusedContainerColor: Color = DarwinTheme.colorScheme.inputBackground,
-        disabledContainerColor: Color = DarwinTheme.colorScheme.inputBackground,
-        errorContainerColor: Color = DarwinTheme.colorScheme.inputBackground,
-        cursorColor: Color = DarwinTheme.colorScheme.inputFocusBorder,
-        errorCursorColor: Color = DarwinTheme.colorScheme.destructive,
-        focusedIndicatorColor: Color = DarwinTheme.colorScheme.inputFocusBorder,
-        unfocusedIndicatorColor: Color = DarwinTheme.colorScheme.inputBorder,
-        disabledIndicatorColor: Color = DarwinTheme.colorScheme.inputBorder.copy(alpha = 0.5f),
-        errorIndicatorColor: Color = DarwinTheme.colorScheme.destructive,
-        focusedLeadingIconColor: Color = DarwinTheme.colorScheme.textTertiary,
-        unfocusedLeadingIconColor: Color = DarwinTheme.colorScheme.textTertiary,
-        disabledLeadingIconColor: Color = DarwinTheme.colorScheme.textTertiary.copy(alpha = 0.5f),
-        errorLeadingIconColor: Color = DarwinTheme.colorScheme.destructive,
-        focusedTrailingIconColor: Color = DarwinTheme.colorScheme.textTertiary,
-        unfocusedTrailingIconColor: Color = DarwinTheme.colorScheme.textTertiary,
-        disabledTrailingIconColor: Color = DarwinTheme.colorScheme.textTertiary.copy(alpha = 0.5f),
-        errorTrailingIconColor: Color = DarwinTheme.colorScheme.destructive,
-        focusedLabelColor: Color = DarwinTheme.colorScheme.textPrimary,
-        unfocusedLabelColor: Color = DarwinTheme.colorScheme.textPrimary,
-        disabledLabelColor: Color = DarwinTheme.colorScheme.textTertiary,
-        errorLabelColor: Color = DarwinTheme.colorScheme.destructive,
-        focusedPlaceholderColor: Color = DarwinTheme.colorScheme.textTertiary,
-        unfocusedPlaceholderColor: Color = DarwinTheme.colorScheme.textTertiary,
-        disabledPlaceholderColor: Color = DarwinTheme.colorScheme.textTertiary.copy(alpha = 0.5f),
-        errorPlaceholderColor: Color = DarwinTheme.colorScheme.textTertiary,
-        focusedSupportingTextColor: Color = DarwinTheme.colorScheme.textTertiary,
-        unfocusedSupportingTextColor: Color = DarwinTheme.colorScheme.textTertiary,
-        disabledSupportingTextColor: Color = DarwinTheme.colorScheme.textTertiary.copy(alpha = 0.5f),
-        errorSupportingTextColor: Color = DarwinTheme.colorScheme.destructive,
+        focusedTextColor: Color = DarwinTheme.componentStyling.textField.colors.content,
+        unfocusedTextColor: Color = DarwinTheme.componentStyling.textField.colors.content,
+        disabledTextColor: Color = DarwinTheme.componentStyling.textField.colors.contentDisabled,
+        errorTextColor: Color = DarwinTheme.componentStyling.textField.colors.content,
+        focusedContainerColor: Color = DarwinTheme.componentStyling.textField.colors.backgroundFocused,
+        unfocusedContainerColor: Color = DarwinTheme.componentStyling.textField.colors.background,
+        disabledContainerColor: Color = DarwinTheme.componentStyling.textField.colors.backgroundDisabled,
+        errorContainerColor: Color = DarwinTheme.componentStyling.textField.colors.backgroundError,
+        cursorColor: Color = DarwinTheme.componentStyling.textField.colors.cursor,
+        errorCursorColor: Color = DarwinTheme.componentStyling.textField.colors.cursorError,
+        focusedIndicatorColor: Color = DarwinTheme.componentStyling.textField.colors.borderFocused,
+        unfocusedIndicatorColor: Color = DarwinTheme.componentStyling.textField.colors.border,
+        disabledIndicatorColor: Color = DarwinTheme.componentStyling.textField.colors.borderDisabled,
+        errorIndicatorColor: Color = DarwinTheme.componentStyling.textField.colors.borderError,
+        focusedLeadingIconColor: Color = DarwinTheme.componentStyling.textField.colors.icon,
+        unfocusedLeadingIconColor: Color = DarwinTheme.componentStyling.textField.colors.icon,
+        disabledLeadingIconColor: Color = DarwinTheme.componentStyling.textField.colors.iconDisabled,
+        errorLeadingIconColor: Color = DarwinTheme.componentStyling.textField.colors.iconError,
+        focusedTrailingIconColor: Color = DarwinTheme.componentStyling.textField.colors.icon,
+        unfocusedTrailingIconColor: Color = DarwinTheme.componentStyling.textField.colors.icon,
+        disabledTrailingIconColor: Color = DarwinTheme.componentStyling.textField.colors.iconDisabled,
+        errorTrailingIconColor: Color = DarwinTheme.componentStyling.textField.colors.iconError,
+        focusedLabelColor: Color = DarwinTheme.componentStyling.textField.colors.label,
+        unfocusedLabelColor: Color = DarwinTheme.componentStyling.textField.colors.label,
+        disabledLabelColor: Color = DarwinTheme.componentStyling.textField.colors.labelDisabled,
+        errorLabelColor: Color = DarwinTheme.componentStyling.textField.colors.labelError,
+        focusedPlaceholderColor: Color = DarwinTheme.componentStyling.textField.colors.placeholder,
+        unfocusedPlaceholderColor: Color = DarwinTheme.componentStyling.textField.colors.placeholder,
+        disabledPlaceholderColor: Color = DarwinTheme.componentStyling.textField.colors.placeholderDisabled,
+        errorPlaceholderColor: Color = DarwinTheme.componentStyling.textField.colors.placeholder,
+        focusedSupportingTextColor: Color = DarwinTheme.componentStyling.textField.colors.placeholder,
+        unfocusedSupportingTextColor: Color = DarwinTheme.componentStyling.textField.colors.placeholder,
+        disabledSupportingTextColor: Color = DarwinTheme.componentStyling.textField.colors.placeholderDisabled,
+        errorSupportingTextColor: Color = DarwinTheme.componentStyling.textField.colors.labelError,
     ) = TextFieldColors(
         focusedTextColor, unfocusedTextColor, disabledTextColor, errorTextColor,
         focusedContainerColor, unfocusedContainerColor, disabledContainerColor, errorContainerColor,
@@ -135,40 +165,41 @@ object TextFieldDefaults {
 
     @Composable
     fun outlinedTextFieldColors(
-        focusedTextColor: Color = DarwinTheme.colorScheme.textPrimary,
-        unfocusedTextColor: Color = DarwinTheme.colorScheme.textPrimary,
-        disabledTextColor: Color = DarwinTheme.colorScheme.textTertiary,
-        errorTextColor: Color = DarwinTheme.colorScheme.textPrimary,
+        focusedTextColor: Color = DarwinTheme.componentStyling.textField.colors.content,
+        unfocusedTextColor: Color = DarwinTheme.componentStyling.textField.colors.content,
+        disabledTextColor: Color = DarwinTheme.componentStyling.textField.colors.contentDisabled,
+        errorTextColor: Color = DarwinTheme.componentStyling.textField.colors.content,
+        // Outlined variant uses transparent background
         focusedContainerColor: Color = Color.Transparent,
         unfocusedContainerColor: Color = Color.Transparent,
         disabledContainerColor: Color = Color.Transparent,
         errorContainerColor: Color = Color.Transparent,
-        cursorColor: Color = DarwinTheme.colorScheme.inputFocusBorder,
-        errorCursorColor: Color = DarwinTheme.colorScheme.destructive,
-        focusedIndicatorColor: Color = DarwinTheme.colorScheme.inputFocusBorder,
-        unfocusedIndicatorColor: Color = DarwinTheme.colorScheme.inputBorder,
-        disabledIndicatorColor: Color = DarwinTheme.colorScheme.inputBorder.copy(alpha = 0.5f),
-        errorIndicatorColor: Color = DarwinTheme.colorScheme.destructive,
-        focusedLeadingIconColor: Color = DarwinTheme.colorScheme.textTertiary,
-        unfocusedLeadingIconColor: Color = DarwinTheme.colorScheme.textTertiary,
-        disabledLeadingIconColor: Color = DarwinTheme.colorScheme.textTertiary.copy(alpha = 0.5f),
-        errorLeadingIconColor: Color = DarwinTheme.colorScheme.destructive,
-        focusedTrailingIconColor: Color = DarwinTheme.colorScheme.textTertiary,
-        unfocusedTrailingIconColor: Color = DarwinTheme.colorScheme.textTertiary,
-        disabledTrailingIconColor: Color = DarwinTheme.colorScheme.textTertiary.copy(alpha = 0.5f),
-        errorTrailingIconColor: Color = DarwinTheme.colorScheme.destructive,
-        focusedLabelColor: Color = DarwinTheme.colorScheme.textPrimary,
-        unfocusedLabelColor: Color = DarwinTheme.colorScheme.textSecondary,
-        disabledLabelColor: Color = DarwinTheme.colorScheme.textTertiary,
-        errorLabelColor: Color = DarwinTheme.colorScheme.destructive,
-        focusedPlaceholderColor: Color = DarwinTheme.colorScheme.textTertiary,
-        unfocusedPlaceholderColor: Color = DarwinTheme.colorScheme.textTertiary,
-        disabledPlaceholderColor: Color = DarwinTheme.colorScheme.textTertiary.copy(alpha = 0.5f),
-        errorPlaceholderColor: Color = DarwinTheme.colorScheme.textTertiary,
-        focusedSupportingTextColor: Color = DarwinTheme.colorScheme.textTertiary,
-        unfocusedSupportingTextColor: Color = DarwinTheme.colorScheme.textTertiary,
-        disabledSupportingTextColor: Color = DarwinTheme.colorScheme.textTertiary.copy(alpha = 0.5f),
-        errorSupportingTextColor: Color = DarwinTheme.colorScheme.destructive,
+        cursorColor: Color = DarwinTheme.componentStyling.textField.colors.cursor,
+        errorCursorColor: Color = DarwinTheme.componentStyling.textField.colors.cursorError,
+        focusedIndicatorColor: Color = DarwinTheme.componentStyling.textField.colors.borderFocused,
+        unfocusedIndicatorColor: Color = DarwinTheme.componentStyling.textField.colors.border,
+        disabledIndicatorColor: Color = DarwinTheme.componentStyling.textField.colors.borderDisabled,
+        errorIndicatorColor: Color = DarwinTheme.componentStyling.textField.colors.borderError,
+        focusedLeadingIconColor: Color = DarwinTheme.componentStyling.textField.colors.icon,
+        unfocusedLeadingIconColor: Color = DarwinTheme.componentStyling.textField.colors.icon,
+        disabledLeadingIconColor: Color = DarwinTheme.componentStyling.textField.colors.iconDisabled,
+        errorLeadingIconColor: Color = DarwinTheme.componentStyling.textField.colors.iconError,
+        focusedTrailingIconColor: Color = DarwinTheme.componentStyling.textField.colors.icon,
+        unfocusedTrailingIconColor: Color = DarwinTheme.componentStyling.textField.colors.icon,
+        disabledTrailingIconColor: Color = DarwinTheme.componentStyling.textField.colors.iconDisabled,
+        errorTrailingIconColor: Color = DarwinTheme.componentStyling.textField.colors.iconError,
+        focusedLabelColor: Color = DarwinTheme.componentStyling.textField.colors.label,
+        unfocusedLabelColor: Color = DarwinTheme.componentStyling.textField.colors.labelDisabled,
+        disabledLabelColor: Color = DarwinTheme.componentStyling.textField.colors.labelDisabled,
+        errorLabelColor: Color = DarwinTheme.componentStyling.textField.colors.labelError,
+        focusedPlaceholderColor: Color = DarwinTheme.componentStyling.textField.colors.placeholder,
+        unfocusedPlaceholderColor: Color = DarwinTheme.componentStyling.textField.colors.placeholder,
+        disabledPlaceholderColor: Color = DarwinTheme.componentStyling.textField.colors.placeholderDisabled,
+        errorPlaceholderColor: Color = DarwinTheme.componentStyling.textField.colors.placeholder,
+        focusedSupportingTextColor: Color = DarwinTheme.componentStyling.textField.colors.placeholder,
+        unfocusedSupportingTextColor: Color = DarwinTheme.componentStyling.textField.colors.placeholder,
+        disabledSupportingTextColor: Color = DarwinTheme.componentStyling.textField.colors.placeholderDisabled,
+        errorSupportingTextColor: Color = DarwinTheme.componentStyling.textField.colors.labelError,
     ) = TextFieldColors(
         focusedTextColor, unfocusedTextColor, disabledTextColor, errorTextColor,
         focusedContainerColor, unfocusedContainerColor, disabledContainerColor, errorContainerColor,
@@ -213,8 +244,10 @@ private fun TextFieldImpl(
     colors: TextFieldColors,
     size: InputSize,
     focusRequester: FocusRequester,
+    outline: Outline,
 ) {
     val typography = DarwinTheme.typography
+    val outlines = DarwinTheme.globalColors.outlines
 
     var isFocused by remember { mutableStateOf(false) }
 
@@ -296,64 +329,72 @@ private fun TextFieldImpl(
             visualTransformation = visualTransformation,
             cursorBrush = cursorBrush,
             decorationBox = { innerTextField ->
+                // Outer unclipped box carries the focus/validation outline ring (Phase 1.4)
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(size.height)
-                        .clip(shape)
-                        .background(containerColor, shape)
-                        .border(width = if (isFocused) 2.dp else 1.dp, color = borderColor, shape = shape)
-                        .then(if (!enabled) Modifier.graphicsLayer { alpha = 0.5f } else Modifier),
+                        .focusOrValidationOutline(isFocused, outline, shape, outlines),
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
+                    // Inner clipped box handles background, border, and disabled opacity
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(shape)
+                            .background(containerColor, shape)
+                            .border(width = if (isFocused) 2.dp else 1.dp, color = borderColor, shape = shape)
+                            .then(if (!enabled) Modifier.graphicsLayer { alpha = 0.5f } else Modifier),
                     ) {
-                        if (leadingIcon != null) {
-                            val iconColor = when {
-                                !enabled -> colors.disabledLeadingIconColor
-                                isError -> colors.errorLeadingIconColor
-                                isFocused -> colors.focusedLeadingIconColor
-                                else -> colors.unfocusedLeadingIconColor
-                            }
-                            Box(modifier = Modifier.padding(end = 8.dp), contentAlignment = Alignment.Center) {
-                                androidx.compose.runtime.CompositionLocalProvider(
-                                    io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides iconColor,
-                                ) { leadingIcon() }
-                            }
-                        }
-                        if (prefix != null) {
-                            Box(modifier = Modifier.padding(end = 4.dp)) { prefix() }
-                        }
-                        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
-                            if (value.isEmpty() && placeholder != null) {
-                                val placeholderColor = when {
-                                    !enabled -> colors.disabledPlaceholderColor
-                                    isError -> colors.errorPlaceholderColor
-                                    isFocused -> colors.focusedPlaceholderColor
-                                    else -> colors.unfocusedPlaceholderColor
+                        Row(
+                            modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            if (leadingIcon != null) {
+                                val iconColor = when {
+                                    !enabled -> colors.disabledLeadingIconColor
+                                    isError -> colors.errorLeadingIconColor
+                                    isFocused -> colors.focusedLeadingIconColor
+                                    else -> colors.unfocusedLeadingIconColor
                                 }
-                                androidx.compose.runtime.CompositionLocalProvider(
-                                    io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides placeholderColor,
-                                    io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides typography.subheadline.copy(color = placeholderColor),
-                                ) { placeholder() }
+                                Box(modifier = Modifier.padding(end = 8.dp), contentAlignment = Alignment.Center) {
+                                    androidx.compose.runtime.CompositionLocalProvider(
+                                        io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides iconColor,
+                                    ) { leadingIcon() }
+                                }
                             }
-                            innerTextField()
-                        }
-                        if (suffix != null) {
-                            Box(modifier = Modifier.padding(start = 4.dp)) { suffix() }
-                        }
-                        if (trailingIcon != null) {
-                            val iconColor = when {
-                                !enabled -> colors.disabledTrailingIconColor
-                                isError -> colors.errorTrailingIconColor
-                                isFocused -> colors.focusedTrailingIconColor
-                                else -> colors.unfocusedTrailingIconColor
+                            if (prefix != null) {
+                                Box(modifier = Modifier.padding(end = 4.dp)) { prefix() }
                             }
-                            Box(modifier = Modifier.padding(start = 8.dp), contentAlignment = Alignment.Center) {
-                                androidx.compose.runtime.CompositionLocalProvider(
-                                    io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides iconColor,
-                                ) { trailingIcon() }
+                            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
+                                if (value.isEmpty() && placeholder != null) {
+                                    val placeholderColor = when {
+                                        !enabled -> colors.disabledPlaceholderColor
+                                        isError -> colors.errorPlaceholderColor
+                                        isFocused -> colors.focusedPlaceholderColor
+                                        else -> colors.unfocusedPlaceholderColor
+                                    }
+                                    androidx.compose.runtime.CompositionLocalProvider(
+                                        io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides placeholderColor,
+                                        io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides typography.subheadline.copy(color = placeholderColor),
+                                    ) { placeholder() }
+                                }
+                                innerTextField()
+                            }
+                            if (suffix != null) {
+                                Box(modifier = Modifier.padding(start = 4.dp)) { suffix() }
+                            }
+                            if (trailingIcon != null) {
+                                val iconColor = when {
+                                    !enabled -> colors.disabledTrailingIconColor
+                                    isError -> colors.errorTrailingIconColor
+                                    isFocused -> colors.focusedTrailingIconColor
+                                    else -> colors.unfocusedTrailingIconColor
+                                }
+                                Box(modifier = Modifier.padding(start = 8.dp), contentAlignment = Alignment.Center) {
+                                    androidx.compose.runtime.CompositionLocalProvider(
+                                        io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides iconColor,
+                                    ) { trailingIcon() }
+                                }
                             }
                         }
                     }
@@ -410,12 +451,14 @@ fun TextField(
     // Darwin extensions
     size: InputSize = InputSize.Md,
     focusRequester: FocusRequester = remember { FocusRequester() },
+    outline: Outline = Outline.None,
 ) {
     TextFieldImpl(
         value, onValueChange, modifier, enabled, readOnly, textStyle,
         label, placeholder, leadingIcon, trailingIcon, prefix, suffix, supportingText,
         isError, visualTransformation, keyboardOptions, keyboardActions,
         singleLine, maxLines, minLines, interactionSource, shape, colors, size, focusRequester,
+        outline,
     )
 }
 
@@ -451,12 +494,14 @@ fun OutlinedTextField(
     // Darwin extensions
     size: InputSize = InputSize.Md,
     focusRequester: FocusRequester = remember { FocusRequester() },
+    outline: Outline = Outline.None,
 ) {
     TextFieldImpl(
         value, onValueChange, modifier, enabled, readOnly, textStyle,
         label, placeholder, leadingIcon, trailingIcon, prefix, suffix, supportingText,
         isError, visualTransformation, keyboardOptions, keyboardActions,
         singleLine, maxLines, minLines, interactionSource, shape, colors, size, focusRequester,
+        outline,
     )
 }
 

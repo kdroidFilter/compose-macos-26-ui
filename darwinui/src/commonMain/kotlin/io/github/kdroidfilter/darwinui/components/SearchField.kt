@@ -10,6 +10,7 @@ import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -43,7 +44,9 @@ import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
+import io.github.kdroidfilter.darwinui.theme.Outline
 import io.github.kdroidfilter.darwinui.theme.darwinTween
+import io.github.kdroidfilter.darwinui.theme.outline as validationOutline
 
 @Composable
 fun SearchField(
@@ -62,11 +65,13 @@ fun SearchField(
     isError: Boolean = false,
     size: InputSize = InputSize.Md,
     trailingIcon: @Composable (() -> Unit)? = null,
+    outline: Outline = Outline.None,
 ) {
     val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
     val isDark = colors.isDark
     val accentColor = colors.accent
+    val outlines = DarwinTheme.globalColors.outlines
 
     var isFocused by remember { mutableStateOf(false) }
 
@@ -106,7 +111,10 @@ fun SearchField(
         keyboardActions = keyboardActions,
         cursorBrush = SolidColor(accentColor),
         decorationBox = { innerTextField ->
-            Row(
+            // Outer unclipped box carries the validation ring (Phase 1.4).
+            // SearchField handles its own animated focus ring via border(), so only
+            // the validation outline (Warning/Error) is drawn here.
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(28.dp)
@@ -117,6 +125,11 @@ fun SearchField(
                         ambientColor = accentColor.copy(alpha = 0.25f),
                         spotColor = accentColor.copy(alpha = 0.25f),
                     )
+                    .validationOutline(outline, shape, outlines),
+            ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
                     .clip(shape)
                     .background(bgColor, shape)
                     .border(1.5.dp, ringColor, shape)
@@ -155,7 +168,8 @@ fun SearchField(
                 } else if (trailingIcon != null) {
                     trailingIcon()
                 }
-            }
+            } // Row
+            } // validation outline Box
         },
     )
 }

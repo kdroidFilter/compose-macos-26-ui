@@ -35,11 +35,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.kdroidfilter.darwinui.theme.Blue500
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import io.github.kdroidfilter.darwinui.theme.Zinc600
-import io.github.kdroidfilter.darwinui.theme.Zinc800
+import io.github.kdroidfilter.darwinui.theme.ToggleableComponentState
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 
 // ===========================================================================
@@ -82,23 +80,37 @@ class CheckboxColors(
 }
 
 // ===========================================================================
+// CheckboxState — implements ToggleableComponentState (Phase 1.2)
+// ===========================================================================
+
+/**
+ * State snapshot for a Darwin checkbox.
+ * Implements [ToggleableComponentState] to integrate with the Phase 1.2 state hierarchy.
+ */
+data class CheckboxState(
+    override val toggleableState: androidx.compose.ui.state.ToggleableState,
+    override val isEnabled: Boolean,
+) : ToggleableComponentState
+
+// ===========================================================================
 // CheckboxDefaults — mirrors M3's CheckboxDefaults
+// Reads defaults from DarwinTheme.componentStyling.checkbox (Phase 1.1)
 // ===========================================================================
 
 object CheckboxDefaults {
     @Composable
     fun colors(
-        checkedCheckmarkColor: Color = Color.White,
+        checkedCheckmarkColor: Color = DarwinTheme.componentStyling.checkbox.colors.checkmark,
         uncheckedCheckmarkColor: Color = Color.Transparent,
-        checkedBoxColor: Color = DarwinTheme.colorScheme.accent,
-        uncheckedBoxColor: Color = if (DarwinTheme.colorScheme.isDark) Zinc800 else Color.White,
-        disabledCheckedBoxColor: Color = checkedBoxColor.copy(alpha = 0.5f),
-        disabledUncheckedBoxColor: Color = uncheckedBoxColor.copy(alpha = 0.5f),
-        checkedBorderColor: Color = DarwinTheme.colorScheme.accent,
-        uncheckedBorderColor: Color = if (DarwinTheme.colorScheme.isDark) Zinc600 else Color.Black.copy(alpha = 0.20f),
-        disabledBorderColor: Color = uncheckedBorderColor.copy(alpha = 0.5f),
-        disabledIndeterminateBorderColor: Color = checkedBorderColor.copy(alpha = 0.5f),
-        disabledIndeterminateBoxColor: Color = disabledCheckedBoxColor,
+        checkedBoxColor: Color = DarwinTheme.componentStyling.checkbox.colors.checkedBox,
+        uncheckedBoxColor: Color = DarwinTheme.componentStyling.checkbox.colors.uncheckedBox,
+        disabledCheckedBoxColor: Color = DarwinTheme.componentStyling.checkbox.colors.disabledCheckedBox,
+        disabledUncheckedBoxColor: Color = DarwinTheme.componentStyling.checkbox.colors.disabledUncheckedBox,
+        checkedBorderColor: Color = DarwinTheme.componentStyling.checkbox.colors.checkedBorder,
+        uncheckedBorderColor: Color = DarwinTheme.componentStyling.checkbox.colors.uncheckedBorder,
+        disabledBorderColor: Color = DarwinTheme.componentStyling.checkbox.colors.disabledBorder,
+        disabledIndeterminateBorderColor: Color = DarwinTheme.componentStyling.checkbox.colors.disabledBorder,
+        disabledIndeterminateBoxColor: Color = DarwinTheme.componentStyling.checkbox.colors.disabledCheckedBox,
     ) = CheckboxColors(
         checkedCheckmarkColor, uncheckedCheckmarkColor,
         checkedBoxColor, uncheckedBoxColor,

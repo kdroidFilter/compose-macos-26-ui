@@ -50,7 +50,9 @@ import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.Outline
 import io.github.kdroidfilter.darwinui.theme.darwinGlass
+import io.github.kdroidfilter.darwinui.theme.focusOrValidationOutline
 
 /**
  * A combo box / select component with index-based selection.
@@ -72,10 +74,12 @@ fun ComboBox(
     header: String? = null,
     placeholder: String? = null,
     disabled: Boolean = false,
+    outline: Outline = Outline.None,
 ) {
     val colors = DarwinTheme.colorScheme
     val shapes = DarwinTheme.shapes
     val typography = DarwinTheme.typography
+    val outlines = DarwinTheme.globalColors.outlines
     val enabled = !disabled
 
     var expanded by remember { mutableStateOf(false) }
@@ -116,10 +120,16 @@ fun ComboBox(
         }
 
         Box {
-            Row(
+            // Outer unclipped box carries the focus/validation outline ring (Phase 1.4)
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(24.dp)
+                    .focusOrValidationOutline(isFocused || expanded, outline, shapes.small, outlines),
+            ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
                     .onGloballyPositioned { coordinates ->
                         triggerWidthPx = coordinates.size.width
                         triggerHeightPx = coordinates.size.height
@@ -212,7 +222,8 @@ fun ComboBox(
                             .rotate(chevronRotation),
                     )
                 }
-            }
+            } // Row
+            } // outline Box
 
             DropdownPopup(
                 expanded = expanded,
