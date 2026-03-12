@@ -24,13 +24,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.sp
 import com.composables.icons.lucide.Bell
 import com.composables.icons.lucide.ChevronsUpDown
@@ -60,17 +60,23 @@ import com.composables.icons.lucide.TextCursorInput
 import com.composables.icons.lucide.ToggleLeft
 import com.composables.icons.lucide.TriangleAlert
 import com.composables.icons.lucide.Upload
+import io.github.kdroidfilter.darwinui.components.DarwinScaffold
 import io.github.kdroidfilter.darwinui.components.IconButton
-import io.github.kdroidfilter.darwinui.components.PushButton
-import io.github.kdroidfilter.darwinui.components.SearchField
+import io.github.kdroidfilter.darwinui.components.NavigationButtons
+import io.github.kdroidfilter.darwinui.components.SearchSuggestionHeader
+import io.github.kdroidfilter.darwinui.components.SearchSuggestionItem
+import io.github.kdroidfilter.darwinui.components.SearchSuggestionSeparator
 import io.github.kdroidfilter.darwinui.components.Sidebar
 import io.github.kdroidfilter.darwinui.components.SidebarIconSize
 import io.github.kdroidfilter.darwinui.components.SidebarItem
 import io.github.kdroidfilter.darwinui.components.Text
+import io.github.kdroidfilter.darwinui.components.TitleBar
 import io.github.kdroidfilter.darwinui.components.ToastHost
+import io.github.kdroidfilter.darwinui.components.ToolbarSearchField
 import io.github.kdroidfilter.darwinui.components.rememberToastState
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideMoon
+import io.github.kdroidfilter.darwinui.icons.LucidePanelLeft
 import io.github.kdroidfilter.darwinui.icons.LucideSun
 import io.github.kdroidfilter.darwinui.sample.pages.AccordionPage
 import io.github.kdroidfilter.darwinui.sample.pages.AlertPage
@@ -108,7 +114,7 @@ import io.github.kdroidfilter.darwinui.sample.pages.UploadPage
 import io.github.kdroidfilter.darwinui.theme.AccentColor
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
-// Navigation data — static tuples (id, label, group, icon)
+// Navigation data
 private data class SidebarEntryDef(val id: String, val label: String, val group: String, val icon: ImageVector)
 
 private val sidebarEntryDefs = listOf(
@@ -155,42 +161,49 @@ fun App() {
 
     DarwinTheme(darkTheme = isDark, accentColor = accentColor) {
         val toastState = rememberToastState()
+        var selectedPage by remember { mutableStateOf("button") }
+        var searchQuery by remember { mutableStateOf("") }
+        var searchExpanded by remember { mutableStateOf(false) }
+        var sidebarVisible by remember { mutableStateOf(true) }
+        var sidebarCollapsed by remember { mutableStateOf(false) }
 
-        Box(modifier = Modifier.fillMaxSize().background(DarwinTheme.colors.background)) {
-            var selectedPage by remember { mutableStateOf("button") }
-            var searchQuery by remember { mutableStateOf("") }
-            var sidebarCollapsed by remember { mutableStateOf(false) }
+        // Navigation helpers
+        val currentIndex = sidebarEntryDefs.indexOfFirst { it.id == selectedPage }
+        val canGoBack = currentIndex > 0
+        val canGoForward = currentIndex < sidebarEntryDefs.lastIndex
+        val currentPageLabel = sidebarEntryDefs.getOrNull(currentIndex)?.label ?: ""
 
-            Row(modifier = Modifier.fillMaxSize()) {
-                // Gallery navigation sidebar using Sidebar
-                val query = searchQuery.lowercase().trim()
-                val filteredDefs = if (query.isEmpty()) {
-                    sidebarEntryDefs
-                } else {
-                    sidebarEntryDefs.filter { it.label.lowercase().contains(query) }
-                }
-                val sidebarItems = filteredDefs.map { def ->
-                    SidebarItem(
-                        label = def.label,
-                        onClick = { selectedPage = def.id },
-                        icon = def.icon,
-                        group = def.group,
-                        id = def.id,
-                    )
-                }
+        val sidebarItems = sidebarEntryDefs.map { def ->
+            SidebarItem(
+                label = def.label,
+                onClick = { selectedPage = def.id },
+                icon = def.icon,
+                group = def.group,
+                id = def.id,
+            )
+        }
 
-                Sidebar(
-                    items = sidebarItems,
-                    activeItem = selectedPage,
-                    showBorder = false,
-                    collapsed = sidebarCollapsed,
-                    onCollapsedChange = { sidebarCollapsed = it },
-                    collapsible = true,
-                    iconSize = sidebarIconSize,
-                    header = {
-                        Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 10.dp)) {
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            DarwinScaffold(
+                sidebarVisible = sidebarVisible,
+                onSidebarVisibleChange = { sidebarVisible = it },
+                sidebar = {
+                    Sidebar(
+                        items = sidebarItems,
+                        activeItem = selectedPage,
+                        showBorder = false,
+                        collapsed = sidebarCollapsed,
+                        onCollapsedChange = { sidebarCollapsed = it },
+                        collapsible = true,
+                        iconSize = sidebarIconSize,
+                        header = {
+                            Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 10.dp)) {
+                                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
                                         Column {
                                             Text(
                                                 text = "Darwin UI",
@@ -204,16 +217,10 @@ fun App() {
                                                 color = DarwinTheme.colors.textTertiary,
                                             )
                                         }
-                                        IconButton(onClick = { isDark = !isDark }) {
-                                            Icon(if (isDark) LucideSun else LucideMoon, modifier = Modifier.size(14.dp))
+                                        IconButton(onClick = { sidebarVisible = false }) {
+                                            Icon(LucidePanelLeft, modifier = Modifier.size(14.dp))
                                         }
                                     }
-                                    SearchField(
-                                        value = searchQuery,
-                                        onValueChange = { searchQuery = it },
-                                        placeholder = "Search components...",
-                                        modifier = Modifier.fillMaxWidth(),
-                                    )
                                     AccentColorPicker(
                                         selected = accentColor,
                                         onSelect = { accentColor = it },
@@ -222,24 +229,74 @@ fun App() {
                                         selected = sidebarIconSize,
                                         onSelect = { sidebarIconSize = it },
                                     )
-                                    if (filteredDefs.isEmpty()) {
-                                        Text(
-                                            text = "No results found",
-                                            style = DarwinTheme.typography.bodySmall,
-                                            color = DarwinTheme.colors.textTertiary,
-                                            modifier = Modifier.padding(top = 8.dp),
-                                        )
-                                    }
                                 }
                             }
                         },
                     )
-
-                // Main content area
+                },
+                titleBar = {
+                    TitleBar(
+                        navigationActions = {
+                            NavigationButtons(
+                                onBack = {
+                                    if (canGoBack) selectedPage = sidebarEntryDefs[currentIndex - 1].id
+                                },
+                                onForward = {
+                                    if (canGoForward) selectedPage = sidebarEntryDefs[currentIndex + 1].id
+                                },
+                                backEnabled = canGoBack,
+                                forwardEnabled = canGoForward,
+                            )
+                        },
+                        title = { Text(currentPageLabel) },
+                        actions = {
+                            IconButton(onClick = { isDark = !isDark }) {
+                                Icon(if (isDark) LucideSun else LucideMoon, modifier = Modifier.size(14.dp))
+                            }
+                            ToolbarSearchField(
+                                value = searchQuery,
+                                onValueChange = { searchQuery = it },
+                                expanded = searchExpanded,
+                                onExpandedChange = { searchExpanded = it },
+                                expandedWidth = 240.dp,
+                                placeholder = "Search components...",
+                                onSearch = { query ->
+                                    val match = sidebarEntryDefs.firstOrNull {
+                                        it.label.lowercase().contains(query.lowercase().trim())
+                                    }
+                                    if (match != null) {
+                                        selectedPage = match.id
+                                        searchQuery = ""
+                                        searchExpanded = false
+                                    }
+                                },
+                                suggestions = {
+                                    val query = searchQuery.lowercase().trim()
+                                    val matches = sidebarEntryDefs.filter {
+                                        it.label.lowercase().contains(query)
+                                    }
+                                    matches.groupBy { it.group }.entries.forEachIndexed { index, (group, items) ->
+                                        if (index > 0) SearchSuggestionSeparator()
+                                        SearchSuggestionHeader(group)
+                                        items.forEach { def ->
+                                            SearchSuggestionItem(onClick = {
+                                                selectedPage = def.id
+                                                searchQuery = ""
+                                                searchExpanded = false
+                                            }) {
+                                                Text(def.label)
+                                            }
+                                        }
+                                    }
+                                },
+                            )
+                        },
+                    )
+                },
+            ) {
                 Column(
                     modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
+                        .fillMaxSize()
                         .verticalScroll(rememberScrollState())
                         .padding(40.dp),
                     verticalArrangement = Arrangement.spacedBy(24.dp),
