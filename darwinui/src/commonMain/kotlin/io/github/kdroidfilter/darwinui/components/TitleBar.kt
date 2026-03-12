@@ -19,8 +19,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.icons.Icon
+import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.icons.LucideChevronLeft
 import io.github.kdroidfilter.darwinui.icons.LucideChevronRight
+import io.github.kdroidfilter.darwinui.icons.LucidePanelLeft
 import io.github.kdroidfilter.darwinui.theme.*
 
 /**
@@ -74,7 +76,7 @@ fun TitleBar(
         // Left section: Nav Actions
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.widthIn(min = 80.dp)
+            modifier = Modifier.padding(end = 8.dp).widthIn(min = 80.dp)
         ) {
             navigationActions()
         }
@@ -230,6 +232,61 @@ fun NavigationButtons(
         TitleBarGroupDivider()
         TitleBarGroupButton(onClick = onForward, enabled = forwardEnabled) {
             Icon(LucideChevronRight, modifier = Modifier.size(16.dp))
+        }
+    }
+}
+
+// =============================================================================
+// SidebarButton — sidebar toggle with optional dropdown menu
+// =============================================================================
+
+/**
+ * A macOS-style sidebar toggle button with an optional dropdown chevron.
+ * Matches the pattern seen in Safari and Finder toolbars.
+ *
+ * The left side shows a sidebar panel icon and triggers [onClick].
+ * When [menuContent] is provided, a chevron-down appears on the right side
+ * and opens a [DropdownMenu] when clicked.
+ *
+ * @param onClick Called when the sidebar icon is clicked.
+ * @param modifier Modifier applied to the pill container.
+ * @param enabled Whether the button is interactive.
+ * @param icon The icon composable shown on the left side.
+ * @param menuContent Optional dropdown menu content. When non-null, a chevron
+ *   button and divider are added to the right of the main icon.
+ */
+@Composable
+fun SidebarButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    icon: @Composable () -> Unit = { Icon(LucidePanelLeft, modifier = Modifier.size(16.dp)) },
+    menuContent: (@Composable ColumnScope.() -> Unit)? = null,
+) {
+    var menuExpanded by remember { mutableStateOf(false) }
+
+    Box {
+        TitleBarButtonGroup(modifier = modifier) {
+            TitleBarGroupButton(onClick = onClick, enabled = enabled) {
+                icon()
+            }
+            if (menuContent != null) {
+                TitleBarGroupDivider()
+                TitleBarGroupButton(
+                    onClick = { menuExpanded = true },
+                    enabled = enabled,
+                ) {
+                    Icon(LucideChevronDown, modifier = Modifier.size(10.dp))
+                }
+            }
+        }
+
+        if (menuContent != null) {
+            DropdownMenu(
+                expanded = menuExpanded,
+                onDismissRequest = { menuExpanded = false },
+                content = menuContent,
+            )
         }
     }
 }

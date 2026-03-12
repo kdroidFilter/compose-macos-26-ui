@@ -7,10 +7,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.darwinui.components.DropdownMenuItem
 import io.github.kdroidfilter.darwinui.components.HelpButton
 import io.github.kdroidfilter.darwinui.components.IconButton
 import io.github.kdroidfilter.darwinui.components.NavigationButtons
 import io.github.kdroidfilter.darwinui.components.PushButton
+import io.github.kdroidfilter.darwinui.components.SidebarButton
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.components.TitleBarButtonGroup
 import io.github.kdroidfilter.darwinui.components.TitleBarGroupButton
 import io.github.kdroidfilter.darwinui.components.TitleBarGroupDivider
@@ -110,6 +113,25 @@ fun IconButtonButtonGroupExample() {
     }
 }
 
+@GalleryExample("IconButton", "Sidebar Button")
+@Composable
+fun IconButtonSidebarButtonExample() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        SidebarButton(onClick = {})
+        SidebarButton(
+            onClick = {},
+            menuContent = {
+                DropdownMenuItem(onClick = {}) { Text("Bookmarks") }
+                DropdownMenuItem(onClick = {}) { Text("Reading List") }
+                DropdownMenuItem(onClick = {}) { Text("Shared with You") }
+            },
+        )
+    }
+}
+
 @Composable
 internal fun IconButtonPage() {
     GalleryPage("Icon Button", "macOS-native circular icon buttons with idiomatic Compose APIs.") {
@@ -136,5 +158,10 @@ internal fun IconButtonPage() {
             description = "Pill container grouping icon buttons with dividers, including disabled state",
             sourceCode = GallerySources.IconButtonButtonGroupExample,
         ) { IconButtonButtonGroupExample() }
+        ExampleCard(
+            title = "Sidebar Button",
+            description = "Sidebar toggle with dropdown menu — icon only and with chevron menu",
+            sourceCode = GallerySources.IconButtonSidebarButtonExample,
+        ) { IconButtonSidebarButtonExample() }
     }
 }
