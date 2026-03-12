@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.sp
 import com.composables.icons.lucide.Bell
 import com.composables.icons.lucide.ChevronsUpDown
+import com.composables.icons.lucide.CircleDot
 import com.composables.icons.lucide.CircleUser
 import com.composables.icons.lucide.Columns3
 import com.composables.icons.lucide.CreditCard
@@ -89,6 +90,7 @@ import io.github.kdroidfilter.darwinui.sample.pages.InputPage
 import io.github.kdroidfilter.darwinui.sample.pages.MultiSelectPage
 import io.github.kdroidfilter.darwinui.sample.pages.PopoverPage
 import io.github.kdroidfilter.darwinui.sample.pages.ProgressPage
+import io.github.kdroidfilter.darwinui.sample.pages.RadioButtonPage
 import io.github.kdroidfilter.darwinui.sample.pages.SearchInputPage
 import io.github.kdroidfilter.darwinui.sample.pages.SegmentedControlPage
 import io.github.kdroidfilter.darwinui.sample.pages.SelectPage
@@ -99,6 +101,7 @@ import io.github.kdroidfilter.darwinui.sample.pages.SwitchPage
 import io.github.kdroidfilter.darwinui.sample.pages.TablePage
 import io.github.kdroidfilter.darwinui.sample.pages.TabsPage
 import io.github.kdroidfilter.darwinui.sample.pages.TextAreaPage
+import io.github.kdroidfilter.darwinui.sample.pages.TitleBarPage
 import io.github.kdroidfilter.darwinui.sample.pages.ToastPage
 import io.github.kdroidfilter.darwinui.sample.pages.TooltipPage
 import io.github.kdroidfilter.darwinui.sample.pages.UploadPage
@@ -114,6 +117,7 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("input", "Input", "FORM CONTROLS", Lucide.TextCursorInput),
     SidebarEntryDef("textarea", "Textarea", "FORM CONTROLS", Lucide.TextAlignStart),
     SidebarEntryDef("checkbox", "Checkbox", "FORM CONTROLS", Lucide.SquareCheck),
+    SidebarEntryDef("radiobutton", "Radio Button", "FORM CONTROLS", Lucide.CircleDot),
     SidebarEntryDef("switch", "Switch", "FORM CONTROLS", Lucide.ToggleLeft),
     SidebarEntryDef("select", "Select", "FORM CONTROLS", Lucide.ChevronsUpDown),
     SidebarEntryDef("multiselect", "Multi Select", "FORM CONTROLS", Lucide.ListChecks),
@@ -140,6 +144,7 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("accordion", "Accordion", "NAVIGATION", Lucide.ChevronsUpDown),
     SidebarEntryDef("sidebar", "Sidebar", "NAVIGATION", Lucide.PanelLeft),
     SidebarEntryDef("segmentedcontrol", "Segmented Control", "NAVIGATION", Lucide.Columns3),
+    SidebarEntryDef("titlebar", "Title Bar", "NAVIGATION", Lucide.PanelTopOpen),
 )
 
 @Composable
@@ -246,6 +251,7 @@ fun App() {
                         "searchinput" -> SearchInputPage()
                         "textarea" -> TextAreaPage()
                         "checkbox" -> CheckboxPage()
+                        "radiobutton" -> RadioButtonPage()
                         "switch" -> SwitchPage()
                         "select" -> SelectPage()
                         "multiselect" -> MultiSelectPage()
@@ -270,6 +276,7 @@ fun App() {
                         "accordion" -> AccordionPage()
                         "sidebar" -> SidebarPage()
                         "segmentedcontrol" -> SegmentedControlPage()
+                        "titlebar" -> TitleBarPage()
                         "colorwell" -> ColorWellPage()
                     }
                     Spacer(modifier = Modifier.height(48.dp))

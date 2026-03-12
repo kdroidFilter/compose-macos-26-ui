@@ -9,10 +9,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.HelpButton
 import io.github.kdroidfilter.darwinui.components.IconButton
+import io.github.kdroidfilter.darwinui.components.NavigationButtons
 import io.github.kdroidfilter.darwinui.components.PushButton
+import io.github.kdroidfilter.darwinui.components.TitleBarButtonGroup
+import io.github.kdroidfilter.darwinui.components.TitleBarGroupButton
+import io.github.kdroidfilter.darwinui.components.TitleBarGroupDivider
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.icons.Icon
+import io.github.kdroidfilter.darwinui.icons.LucideCopy
+import io.github.kdroidfilter.darwinui.icons.LucideDownload
 import io.github.kdroidfilter.darwinui.icons.LucideSettings
+import io.github.kdroidfilter.darwinui.icons.LucideShare2
+import io.github.kdroidfilter.darwinui.icons.LucideUpload
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
@@ -52,6 +60,56 @@ fun IconButtonIconExample() {
     }
 }
 
+@GalleryExample("IconButton", "NavigationButtons")
+@Composable
+fun IconButtonNavigationButtonsExample() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        NavigationButtons(onBack = {}, onForward = {}, backEnabled = true, forwardEnabled = false)
+        NavigationButtons(onBack = {}, onForward = {}, backEnabled = true, forwardEnabled = true)
+        NavigationButtons(onBack = {}, onForward = {}, backEnabled = false, forwardEnabled = false)
+    }
+}
+
+@GalleryExample("IconButton", "Button Group")
+@Composable
+fun IconButtonButtonGroupExample() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        TitleBarButtonGroup {
+            TitleBarGroupButton(onClick = {}) {
+                Icon(LucideDownload, modifier = Modifier.size(14.dp))
+            }
+            TitleBarGroupDivider()
+            TitleBarGroupButton(onClick = {}) {
+                Icon(LucideUpload, modifier = Modifier.size(14.dp))
+            }
+            TitleBarGroupDivider()
+            TitleBarGroupButton(onClick = {}) {
+                Icon(LucideCopy, modifier = Modifier.size(14.dp))
+            }
+        }
+        TitleBarButtonGroup {
+            TitleBarGroupButton(onClick = {}) {
+                Icon(LucideShare2, modifier = Modifier.size(14.dp))
+            }
+        }
+        TitleBarButtonGroup {
+            TitleBarGroupButton(onClick = {}, enabled = false) {
+                Icon(LucideCopy, modifier = Modifier.size(14.dp))
+            }
+            TitleBarGroupDivider()
+            TitleBarGroupButton(onClick = {}, enabled = false) {
+                Icon(LucideShare2, modifier = Modifier.size(14.dp))
+            }
+        }
+    }
+}
+
 @Composable
 internal fun IconButtonPage() {
     GalleryPage("Icon Button", "macOS-native circular icon buttons with idiomatic Compose APIs.") {
@@ -66,5 +124,17 @@ internal fun IconButtonPage() {
             description = "Circular button wrapping any icon content",
             sourceCode = GallerySources.IconButtonIconExample,
         ) { IconButtonIconExample() }
+
+        SectionHeader("Grouped")
+        ExampleCard(
+            title = "NavigationButtons",
+            description = "Combined back/forward pill — forward disabled, both enabled, both disabled",
+            sourceCode = GallerySources.IconButtonNavigationButtonsExample,
+        ) { IconButtonNavigationButtonsExample() }
+        ExampleCard(
+            title = "Button Group",
+            description = "Pill container grouping icon buttons with dividers, including disabled state",
+            sourceCode = GallerySources.IconButtonButtonGroupExample,
+        ) { IconButtonButtonGroupExample() }
     }
 }
