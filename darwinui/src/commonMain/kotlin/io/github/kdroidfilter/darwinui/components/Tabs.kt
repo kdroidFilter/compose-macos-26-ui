@@ -147,7 +147,7 @@ fun TabsList(
     val state = LocalTabsState.current
     val shapes = DarwinTheme.shapes
     val density = LocalDensity.current
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
 
     // Indicator colour: subtle overlay on the selected tab
     val indicatorColor = if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.06f)
@@ -222,7 +222,7 @@ fun TabsTrigger(
 ) {
     val state = LocalTabsState.current
     val tabSize = LocalTabSize.current
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
     val density = LocalDensity.current
     val isDark = colors.isDark
@@ -238,9 +238,9 @@ fun TabsTrigger(
     }
 
     val textStyle = when (tabSize) {
-        TabSize.Sm -> typography.bodySmall
-        TabSize.Md -> typography.bodyMedium
-        TabSize.Lg -> typography.bodyLarge
+        TabSize.Sm -> typography.caption1
+        TabSize.Md -> typography.subheadline
+        TabSize.Lg -> typography.callout
     }.merge(TextStyle(color = textColor, fontWeight = FontWeight.Medium))
 
     Box(

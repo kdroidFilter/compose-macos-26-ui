@@ -29,7 +29,7 @@ fun AccordionSingleModeExample() {
             content = {
                 Text(
                     "Darwin UI is a macOS-inspired design system for Compose Multiplatform.",
-                    color = DarwinTheme.colors.textSecondary,
+                    color = DarwinTheme.colorScheme.textSecondary,
                 )
             },
         )
@@ -41,7 +41,7 @@ fun AccordionSingleModeExample() {
             content = {
                 Text(
                     "Android, iOS, Desktop (JVM), Web (JS), and WASM are all supported through Compose Multiplatform.",
-                    color = DarwinTheme.colors.textSecondary,
+                    color = DarwinTheme.colorScheme.textSecondary,
                 )
             },
         )
@@ -53,7 +53,7 @@ fun AccordionSingleModeExample() {
             content = {
                 Text(
                     "Yes! Dark mode is the default theme.",
-                    color = DarwinTheme.colors.textSecondary,
+                    color = DarwinTheme.colorScheme.textSecondary,
                 )
             },
         )

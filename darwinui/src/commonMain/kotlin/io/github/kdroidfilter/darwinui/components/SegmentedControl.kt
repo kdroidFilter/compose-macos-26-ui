@@ -92,12 +92,12 @@ object SegmentedControlDefaults {
 
     @Composable
     fun colors(
-        trackColor: Color = if (DarwinTheme.colors.isDark)
+        trackColor: Color = if (DarwinTheme.colorScheme.isDark)
             Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.06f),
-        indicatorColor: Color = if (DarwinTheme.colors.isDark)
+        indicatorColor: Color = if (DarwinTheme.colorScheme.isDark)
             Color.White.copy(alpha = 0.25f) else Color.White,
-        indicatorShadowElevation: Dp = if (DarwinTheme.colors.isDark) 0.dp else 1.dp,
-        dividerColor: Color = if (DarwinTheme.colors.isDark)
+        indicatorShadowElevation: Dp = if (DarwinTheme.colorScheme.isDark) 0.dp else 1.dp,
+        dividerColor: Color = if (DarwinTheme.colorScheme.isDark)
             Zinc600 else Zinc300,
         contentColor: Color = DarwinTheme.colorScheme.onSurface,
         selectedContentColor: Color = DarwinTheme.colorScheme.onSurface,
@@ -151,7 +151,7 @@ fun SegmentedControl(
     require(segmentCount > 0) { "segmentCount must be > 0" }
 
     val density = LocalDensity.current
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val trackShape = RoundedCornerShape(50)
     val pillShape = RoundedCornerShape(50)
 
@@ -336,7 +336,7 @@ private fun RowScope.Segment(
         label = "segmentPress",
     )
 
-    val textStyle = DarwinTheme.typography.bodySmall
+    val textStyle = DarwinTheme.typography.caption1
         .merge(TextStyle(color = textColor, fontWeight = FontWeight.Medium))
 
     Box(

@@ -68,13 +68,13 @@ fun SidebarPreviewExample() {
             Switcher(checked = isCollapsed, onCheckedChange = { isCollapsed = it })
             Text(
                 text = if (isCollapsed) "Collapsed" else "Expanded",
-                style = DarwinTheme.typography.bodySmall,
-                color = DarwinTheme.colors.textSecondary,
+                style = DarwinTheme.typography.caption1,
+                color = DarwinTheme.colorScheme.textSecondary,
             )
         }
         Card(modifier = Modifier.fillMaxWidth().height(320.dp)) {
             Row(modifier = Modifier.fillMaxSize()) {
-                Box(modifier = Modifier.fillMaxHeight().background(DarwinTheme.colors.muted)) {
+                Box(modifier = Modifier.fillMaxHeight().background(DarwinTheme.colorScheme.muted)) {
                     Sidebar(
                         items = sidebarItems,
                         pinnedItems = pinnedItems,
@@ -85,13 +85,13 @@ fun SidebarPreviewExample() {
                         collapsible = true,
                     )
                 }
-                Box(modifier = Modifier.width(1.dp).fillMaxHeight().background(DarwinTheme.colors.border))
+                Box(modifier = Modifier.width(1.dp).fillMaxHeight().background(DarwinTheme.colorScheme.border))
                 Box(modifier = Modifier.weight(1f).fillMaxHeight().padding(16.dp), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = "Current page:",
-                            color = DarwinTheme.colors.textSecondary,
-                            style = DarwinTheme.typography.bodySmall,
+                            color = DarwinTheme.colorScheme.textSecondary,
+                            style = DarwinTheme.typography.caption1,
                         )
                         Text(text = activeItem, fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 4.dp))
                     }
@@ -100,8 +100,8 @@ fun SidebarPreviewExample() {
         }
         Text(
             text = "Use the toggle or click \"Collapse\" in the sidebar.",
-            style = DarwinTheme.typography.labelSmall,
-            color = DarwinTheme.colors.textTertiary.copy(alpha = 0.70f),
+            style = DarwinTheme.typography.caption2,
+            color = DarwinTheme.colorScheme.textTertiary.copy(alpha = 0.70f),
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
         )
@@ -138,7 +138,7 @@ fun SidebarCollapsibleExample() {
                     collapsible = true,
                 )
                 Box(modifier = Modifier.weight(1f).fillMaxHeight().padding(16.dp), contentAlignment = Alignment.Center) {
-                    Text(text = "Current: $active", color = DarwinTheme.colors.textSecondary)
+                    Text(text = "Current: $active", color = DarwinTheme.colorScheme.textSecondary)
                 }
             }
         }

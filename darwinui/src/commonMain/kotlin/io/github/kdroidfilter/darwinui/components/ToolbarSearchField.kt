@@ -171,7 +171,7 @@ private fun ExpandedField(
     onSearch: ((String) -> Unit)?,
     onClose: () -> Unit,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
     val isDark = colors.isDark
 
@@ -187,7 +187,7 @@ private fun ExpandedField(
         onValueChange = onValueChange,
         modifier = Modifier.focusRequester(focusRequester),
         singleLine = true,
-        textStyle = typography.bodySmall.copy(color = textColor),
+        textStyle = typography.caption1.copy(color = textColor),
         cursorBrush = SolidColor(colors.accent),
         keyboardActions = KeyboardActions(
             onSearch = onSearch?.let { { it(value) } },
@@ -223,7 +223,7 @@ private fun ExpandedField(
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
                     if (value.isEmpty()) {
                         CompositionLocalProvider(
-                            LocalDarwinTextStyle provides typography.bodySmall.copy(
+                            LocalDarwinTextStyle provides typography.caption1.copy(
                                 color = placeholderColor,
                             ),
                         ) {
@@ -300,7 +300,7 @@ private fun SearchSuggestionsPopup(
     expandedWidth: Dp,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val isDark = colors.isDark
     val shapes = DarwinTheme.shapes
     val density = androidx.compose.ui.platform.LocalDensity.current
@@ -349,7 +349,7 @@ fun SearchSuggestionHeader(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val typography = DarwinTheme.typography
 
     Box(
@@ -359,7 +359,7 @@ fun SearchSuggestionHeader(
     ) {
         Text(
             text = text,
-            style = typography.labelMedium.copy(
+            style = typography.caption1.copy(
                 fontWeight = FontWeight.SemiBold,
                 color = if (isDark) Zinc400 else Zinc500,
             ),
@@ -387,7 +387,7 @@ fun SearchSuggestionItem(
     enabled: Boolean = true,
     content: @Composable () -> Unit,
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val typography = DarwinTheme.typography
     val shapes = DarwinTheme.shapes
 
@@ -429,7 +429,7 @@ fun SearchSuggestionItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         CompositionLocalProvider(
-            LocalDarwinTextStyle provides typography.bodyMedium.copy(color = textColor),
+            LocalDarwinTextStyle provides typography.subheadline.copy(color = textColor),
             LocalDarwinContentColor provides textColor,
         ) {
             content()
@@ -449,7 +449,7 @@ fun SearchSuggestionItem(
  */
 @Composable
 fun SearchSuggestionSeparator(modifier: Modifier = Modifier) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
 
     Box(
         modifier = modifier

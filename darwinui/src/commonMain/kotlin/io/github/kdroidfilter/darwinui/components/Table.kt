@@ -72,8 +72,8 @@ fun Table(
     content: @Composable () -> Unit,
 ) {
     val shape = DarwinTheme.shapes.large
-    val backgroundColor = DarwinTheme.colors.card
-    val borderColor = DarwinTheme.colors.borderSubtle
+    val backgroundColor = DarwinTheme.colorScheme.card
+    val borderColor = DarwinTheme.colorScheme.borderSubtle
 
     val containerModifier = when (layout) {
         TableLayout.Fluid -> modifier
@@ -100,7 +100,7 @@ fun TableHead(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val headerBackground = if (colors.isDark) {
         Color.White.copy(alpha = 0.05f)
     } else {
@@ -181,7 +181,7 @@ fun TableRow(
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
 
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -258,8 +258,8 @@ fun RowScope.TableCell(
     alignment: Alignment.Vertical = Alignment.CenterVertically,
     content: @Composable () -> Unit,
 ) {
-    val style = DarwinTheme.typography.bodyMedium.merge(
-        TextStyle(color = DarwinTheme.colors.textPrimary)
+    val style = DarwinTheme.typography.subheadline.merge(
+        TextStyle(color = DarwinTheme.colorScheme.textPrimary)
     )
 
     val sizeModifier = if (width != null) modifier.width(width) else modifier.weight(weight)
@@ -300,9 +300,9 @@ fun RowScope.TableHeaderCell(
     width: Dp? = null,
     content: @Composable () -> Unit,
 ) {
-    val style = DarwinTheme.typography.labelMedium.merge(
+    val style = DarwinTheme.typography.caption1.merge(
         TextStyle(
-            color = DarwinTheme.colors.textSecondary,
+            color = DarwinTheme.colorScheme.textSecondary,
             fontWeight = FontWeight.Medium,
         )
     )
@@ -346,9 +346,9 @@ fun TableEmptyRow(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        val style = DarwinTheme.typography.bodyMedium.merge(
+        val style = DarwinTheme.typography.subheadline.merge(
             TextStyle(
-                color = DarwinTheme.colors.textTertiary,
+                color = DarwinTheme.colorScheme.textTertiary,
                 fontStyle = FontStyle.Italic,
                 textAlign = TextAlign.Center,
             )
@@ -383,7 +383,7 @@ fun TableLoadingRows(
     columnCount: Int = 4,
     modifier: Modifier = Modifier,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
 
     // Pulsing animation for skeleton effect
     val infiniteTransition = rememberInfiniteTransition(label = "skeleton_pulse")

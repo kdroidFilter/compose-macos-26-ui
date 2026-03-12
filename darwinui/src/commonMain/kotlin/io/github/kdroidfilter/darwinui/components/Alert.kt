@@ -83,7 +83,7 @@ enum class AlertType {
  */
 @Composable
 private fun resolveAlertTypeColor(type: AlertType): Color {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     return when (type) {
         AlertType.Info -> colors.info
         AlertType.Success -> colors.success
@@ -131,7 +131,7 @@ fun AlertBanner(
     onDismiss: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
     val shapes = DarwinTheme.shapes
 
@@ -179,7 +179,7 @@ fun AlertBanner(
                 if (title != null) {
                     Text(
                         text = title,
-                        style = typography.labelLarge,
+                        style = typography.subheadline,
                         color = colors.textPrimary,
                         fontWeight = FontWeight.SemiBold,
                     )
@@ -187,7 +187,7 @@ fun AlertBanner(
                 }
                 Text(
                     text = message,
-                    style = typography.bodyMedium,
+                    style = typography.subheadline,
                     color = colors.textSecondary,
                 )
             }
@@ -290,7 +290,7 @@ fun AlertDialog(
             onDismissRequest = onDismissRequest,
             properties = PopupProperties(focusable = true),
         ) {
-            val colors = DarwinTheme.colors
+            val colors = DarwinTheme.colorScheme
 
             // Scrim with fade animation
             AnimatedVisibility(
@@ -369,7 +369,7 @@ private fun AlertDialogContent(
     onCancel: () -> Unit,
     onDestructive: (() -> Unit)? = null,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val isDark = colors.isDark
 
     // macOS native alert panel appearance — frosted glass vibrancy
@@ -464,7 +464,7 @@ private fun AlertPillButton(
     style: AlertPillButtonStyle,
     modifier: Modifier = Modifier,
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val interactionSource = remember { MutableInteractionSource() }
 
     val pillShape = RoundedCornerShape(14.dp)
@@ -702,7 +702,7 @@ fun AlertDialog(
         onDismissRequest = onDismissRequest,
         properties = PopupProperties(focusable = true),
     ) {
-        val colors = DarwinTheme.colors
+        val colors = DarwinTheme.colorScheme
         val isDark = colors.isDark
 
         // macOS native alert panel colors
@@ -749,7 +749,7 @@ fun AlertDialog(
                 }
                 if (title != null) {
                     androidx.compose.runtime.CompositionLocalProvider(
-                        io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides DarwinTheme.typography.bodySmall.copy(
+                        io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides DarwinTheme.typography.caption1.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 13.sp,
                             color = resolvedTitleColor,
@@ -761,7 +761,7 @@ fun AlertDialog(
                 }
                 if (text != null) {
                     androidx.compose.runtime.CompositionLocalProvider(
-                        io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides DarwinTheme.typography.bodySmall.copy(
+                        io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides DarwinTheme.typography.caption1.copy(
                             fontWeight = FontWeight.Normal,
                             fontSize = 11.sp,
                             color = resolvedTextColor,

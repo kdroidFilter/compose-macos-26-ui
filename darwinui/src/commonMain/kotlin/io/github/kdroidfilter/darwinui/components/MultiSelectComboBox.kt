@@ -80,7 +80,7 @@ fun MultiSelectComboBox(
     disabled: Boolean = false,
     showTags: Boolean = true,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val shapes = DarwinTheme.shapes
     val typography = DarwinTheme.typography
     val enabled = !disabled
@@ -127,7 +127,7 @@ fun MultiSelectComboBox(
         if (header != null) {
             Text(
                 text = header,
-                style = typography.labelMedium,
+                style = typography.caption1,
                 color = colors.textPrimary,
                 modifier = Modifier.padding(bottom = 6.dp),
             )
@@ -199,7 +199,7 @@ fun MultiSelectComboBox(
             ) {
                 Text(
                     text = displayText ?: placeholder,
-                    style = typography.bodyMedium,
+                    style = typography.subheadline,
                     color = if (displayText != null) colors.textPrimary else colors.textTertiary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -289,7 +289,7 @@ fun MultiSelectComboBox(
                             }
                             Text(
                                 text = label,
-                                style = typography.bodyMedium,
+                                style = typography.subheadline,
                                 color = colors.textPrimary,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -327,7 +327,7 @@ fun MultiSelectComboBox(
                     ) {
                         Text(
                             text = label,
-                            style = typography.bodySmall.copy(fontSize = 12.sp),
+                            style = typography.caption1.copy(fontSize = 12.sp),
                             color = if (colors.isDark) Color(0xFFD4D4D8) else Color(0xFF3F3F46),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,

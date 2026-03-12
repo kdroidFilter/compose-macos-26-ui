@@ -76,7 +76,7 @@ object SwitchDefaults {
         checkedBorderColor: Color = Color.Transparent,
         uncheckedThumbColor: Color = Color.White,
         // macOS unchecked track: #78788C in dark / #E5E5EA in light
-        uncheckedTrackColor: Color = if (DarwinTheme.colors.isDark) Color(0xFF78788C) else Color(0xFFE5E5EA),
+        uncheckedTrackColor: Color = if (DarwinTheme.colorScheme.isDark) Color(0xFF78788C) else Color(0xFFE5E5EA),
         uncheckedBorderColor: Color = Color.Transparent,
         disabledCheckedThumbColor: Color = checkedThumbColor.copy(alpha = 0.5f),
         disabledCheckedTrackColor: Color = checkedTrackColor.copy(alpha = 0.5f),
@@ -204,7 +204,7 @@ fun Switcher(
             androidx.compose.foundation.layout.Spacer(Modifier.size(8.dp))
             androidx.compose.foundation.text.BasicText(
                 text = label,
-                style = DarwinTheme.typography.bodyMedium.merge(
+                style = DarwinTheme.typography.subheadline.merge(
                     androidx.compose.ui.text.TextStyle(color = DarwinTheme.colorScheme.textPrimary)
                 ),
             )

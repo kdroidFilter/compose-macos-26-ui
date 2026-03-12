@@ -273,7 +273,7 @@ private fun TextFieldImpl(
             Box(modifier = Modifier.padding(bottom = 6.dp, start = 2.dp)) {
                 androidx.compose.runtime.CompositionLocalProvider(
                     io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides labelColor,
-                    io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides typography.labelMedium.copy(color = labelColor),
+                    io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides typography.caption1.copy(color = labelColor),
                 ) { label() }
             }
         }
@@ -335,7 +335,7 @@ private fun TextFieldImpl(
                                 }
                                 androidx.compose.runtime.CompositionLocalProvider(
                                     io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides placeholderColor,
-                                    io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides typography.bodyMedium.copy(color = placeholderColor),
+                                    io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides typography.subheadline.copy(color = placeholderColor),
                                 ) { placeholder() }
                             }
                             innerTextField()
@@ -371,7 +371,7 @@ private fun TextFieldImpl(
             Box(modifier = Modifier.padding(top = 4.dp, start = 2.dp)) {
                 androidx.compose.runtime.CompositionLocalProvider(
                     io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides supportingColor,
-                    io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides typography.bodySmall.copy(color = supportingColor),
+                    io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides typography.caption1.copy(color = supportingColor),
                 ) { supportingText() }
             }
         }
@@ -389,7 +389,7 @@ fun TextField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     readOnly: Boolean = false,
-    textStyle: TextStyle = DarwinTheme.typography.bodyMedium,
+    textStyle: TextStyle = DarwinTheme.typography.subheadline,
     label: (@Composable () -> Unit)? = null,
     placeholder: (@Composable () -> Unit)? = null,
     leadingIcon: (@Composable () -> Unit)? = null,
@@ -430,7 +430,7 @@ fun OutlinedTextField(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     readOnly: Boolean = false,
-    textStyle: TextStyle = DarwinTheme.typography.bodyMedium,
+    textStyle: TextStyle = DarwinTheme.typography.subheadline,
     label: (@Composable () -> Unit)? = null,
     placeholder: (@Composable () -> Unit)? = null,
     leadingIcon: (@Composable () -> Unit)? = null,

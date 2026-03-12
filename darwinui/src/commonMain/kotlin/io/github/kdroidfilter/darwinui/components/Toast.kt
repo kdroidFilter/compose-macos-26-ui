@@ -214,7 +214,7 @@ private fun ToastItem(
     toast: ToastData,
     onDismiss: () -> Unit,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
     val shapes = DarwinTheme.shapes
 
@@ -278,14 +278,14 @@ private fun ToastItem(
                     if (toast.title != null) {
                         Text(
                             text = toast.title,
-                            style = typography.labelLarge,
+                            style = typography.subheadline,
                             color = colors.textPrimary,
                             fontWeight = FontWeight.SemiBold,
                         )
                     }
                     Text(
                         text = toast.message,
-                        style = typography.bodySmall,
+                        style = typography.caption1,
                         color = colors.textSecondary,
                     )
                 }
@@ -318,7 +318,7 @@ private fun ToastItem(
  */
 @Composable
 private fun resolveTypeColor(type: ToastType): Color {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     return when (type) {
         ToastType.Info -> colors.info
         ToastType.Success -> colors.success

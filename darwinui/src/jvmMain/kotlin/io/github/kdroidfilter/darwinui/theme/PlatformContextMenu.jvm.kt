@@ -45,7 +45,7 @@ private class DarwinContextMenuRepresentation : ContextMenuRepresentation {
     ) {
         val status = state.status
         if (status is ContextMenuState.Status.Open) {
-            val colors = DarwinTheme.colors
+            val colors = DarwinTheme.colorScheme
             val shapes = DarwinTheme.shapes
 
             val bgColor = if (colors.isDark) Zinc900.copy(alpha = 0.95f)
@@ -92,7 +92,7 @@ private class DarwinContextMenuRepresentation : ContextMenuRepresentation {
 private fun DarwinContextMenuItemRow(
     label: String,
     onClick: () -> Unit,
-    colors: DarwinColors,
+    colors: ColorScheme,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -128,7 +128,7 @@ private fun DarwinContextMenuItemRow(
     ) {
         BasicText(
             text = label,
-            style = DarwinTheme.typography.bodyMedium.merge(
+            style = DarwinTheme.typography.subheadline.merge(
                 TextStyle(color = textColor)
             ),
         )

@@ -54,7 +54,7 @@ fun IconButton(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit,
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val isPressed by interactionSource.collectIsPressedAsState()
     val isHovered by interactionSource.collectIsHoveredAsState()
     val toolbarGlassState = LocalToolbarGlassState.current
@@ -102,7 +102,7 @@ fun IconButton(
 
     CompositionLocalProvider(
         LocalDarwinContentColor provides contentColor,
-        LocalDarwinTextStyle provides DarwinTheme.typography.labelMedium,
+        LocalDarwinTextStyle provides DarwinTheme.typography.caption1,
     ) {
         Box(
             modifier = modifier

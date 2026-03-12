@@ -52,7 +52,7 @@ import kotlinx.coroutines.delay
 fun CodeBlock(code: String) {
     val clipboardManager = LocalClipboardManager.current
     var copied by remember { mutableStateOf(false) }
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
 
     val highlightedCode =
         remember(code, isDark) {
@@ -100,7 +100,7 @@ fun CodeBlock(code: String) {
             Modifier
                 .fillMaxWidth()
                 .clip(DarwinTheme.shapes.medium)
-                .background(DarwinTheme.colors.backgroundSubtle),
+                .background(DarwinTheme.colorScheme.backgroundSubtle),
     ) {
         // Header with language label and copy button
         Row(
@@ -113,8 +113,8 @@ fun CodeBlock(code: String) {
         ) {
             Text(
                 text = "KOTLIN",
-                style = DarwinTheme.typography.labelSmall,
-                color = DarwinTheme.colors.textTertiary,
+                style = DarwinTheme.typography.caption2,
+                color = DarwinTheme.colorScheme.textTertiary,
                 fontWeight = FontWeight.Medium,
             )
 
@@ -141,9 +141,9 @@ fun CodeBlock(code: String) {
                         colorFilter =
                             ColorFilter.tint(
                                 if (isCopied) {
-                                    DarwinTheme.colors.success
+                                    DarwinTheme.colorScheme.success
                                 } else {
-                                    DarwinTheme.colors.textTertiary
+                                    DarwinTheme.colorScheme.textTertiary
                                 },
                             ),
                     )
@@ -155,13 +155,13 @@ fun CodeBlock(code: String) {
                 ) { isCopied ->
                     Text(
                         text = if (isCopied) "Copied!" else "Copy",
-                        style = DarwinTheme.typography.labelSmall,
+                        style = DarwinTheme.typography.caption2,
                         fontWeight = FontWeight.Medium,
                         color =
                             if (isCopied) {
-                                DarwinTheme.colors.success
+                                DarwinTheme.colorScheme.success
                             } else {
-                                DarwinTheme.colors.textTertiary
+                                DarwinTheme.colorScheme.textTertiary
                             },
                     )
                 }
@@ -175,8 +175,8 @@ fun CodeBlock(code: String) {
                 style =
                     TextStyle(
                         fontFamily = FontFamily.Monospace,
-                        fontSize = DarwinTheme.typography.bodySmall.fontSize,
-                        color = DarwinTheme.colors.textSecondary,
+                        fontSize = DarwinTheme.typography.caption1.fontSize,
+                        color = DarwinTheme.colorScheme.textSecondary,
                     ),
                 modifier =
                     Modifier

@@ -36,12 +36,12 @@ fun SliderVolumeExample() {
         ) {
             Text(
                 text = "Volume",
-                style = DarwinTheme.typography.bodySmall,
-                color = DarwinTheme.colors.textTertiary,
+                style = DarwinTheme.typography.caption1,
+                color = DarwinTheme.colorScheme.textTertiary,
             )
             Text(
                 text = "${value.toInt()}%",
-                style = DarwinTheme.typography.bodySmall,
+                style = DarwinTheme.typography.caption1,
                 color = Color(0xFF60A5FA), // blue-400
             )
         }
@@ -56,8 +56,8 @@ fun SliderWithValueExample() {
     Column(modifier = Modifier.fillMaxWidth(0.5f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = "With value display",
-            style = DarwinTheme.typography.bodySmall,
-            color = DarwinTheme.colors.textTertiary,
+            style = DarwinTheme.typography.caption1,
+            color = DarwinTheme.colorScheme.textTertiary,
         )
         Slider(value = value, onValueChange = { value = it }, valueRange = 0f..100f, showValue = true)
     }
@@ -75,8 +75,8 @@ fun SliderCircularKnobExample() {
         )
         Text(
             text = "${(value * 100).toInt()}%",
-            style = DarwinTheme.typography.bodySmall,
-            color = DarwinTheme.colors.textTertiary,
+            style = DarwinTheme.typography.caption1,
+            color = DarwinTheme.colorScheme.textTertiary,
         )
     }
 }
@@ -93,15 +93,15 @@ fun SliderCircularSizesExample() {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
             CircularSlider(value = small, onValueChange = { small = it }, size = CircularSliderSize.Small)
-            Text("S", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary)
+            Text("S", style = DarwinTheme.typography.caption2, color = DarwinTheme.colorScheme.textTertiary)
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
             CircularSlider(value = medium, onValueChange = { medium = it }, size = CircularSliderSize.Medium)
-            Text("M", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary)
+            Text("M", style = DarwinTheme.typography.caption2, color = DarwinTheme.colorScheme.textTertiary)
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
             CircularSlider(value = large, onValueChange = { large = it }, size = CircularSliderSize.Large)
-            Text("L", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary)
+            Text("L", style = DarwinTheme.typography.caption2, color = DarwinTheme.colorScheme.textTertiary)
         }
     }
 }

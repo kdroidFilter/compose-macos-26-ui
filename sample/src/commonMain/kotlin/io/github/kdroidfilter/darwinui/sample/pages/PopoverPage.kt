@@ -36,8 +36,8 @@ fun PopoverDefaultExample() {
         },
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Popover Content", fontWeight = FontWeight.SemiBold, color = DarwinTheme.colors.textPrimary)
-            Text("This is a popover panel with rich content.", color = DarwinTheme.colors.textSecondary)
+            Text("Popover Content", fontWeight = FontWeight.SemiBold, color = DarwinTheme.colorScheme.textPrimary)
+            Text("This is a popover panel with rich content.", color = DarwinTheme.colorScheme.textSecondary)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 PushButton(
                     text = "Edit",
@@ -69,7 +69,7 @@ fun PopoverPlacementExample() {
                     )
                 },
             ) {
-                Text("Placed ${placement.name}", color = DarwinTheme.colors.textPrimary)
+                Text("Placed ${placement.name}", color = DarwinTheme.colorScheme.textPrimary)
             }
         }
     }

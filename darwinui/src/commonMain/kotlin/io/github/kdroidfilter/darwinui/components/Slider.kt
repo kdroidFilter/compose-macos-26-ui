@@ -228,7 +228,7 @@ fun Slider(
         if (showValue) {
             Text(
                 text = if (steps > 0) value.roundToInt().toString() else "${round(value * 10f) / 10f}",
-                style = DarwinTheme.typography.labelSmall,
+                style = DarwinTheme.typography.caption2,
                 color = if (DarwinTheme.colorScheme.isDark) Color(0xFFA1A1AA) else Color(0xFF71717A),
                 modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                 textAlign = androidx.compose.ui.text.style.TextAlign.End,

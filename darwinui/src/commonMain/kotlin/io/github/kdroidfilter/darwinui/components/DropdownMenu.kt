@@ -93,7 +93,7 @@ fun DropdownMenu(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val isDark = colors.isDark
     val shapes = DarwinTheme.shapes
 
@@ -167,7 +167,7 @@ fun DropdownMenuItem(
     trailingContent: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val typography = DarwinTheme.typography
     val shapes = DarwinTheme.shapes
 
@@ -189,7 +189,7 @@ fun DropdownMenuItem(
         else -> if (isDark) Zinc300 else Zinc700
     }
 
-    val contentStyle = typography.bodyMedium.merge(TextStyle(color = textColor))
+    val contentStyle = typography.subheadline.merge(TextStyle(color = textColor))
 
     // Outer padding(horizontal=4.dp) simulates the p-1 container inset
     Row(
@@ -271,7 +271,7 @@ fun DropdownMenuCheckboxItem(
                     Icon(
                         imageVector = LucideCheck,
                         modifier = Modifier.size(12.dp),
-                        tint = if (DarwinTheme.colors.isDark) Zinc300 else Zinc700,
+                        tint = if (DarwinTheme.colorScheme.isDark) Zinc300 else Zinc700,
                     )
                 }
             }
@@ -295,7 +295,7 @@ fun DropdownMenuLabel(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val typography = DarwinTheme.typography
 
     // Outer horizontal padding 4dp (container p-1 inset) + inner px-2 (8dp)
@@ -307,7 +307,7 @@ fun DropdownMenuLabel(
     ) {
         BasicText(
             text = text,
-            style = typography.labelMedium.merge(
+            style = typography.caption1.merge(
                 TextStyle(
                     fontWeight = FontWeight.SemiBold,
                     color = if (isDark) Zinc400 else Zinc500,
@@ -328,7 +328,7 @@ fun DropdownMenuLabel(
  */
 @Composable
 fun DropdownMenuSeparator(modifier: Modifier = Modifier) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
 
     // -mx-1 extends past the container p-1 → edge-to-edge within the border.
     // Since the Column has no horizontal padding, separator fills full width.
@@ -359,12 +359,12 @@ fun DropdownMenuShortcut(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val typography = DarwinTheme.typography
 
     BasicText(
         text = text,
-        style = typography.labelMedium.merge(
+        style = typography.caption1.merge(
             TextStyle(
                 color = if (isDark) Zinc400 else Zinc500,
                 letterSpacing = 1.2.sp, // tracking-widest ≈ 0.1em at 12sp

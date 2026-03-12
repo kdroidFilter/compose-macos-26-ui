@@ -60,7 +60,7 @@ fun Tooltip(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
     val shapes = DarwinTheme.shapes
 
@@ -126,7 +126,7 @@ fun Tooltip(
                 ) {
                     BasicText(
                         text = text,
-                        style = typography.bodySmall.merge(
+                        style = typography.caption1.merge(
                             TextStyle(color = tooltipTextColor)
                         ),
                     )

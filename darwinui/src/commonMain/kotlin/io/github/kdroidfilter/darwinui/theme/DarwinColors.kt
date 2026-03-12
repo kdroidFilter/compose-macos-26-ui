@@ -222,9 +222,6 @@ class ColorScheme(
     )
 }
 
-/** Backward-compatible alias. */
-typealias DarwinColors = ColorScheme
-
 fun darkColorScheme(accentColor: AccentColor = AccentColor.Blue): ColorScheme {
     val accent = accentColor.dark
     val accentContainer = accentColor.containerDark
@@ -378,11 +375,5 @@ fun lightColorScheme(accentColor: AccentColor = AccentColor.Blue): ColorScheme {
         isDark = false,
     )
 }
-
-/** Backward-compatible factory function. */
-fun darkDarwinColors(): ColorScheme = darkColorScheme()
-
-/** Backward-compatible factory function. */
-fun lightDarwinColors(): ColorScheme = lightColorScheme()
 
 val LocalDarwinColors = staticCompositionLocalOf { darkColorScheme() }

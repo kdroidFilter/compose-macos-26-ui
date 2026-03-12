@@ -44,8 +44,8 @@ fun SmallDialogExample() {
     ) {
         Text(
             text = "Review your changes before saving. You can cancel to go back.",
-            style = DarwinTheme.typography.bodySmall,
-            color = DarwinTheme.colors.textSecondary,
+            style = DarwinTheme.typography.caption1,
+            color = DarwinTheme.colorScheme.textSecondary,
         )
     }
 }
@@ -73,15 +73,15 @@ fun SmallDialogDestructiveExample() {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Text("Name", style = DarwinTheme.typography.bodySmall, color = DarwinTheme.colors.textTertiary)
-                Text("Untitled Document", style = DarwinTheme.typography.bodySmall)
+                Text("Name", style = DarwinTheme.typography.caption1, color = DarwinTheme.colorScheme.textTertiary)
+                Text("Untitled Document", style = DarwinTheme.typography.caption1)
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Text("Location", style = DarwinTheme.typography.bodySmall, color = DarwinTheme.colors.textTertiary)
-                Text("Desktop", style = DarwinTheme.typography.bodySmall)
+                Text("Location", style = DarwinTheme.typography.caption1, color = DarwinTheme.colorScheme.textTertiary)
+                Text("Desktop", style = DarwinTheme.typography.caption1)
             }
         }
     }

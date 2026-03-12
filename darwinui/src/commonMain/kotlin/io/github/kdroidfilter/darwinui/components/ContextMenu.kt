@@ -69,7 +69,7 @@ fun ContextMenu(
     trigger: @Composable () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
 
     var isOpen by remember { mutableStateOf(false) }
     var clickOffset by remember { mutableStateOf(IntOffset.Zero) }
@@ -158,7 +158,7 @@ fun ContextMenuItem(
     trailingContent: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val closeMenu = LocalContextMenuClose.current
     val accentColor = colors.accent
 
@@ -260,7 +260,7 @@ fun ContextMenuCheckboxItem(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val closeMenu = LocalContextMenuClose.current
     val accentColor = colors.accent
 
@@ -351,7 +351,7 @@ fun ContextMenuLabel(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
 
     val labelColor = if (colors.isDark) Color.White.copy(alpha = 0.45f)
     else Color(0xFF727272)
@@ -381,7 +381,7 @@ fun ContextMenuLabel(
 
 @Composable
 fun ContextMenuSeparator(modifier: Modifier = Modifier) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
 
     val separatorColor = if (colors.isDark) Color.White.copy(alpha = 0.08f)
     else Color(0xFFE6E6E6)

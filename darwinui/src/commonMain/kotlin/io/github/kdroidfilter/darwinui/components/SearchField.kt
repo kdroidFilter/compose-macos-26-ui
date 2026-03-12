@@ -63,7 +63,7 @@ fun SearchField(
     size: InputSize = InputSize.Md,
     trailingIcon: @Composable (() -> Unit)? = null,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
     val isDark = colors.isDark
     val accentColor = colors.accent
@@ -101,7 +101,7 @@ fun SearchField(
             .onFocusChanged { isFocused = it.isFocused },
         enabled = enabled,
         singleLine = singleLine,
-        textStyle = typography.bodyMedium.copy(color = textColor),
+        textStyle = typography.subheadline.copy(color = textColor),
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         cursorBrush = SolidColor(accentColor),
@@ -136,13 +136,13 @@ fun SearchField(
                     if (value.isEmpty()) {
                         CompositionLocalProvider(
                             LocalDarwinContentColor provides placeholderColor,
-                            LocalDarwinTextStyle provides typography.bodySmall.copy(color = placeholderColor),
+                            LocalDarwinTextStyle provides typography.caption1.copy(color = placeholderColor),
                         ) {
                             Text(placeholder)
                         }
                     }
                     CompositionLocalProvider(
-                        LocalDarwinTextStyle provides typography.bodySmall.copy(color = textColor),
+                        LocalDarwinTextStyle provides typography.caption1.copy(color = textColor),
                     ) {
                         innerTextField()
                     }

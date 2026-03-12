@@ -73,7 +73,7 @@ fun ComboBox(
     placeholder: String? = null,
     disabled: Boolean = false,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val shapes = DarwinTheme.shapes
     val typography = DarwinTheme.typography
     val enabled = !disabled
@@ -109,7 +109,7 @@ fun ComboBox(
         if (header != null) {
             Text(
                 text = header,
-                style = typography.labelMedium,
+                style = typography.caption1,
                 color = colors.textPrimary,
                 modifier = Modifier.padding(bottom = 6.dp),
             )
@@ -191,7 +191,7 @@ fun ComboBox(
             ) {
                 Text(
                     text = selectedLabel ?: placeholder ?: "Select...",
-                    style = typography.bodyMedium,
+                    style = typography.subheadline,
                     color = if (selectedLabel != null) colors.textPrimary else colors.textTertiary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -277,7 +277,7 @@ fun ComboBox(
                             }
                             Text(
                                 text = label,
-                                style = typography.bodyMedium,
+                                style = typography.subheadline,
                                 color = when {
                                     isSelected -> colors.onAccent
                                     else -> colors.textPrimary

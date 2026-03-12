@@ -44,7 +44,7 @@ fun GroupedList(
     content: @Composable () -> Unit,
 ) {
     val shape = DarwinTheme.shapes.large
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
 
     Column(
         modifier = modifier
@@ -90,7 +90,7 @@ fun GroupedListItem(
     trailing: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val dividerColor = colors.borderSubtle
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()

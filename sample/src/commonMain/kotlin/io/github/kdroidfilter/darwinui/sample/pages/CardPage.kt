@@ -34,7 +34,7 @@ fun CardDefaultExample() {
         CardContent {
             Text(
                 "Cards can contain any content including text, images, and other components.",
-                color = DarwinTheme.colors.mutedForeground,
+                color = DarwinTheme.colorScheme.mutedForeground,
             )
         }
         CardFooter {

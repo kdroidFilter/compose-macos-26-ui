@@ -155,7 +155,7 @@ fun Tab(
     ) {
         androidx.compose.runtime.CompositionLocalProvider(
             io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides contentColor,
-            io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides DarwinTheme.typography.titleSmall.copy(color = contentColor),
+            io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides DarwinTheme.typography.caption1.copy(color = contentColor),
         ) {
             if (icon != null && text != null) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {

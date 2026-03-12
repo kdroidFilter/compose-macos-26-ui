@@ -72,10 +72,10 @@ class CircularSliderColors(
 object CircularSliderDefaults {
     @Composable
     fun colors(
-        backgroundColor: Color = if (DarwinTheme.colors.isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f),
-        trackColor: Color = if (DarwinTheme.colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
-        activeTrackColor: Color = DarwinTheme.colors.accent,
-        indicatorColor: Color = if (DarwinTheme.colors.isDark) Color.White.copy(alpha = 0.85f) else Color.Black.copy(alpha = 0.85f),
+        backgroundColor: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f),
+        trackColor: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
+        activeTrackColor: Color = DarwinTheme.colorScheme.accent,
+        indicatorColor: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.85f) else Color.Black.copy(alpha = 0.85f),
         disabledBackgroundColor: Color = backgroundColor.copy(alpha = backgroundColor.alpha * 0.38f),
         disabledTrackColor: Color = trackColor.copy(alpha = trackColor.alpha * 0.38f),
         disabledActiveTrackColor: Color = activeTrackColor.copy(alpha = 0.38f),

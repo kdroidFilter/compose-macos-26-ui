@@ -89,12 +89,12 @@ fun ScaffoldFullLayoutExample() {
                                     text = "Finder",
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = DarwinTheme.colors.textPrimary,
+                                    color = DarwinTheme.colorScheme.textPrimary,
                                 )
                                 Text(
                                     text = "File Browser",
-                                    style = DarwinTheme.typography.bodySmall,
-                                    color = DarwinTheme.colors.textTertiary,
+                                    style = DarwinTheme.typography.caption1,
+                                    color = DarwinTheme.colorScheme.textTertiary,
                                 )
                             }
                             IconButton(onClick = { sidebarVisible = false }) {
@@ -133,15 +133,15 @@ fun ScaffoldFullLayoutExample() {
             ) {
                 Text(
                     text = selectedPage,
-                    style = DarwinTheme.typography.titleLarge,
+                    style = DarwinTheme.typography.callout,
                     fontWeight = FontWeight.Bold,
-                    color = DarwinTheme.colors.textPrimary,
+                    color = DarwinTheme.colorScheme.textPrimary,
                 )
                 repeat(8) { i ->
                     Text(
                         text = "Content item ${i + 1} — scroll to see glass blur on title bar.",
-                        style = DarwinTheme.typography.bodyMedium,
-                        color = DarwinTheme.colors.textSecondary,
+                        style = DarwinTheme.typography.subheadline,
+                        color = DarwinTheme.colorScheme.textSecondary,
                     )
                 }
             }
@@ -180,15 +180,15 @@ fun ScaffoldNoSidebarExample() {
             ) {
                 Text(
                     text = "Scaffold without sidebar",
-                    style = DarwinTheme.typography.titleMedium,
+                    style = DarwinTheme.typography.subheadline,
                     fontWeight = FontWeight.SemiBold,
-                    color = DarwinTheme.colors.textPrimary,
+                    color = DarwinTheme.colorScheme.textPrimary,
                 )
                 repeat(6) { i ->
                     Text(
                         text = "Line ${i + 1} — title bar overlays content with frosted glass.",
-                        style = DarwinTheme.typography.bodyMedium,
-                        color = DarwinTheme.colors.textSecondary,
+                        style = DarwinTheme.typography.subheadline,
+                        color = DarwinTheme.colorScheme.textSecondary,
                     )
                 }
             }

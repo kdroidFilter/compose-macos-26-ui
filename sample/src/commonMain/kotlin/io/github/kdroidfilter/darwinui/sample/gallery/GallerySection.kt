@@ -45,9 +45,9 @@ fun GallerySection(
                 .clip(DarwinTheme.shapes.large)
                 .border(
                     width = 1.dp,
-                    color = DarwinTheme.colors.border,
+                    color = DarwinTheme.colorScheme.border,
                     shape = DarwinTheme.shapes.large,
-                ).background(DarwinTheme.colors.card),
+                ).background(DarwinTheme.colorScheme.card),
     ) {
         // Section title
         Box(
@@ -58,9 +58,9 @@ fun GallerySection(
         ) {
             Text(
                 text = title,
-                style = DarwinTheme.typography.titleSmall,
+                style = DarwinTheme.typography.caption1,
                 fontWeight = FontWeight.SemiBold,
-                color = DarwinTheme.colors.textPrimary,
+                color = DarwinTheme.colorScheme.textPrimary,
             )
         }
 
@@ -69,7 +69,7 @@ fun GallerySection(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .background(DarwinTheme.colors.border)
+                    .background(DarwinTheme.colorScheme.border)
                     .defaultMinSize(minHeight = 1.dp),
         )
 
@@ -89,7 +89,7 @@ fun GallerySection(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .background(DarwinTheme.colors.border)
+                    .background(DarwinTheme.colorScheme.border)
                     .defaultMinSize(minHeight = 1.dp),
         )
 
@@ -105,14 +105,14 @@ fun GallerySection(
         ) {
             Text(
                 text = if (expanded) "\u25BC" else "\u25B6",
-                style = DarwinTheme.typography.labelSmall,
-                color = DarwinTheme.colors.textTertiary,
+                style = DarwinTheme.typography.caption2,
+                color = DarwinTheme.colorScheme.textTertiary,
             )
             Text(
                 text = "Source Code",
-                style = DarwinTheme.typography.labelMedium,
+                style = DarwinTheme.typography.caption1,
                 fontWeight = FontWeight.Medium,
-                color = DarwinTheme.colors.textSecondary,
+                color = DarwinTheme.colorScheme.textSecondary,
             )
         }
 

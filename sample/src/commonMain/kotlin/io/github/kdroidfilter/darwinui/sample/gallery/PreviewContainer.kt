@@ -25,16 +25,16 @@ fun PreviewContainer(content: @Composable () -> Unit) {
                 .clip(DarwinTheme.shapes.extraLarge)
                 .border(
                     width = 1.dp,
-                    color = DarwinTheme.colors.border.copy(alpha = 0.60f), // border-border/60
+                    color = DarwinTheme.colorScheme.border.copy(alpha = 0.60f), // border-border/60
                     shape = DarwinTheme.shapes.extraLarge,
-                ).background(DarwinTheme.colors.muted.copy(alpha = 0.20f)),
+                ).background(DarwinTheme.colorScheme.muted.copy(alpha = 0.20f)),
         // bg-muted/20
     ) {
         Text(
             text = "Preview",
-            style = DarwinTheme.typography.labelMedium,
+            style = DarwinTheme.typography.caption1,
             fontWeight = FontWeight.Medium,
-            color = DarwinTheme.colors.textTertiary,
+            color = DarwinTheme.colorScheme.textTertiary,
             modifier = Modifier.padding(start = 24.dp, top = 20.dp),
         )
         Box(

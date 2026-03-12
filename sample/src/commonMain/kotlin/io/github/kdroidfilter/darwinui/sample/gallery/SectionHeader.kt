@@ -9,8 +9,8 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 fun SectionHeader(title: String) {
     Text(
         text = title,
-        style = DarwinTheme.typography.headlineSmall,
+        style = DarwinTheme.typography.headline,
         fontWeight = FontWeight.SemiBold,
-        color = DarwinTheme.colors.textPrimary,
+        color = DarwinTheme.colorScheme.textPrimary,
     )
 }

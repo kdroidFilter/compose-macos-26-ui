@@ -112,7 +112,7 @@ fun Avatar(
     size: Dp = 40.dp,
     onClick: (() -> Unit)? = null,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val backgroundColor = hashColor(name)
     val borderColor = if (colors.isDark) Zinc900 else Color.White
     val initials = extractInitials(name)
@@ -196,7 +196,7 @@ fun AvatarGroup(
     maxDisplay: Int = 4,
     size: Dp = 40.dp,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val borderColor = if (colors.isDark) Zinc900 else Color.White
     val overlapDp = 12.dp // how much each avatar overlaps the previous one
 

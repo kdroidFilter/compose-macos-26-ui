@@ -118,7 +118,7 @@ fun SmallDialog(
             onDismissRequest = { (onCancel ?: onDismissRequest)() },
             properties = PopupProperties(focusable = true),
         ) {
-            val colors = DarwinTheme.colors
+            val colors = DarwinTheme.colorScheme
             val isDark = colors.isDark
             val scrimColor = if (isDark) Color.Black.copy(alpha = 0.50f) else Color.Black.copy(alpha = 0.30f)
 

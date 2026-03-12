@@ -25,7 +25,7 @@ fun Skeleton(
     modifier: Modifier = Modifier,
     shape: Shape = DarwinTheme.shapes.small, // rounded-lg = 8dp
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
 
     // default: bg-black/10 dark:bg-white/10
     val backgroundColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)

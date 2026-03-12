@@ -65,7 +65,7 @@ fun PulldownButton(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit,
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val isPressed by interactionSource.collectIsPressedAsState()
     val isHovered by interactionSource.collectIsHoveredAsState()
 
@@ -95,7 +95,7 @@ fun PulldownButton(
 
     CompositionLocalProvider(
         LocalDarwinContentColor provides contentColor,
-        LocalDarwinTextStyle provides DarwinTheme.typography.labelMedium,
+        LocalDarwinTextStyle provides DarwinTheme.typography.caption1,
     ) {
         Box(
             modifier = modifier
@@ -157,7 +157,7 @@ fun GlassPulldownButton(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit,
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val isPressed by interactionSource.collectIsPressedAsState()
     val isHovered by interactionSource.collectIsHoveredAsState()
 
@@ -188,7 +188,7 @@ fun GlassPulldownButton(
 
     CompositionLocalProvider(
         LocalDarwinContentColor provides contentColor,
-        LocalDarwinTextStyle provides DarwinTheme.typography.labelMedium,
+        LocalDarwinTextStyle provides DarwinTheme.typography.caption1,
     ) {
         Box(
             modifier = modifier
@@ -281,7 +281,7 @@ fun DisclosureButton(
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val isPressed by interactionSource.collectIsPressedAsState()
 
     val scale by animateFloatAsState(
@@ -347,7 +347,7 @@ fun PushButton(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit,
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val isPressed by interactionSource.collectIsPressedAsState()
     val isHovered by interactionSource.collectIsHoveredAsState()
 
@@ -377,7 +377,7 @@ fun PushButton(
 
     CompositionLocalProvider(
         LocalDarwinContentColor provides contentColor,
-        LocalDarwinTextStyle provides DarwinTheme.typography.labelMedium,
+        LocalDarwinTextStyle provides DarwinTheme.typography.caption1,
     ) {
         Box(
             modifier = modifier
@@ -435,7 +435,7 @@ fun ArrowButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val bgColor = if (isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f)
     val iconColor = if (isDark) Color.White.copy(alpha = 0.85f) else Color.Black.copy(alpha = 0.85f)
     val circleShape = RoundedCornerShape(50)
@@ -531,7 +531,7 @@ fun PanelAccentButton(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val isHovered by interactionSource.collectIsHoveredAsState()
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
 
     val scale by animateFloatAsState(
         targetValue = if (isPressed && enabled) 0.97f else 1f,
@@ -569,7 +569,7 @@ fun PanelAccentButton(
     ) {
         CompositionLocalProvider(
             LocalDarwinContentColor provides Color.White,
-            LocalDarwinTextStyle provides DarwinTheme.typography.bodySmall.copy(
+            LocalDarwinTextStyle provides DarwinTheme.typography.caption1.copy(
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
                 fontSize = 13.sp,
             ),
@@ -594,7 +594,7 @@ fun PanelDestructiveButton(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val isHovered by interactionSource.collectIsHoveredAsState()
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
 
     val scale by animateFloatAsState(
         targetValue = if (isPressed && enabled) 0.97f else 1f,
@@ -633,7 +633,7 @@ fun PanelDestructiveButton(
     ) {
         CompositionLocalProvider(
             LocalDarwinContentColor provides Color(0xFFFF383C),
-            LocalDarwinTextStyle provides DarwinTheme.typography.bodySmall.copy(
+            LocalDarwinTextStyle provides DarwinTheme.typography.caption1.copy(
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
                 fontSize = 13.sp,
             ),
@@ -655,7 +655,7 @@ fun PanelSecondaryButton(
     enabled: Boolean = true,
     fillWidth: Boolean = false,
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -700,7 +700,7 @@ fun PanelSecondaryButton(
     ) {
         CompositionLocalProvider(
             LocalDarwinContentColor provides textColor,
-            LocalDarwinTextStyle provides DarwinTheme.typography.bodySmall.copy(
+            LocalDarwinTextStyle provides DarwinTheme.typography.caption1.copy(
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
                 fontSize = 13.sp,
             ),
@@ -756,7 +756,7 @@ fun MacNativeAccentButton(
     ) {
         CompositionLocalProvider(
             LocalDarwinContentColor provides Color.White,
-            LocalDarwinTextStyle provides DarwinTheme.typography.bodySmall.copy(
+            LocalDarwinTextStyle provides DarwinTheme.typography.caption1.copy(
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
                 fontSize = 13.sp,
             ),
@@ -808,7 +808,7 @@ fun MacNativeDestructiveButton(
     ) {
         CompositionLocalProvider(
             LocalDarwinContentColor provides Color(0xFFFF383C),
-            LocalDarwinTextStyle provides DarwinTheme.typography.bodySmall.copy(
+            LocalDarwinTextStyle provides DarwinTheme.typography.caption1.copy(
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
                 fontSize = 13.sp,
             ),
@@ -830,7 +830,7 @@ fun MacNativeSecondaryButton(
     enabled: Boolean = true,
     fillWidth: Boolean = true,
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
@@ -864,7 +864,7 @@ fun MacNativeSecondaryButton(
     ) {
         CompositionLocalProvider(
             LocalDarwinContentColor provides textColor,
-            LocalDarwinTextStyle provides DarwinTheme.typography.bodySmall.copy(
+            LocalDarwinTextStyle provides DarwinTheme.typography.caption1.copy(
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
                 fontSize = 13.sp,
             ),

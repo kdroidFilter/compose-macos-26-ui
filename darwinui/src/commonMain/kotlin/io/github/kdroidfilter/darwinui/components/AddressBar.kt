@@ -72,7 +72,7 @@ fun AddressBar(
     leadingIcon: @Composable (() -> Unit)? = null,
     focusRequester: FocusRequester = remember { FocusRequester() },
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
     val isDark = colors.isDark
     val accentColor = colors.accent
@@ -178,18 +178,18 @@ private fun RowScope.CenterTextField(
                 .matchParentSize(),
             enabled = enabled,
             singleLine = true,
-            textStyle = typography.bodySmall.copy(
+            textStyle = typography.caption1.copy(
                 color = textColor,
                 textAlign = TextAlign.Center,
             ),
-            cursorBrush = SolidColor(DarwinTheme.colors.accent),
+            cursorBrush = SolidColor(DarwinTheme.colorScheme.accent),
             keyboardActions = KeyboardActions(onGo = { onGo?.invoke() }),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
         )
         if (value.isEmpty()) {
             Text(
                 text = placeholder,
-                style = typography.bodySmall.copy(
+                style = typography.caption1.copy(
                     color = placeholderColor,
                     textAlign = TextAlign.Center,
                 ),

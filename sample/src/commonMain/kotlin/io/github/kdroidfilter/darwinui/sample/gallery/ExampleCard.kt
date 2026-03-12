@@ -45,9 +45,9 @@ fun ExampleCard(
                 .clip(DarwinTheme.shapes.large)
                 .border(
                     width = 1.dp,
-                    color = DarwinTheme.colors.border,
+                    color = DarwinTheme.colorScheme.border,
                     shape = DarwinTheme.shapes.large,
-                ).background(DarwinTheme.colors.card),
+                ).background(DarwinTheme.colorScheme.card),
     ) {
         // Header: title + description + tabs
         Column(
@@ -61,15 +61,15 @@ fun ExampleCard(
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(
                     text = title,
-                    style = DarwinTheme.typography.titleSmall,
+                    style = DarwinTheme.typography.caption1,
                     fontWeight = FontWeight.SemiBold,
-                    color = DarwinTheme.colors.textPrimary,
+                    color = DarwinTheme.colorScheme.textPrimary,
                 )
                 if (description.isNotEmpty()) {
                     Text(
                         text = description,
-                        style = DarwinTheme.typography.bodySmall,
-                        color = DarwinTheme.colors.textTertiary,
+                        style = DarwinTheme.typography.caption1,
+                        color = DarwinTheme.colorScheme.textTertiary,
                     )
                 }
             }
@@ -80,7 +80,7 @@ fun ExampleCard(
                 modifier =
                     Modifier
                         .clip(DarwinTheme.shapes.small)
-                        .background(DarwinTheme.colors.backgroundSubtle)
+                        .background(DarwinTheme.colorScheme.backgroundSubtle)
                         .padding(2.dp),
             ) {
                 TabButton(
@@ -101,7 +101,7 @@ fun ExampleCard(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .background(DarwinTheme.colors.border)
+                    .background(DarwinTheme.colorScheme.border)
                     .defaultMinSize(minHeight = 1.dp),
         )
 
@@ -154,7 +154,7 @@ private fun TabButton(
                 .clip(DarwinTheme.shapes.extraSmall)
                 .then(
                     if (selected) {
-                        Modifier.background(DarwinTheme.colors.card)
+                        Modifier.background(DarwinTheme.colorScheme.card)
                     } else {
                         Modifier
                     },
@@ -163,9 +163,9 @@ private fun TabButton(
     ) {
         Text(
             text = text,
-            style = DarwinTheme.typography.labelSmall,
+            style = DarwinTheme.typography.caption2,
             fontWeight = if (selected) FontWeight.Medium else FontWeight.Normal,
-            color = if (selected) DarwinTheme.colors.textPrimary else DarwinTheme.colors.textTertiary,
+            color = if (selected) DarwinTheme.colorScheme.textPrimary else DarwinTheme.colorScheme.textTertiary,
         )
     }
 }

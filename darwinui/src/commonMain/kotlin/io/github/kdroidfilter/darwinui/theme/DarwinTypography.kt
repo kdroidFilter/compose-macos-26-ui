@@ -23,117 +23,112 @@ fun ManropeFontFamily(): FontFamily = FontFamily(
 )
 
 /**
- * Darwin UI typography scale — mirrors Material3's Typography class exactly.
+ * Darwin UI typography scale — macOS Human Interface Guidelines naming.
+ *
+ * Reference: developer.apple.com/design/human-interface-guidelines/typography
  */
 @Immutable
 data class DarwinTypography(
-    val displayLarge: TextStyle = TextStyle(
+    /** Large Title — 34sp Bold. Top-level window/screen headers. */
+    val largeTitle: TextStyle = TextStyle(
         fontWeight = FontWeight.Bold,
-        fontSize = 36.sp,
-        lineHeight = 44.sp,
-        letterSpacing = (-0.25).sp,
-    ),
-    val displayMedium: TextStyle = TextStyle(
-        fontWeight = FontWeight.Bold,
-        fontSize = 30.sp,
-        lineHeight = 38.sp,
-        letterSpacing = (-0.25).sp,
-    ),
-    val displaySmall: TextStyle = TextStyle(
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 24.sp,
-        lineHeight = 32.sp,
+        fontSize = 34.sp,
+        lineHeight = 41.sp,
         letterSpacing = 0.sp,
     ),
-    val headlineLarge: TextStyle = TextStyle(
-        fontWeight = FontWeight.SemiBold,
+
+    /** Title 1 — 28sp Regular. Prominent page/section title. */
+    val title1: TextStyle = TextStyle(
+        fontWeight = FontWeight.Normal,
+        fontSize = 28.sp,
+        lineHeight = 34.sp,
+        letterSpacing = 0.sp,
+    ),
+
+    /** Title 2 — 22sp Regular. Secondary section title. */
+    val title2: TextStyle = TextStyle(
+        fontWeight = FontWeight.Normal,
         fontSize = 22.sp,
         lineHeight = 28.sp,
         letterSpacing = 0.sp,
     ),
-    val headlineMedium: TextStyle = TextStyle(
-        fontWeight = FontWeight.SemiBold,
+
+    /** Title 3 — 20sp Regular. Tertiary section title / card header. */
+    val title3: TextStyle = TextStyle(
+        fontWeight = FontWeight.Normal,
         fontSize = 20.sp,
-        lineHeight = 26.sp,
+        lineHeight = 25.sp,
         letterSpacing = 0.sp,
     ),
-    val headlineSmall: TextStyle = TextStyle(
+
+    /** Headline — 17sp SemiBold. Emphasized label (dialog title, list section header). */
+    val headline: TextStyle = TextStyle(
         fontWeight = FontWeight.SemiBold,
-        fontSize = 18.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.sp,
-    ),
-    val titleLarge: TextStyle = TextStyle(
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 16.sp,
+        fontSize = 17.sp,
         lineHeight = 22.sp,
         letterSpacing = 0.sp,
     ),
-    val titleMedium: TextStyle = TextStyle(
-        fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.1.sp,
+
+    /** Body — 17sp Regular. Default reading text. */
+    val body: TextStyle = TextStyle(
+        fontWeight = FontWeight.Normal,
+        fontSize = 17.sp,
+        lineHeight = 22.sp,
+        letterSpacing = 0.sp,
     ),
-    val titleSmall: TextStyle = TextStyle(
-        fontWeight = FontWeight.Medium,
-        fontSize = 12.sp,
-        lineHeight = 18.sp,
-        letterSpacing = 0.1.sp,
-    ),
-    val bodyLarge: TextStyle = TextStyle(
+
+    /** Callout — 16sp Regular. Secondary descriptive text. */
+    val callout: TextStyle = TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.15.sp,
+        lineHeight = 21.sp,
+        letterSpacing = 0.sp,
     ),
-    val bodyMedium: TextStyle = TextStyle(
+
+    /** Subheadline — 15sp Regular. Compact label text. */
+    val subheadline: TextStyle = TextStyle(
         fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
+        fontSize = 15.sp,
         lineHeight = 20.sp,
-        letterSpacing = 0.25.sp,
+        letterSpacing = 0.sp,
     ),
-    val bodySmall: TextStyle = TextStyle(
+
+    /** Footnote — 13sp Regular. De-emphasised supplementary text. */
+    val footnote: TextStyle = TextStyle(
+        fontWeight = FontWeight.Normal,
+        fontSize = 13.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.sp,
+    ),
+
+    /** Caption 1 — 12sp Regular. Small annotation or metadata text. */
+    val caption1: TextStyle = TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         lineHeight = 16.sp,
-        letterSpacing = 0.4.sp,
+        letterSpacing = 0.sp,
     ),
-    val labelLarge: TextStyle = TextStyle(
-        fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 0.1.sp,
-    ),
-    val labelMedium: TextStyle = TextStyle(
-        fontWeight = FontWeight.Medium,
-        fontSize = 12.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp,
-    ),
-    val labelSmall: TextStyle = TextStyle(
-        fontWeight = FontWeight.Medium,
-        fontSize = 10.sp,
-        lineHeight = 14.sp,
-        letterSpacing = 0.5.sp,
+
+    /** Caption 2 — 11sp Regular. Smallest readable text, use sparingly. */
+    val caption2: TextStyle = TextStyle(
+        fontWeight = FontWeight.Normal,
+        fontSize = 11.sp,
+        lineHeight = 13.sp,
+        letterSpacing = 0.sp,
     ),
 ) {
     internal fun withFontFamily(fontFamily: FontFamily): DarwinTypography = copy(
-        displayLarge = displayLarge.copy(fontFamily = fontFamily),
-        displayMedium = displayMedium.copy(fontFamily = fontFamily),
-        displaySmall = displaySmall.copy(fontFamily = fontFamily),
-        headlineLarge = headlineLarge.copy(fontFamily = fontFamily),
-        headlineMedium = headlineMedium.copy(fontFamily = fontFamily),
-        headlineSmall = headlineSmall.copy(fontFamily = fontFamily),
-        titleLarge = titleLarge.copy(fontFamily = fontFamily),
-        titleMedium = titleMedium.copy(fontFamily = fontFamily),
-        titleSmall = titleSmall.copy(fontFamily = fontFamily),
-        bodyLarge = bodyLarge.copy(fontFamily = fontFamily),
-        bodyMedium = bodyMedium.copy(fontFamily = fontFamily),
-        bodySmall = bodySmall.copy(fontFamily = fontFamily),
-        labelLarge = labelLarge.copy(fontFamily = fontFamily),
-        labelMedium = labelMedium.copy(fontFamily = fontFamily),
-        labelSmall = labelSmall.copy(fontFamily = fontFamily),
+        largeTitle = largeTitle.copy(fontFamily = fontFamily),
+        title1 = title1.copy(fontFamily = fontFamily),
+        title2 = title2.copy(fontFamily = fontFamily),
+        title3 = title3.copy(fontFamily = fontFamily),
+        headline = headline.copy(fontFamily = fontFamily),
+        body = body.copy(fontFamily = fontFamily),
+        callout = callout.copy(fontFamily = fontFamily),
+        subheadline = subheadline.copy(fontFamily = fontFamily),
+        footnote = footnote.copy(fontFamily = fontFamily),
+        caption1 = caption1.copy(fontFamily = fontFamily),
+        caption2 = caption2.copy(fontFamily = fontFamily),
     )
 }
 

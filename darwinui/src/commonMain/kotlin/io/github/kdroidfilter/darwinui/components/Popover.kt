@@ -402,7 +402,7 @@ fun Popover(
     trigger: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val density = LocalDensity.current
     val fallbackBg = colors.card
     val borderColor = colors.border

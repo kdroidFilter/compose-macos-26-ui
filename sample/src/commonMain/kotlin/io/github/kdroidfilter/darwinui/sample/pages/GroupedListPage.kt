@@ -41,13 +41,13 @@ fun GroupedListNetworkExample() {
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Icon(Lucide.Lock, modifier = Modifier.size(16.dp), tint = DarwinTheme.colors.textSecondary)
-                        Icon(Lucide.Wifi, modifier = Modifier.size(16.dp), tint = DarwinTheme.colors.textSecondary)
-                        Icon(Lucide.CircleEllipsis, modifier = Modifier.size(18.dp), tint = DarwinTheme.colors.textSecondary)
+                        Icon(Lucide.Lock, modifier = Modifier.size(16.dp), tint = DarwinTheme.colorScheme.textSecondary)
+                        Icon(Lucide.Wifi, modifier = Modifier.size(16.dp), tint = DarwinTheme.colorScheme.textSecondary)
+                        Icon(Lucide.CircleEllipsis, modifier = Modifier.size(18.dp), tint = DarwinTheme.colorScheme.textSecondary)
                     }
                 },
             ) {
-                Text(name, style = DarwinTheme.typography.bodyMedium, color = DarwinTheme.colors.textPrimary)
+                Text(name, style = DarwinTheme.typography.subheadline, color = DarwinTheme.colorScheme.textPrimary)
             }
         }
     }
@@ -63,12 +63,12 @@ fun GroupedListSettingsExample() {
         GroupedListItem(
             trailing = { Switch(checked = wifi, onCheckedChange = { wifi = it }) },
         ) {
-            Text("Wi-Fi", style = DarwinTheme.typography.bodyMedium, color = DarwinTheme.colors.textPrimary)
+            Text("Wi-Fi", style = DarwinTheme.typography.subheadline, color = DarwinTheme.colorScheme.textPrimary)
         }
         GroupedListItem(
             trailing = { Switch(checked = bluetooth, onCheckedChange = { bluetooth = it }) },
         ) {
-            Text("Bluetooth", style = DarwinTheme.typography.bodyMedium, color = DarwinTheme.colors.textPrimary)
+            Text("Bluetooth", style = DarwinTheme.typography.subheadline, color = DarwinTheme.colorScheme.textPrimary)
         }
         GroupedListItem(
             onClick = {},
@@ -78,12 +78,12 @@ fun GroupedListSettingsExample() {
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text("System Preferences", style = DarwinTheme.typography.bodyMedium, color = DarwinTheme.colors.textTertiary)
-                    Icon(Lucide.ChevronRight, modifier = Modifier.size(16.dp), tint = DarwinTheme.colors.textTertiary)
+                    Text("System Preferences", style = DarwinTheme.typography.subheadline, color = DarwinTheme.colorScheme.textTertiary)
+                    Icon(Lucide.ChevronRight, modifier = Modifier.size(16.dp), tint = DarwinTheme.colorScheme.textTertiary)
                 }
             },
         ) {
-            Text("VPN", style = DarwinTheme.typography.bodyMedium, color = DarwinTheme.colors.textPrimary)
+            Text("VPN", style = DarwinTheme.typography.subheadline, color = DarwinTheme.colorScheme.textPrimary)
         }
     }
 }
@@ -104,8 +104,8 @@ fun GroupedListInfoExample() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(key, style = DarwinTheme.typography.bodyMedium, color = DarwinTheme.colors.textPrimary, modifier = Modifier.weight(1f))
-                    Text(value, style = DarwinTheme.typography.bodyMedium, color = DarwinTheme.colors.textTertiary)
+                    Text(key, style = DarwinTheme.typography.subheadline, color = DarwinTheme.colorScheme.textPrimary, modifier = Modifier.weight(1f))
+                    Text(value, style = DarwinTheme.typography.subheadline, color = DarwinTheme.colorScheme.textTertiary)
                 }
             }
         }

@@ -51,12 +51,12 @@ fun TitleBar(
     navigationActions: @Composable RowScope.() -> Unit = {},
     title: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
-    backgroundColor: Color = DarwinTheme.colors.background,
+    backgroundColor: Color = DarwinTheme.colorScheme.background,
     showBottomBorder: Boolean = true,
     glass: Boolean = false,
     height: Int = 52
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val borderColor = if (isDark) Color.Black.copy(alpha = 0.5f) else Color.Black.copy(alpha = 0.1f)
 
     // Automatically transparent when inside a DarwinScaffold (glass provided by scaffold)
@@ -133,7 +133,7 @@ fun TitleBarButtonGroup(
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit,
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val toolbarGlassState = LocalToolbarGlassState.current
     val fallbackBg = if (isDark) Color.White.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.50f)
 
@@ -164,7 +164,7 @@ fun TitleBarGroupButton(
     contentPadding: PaddingValues = PaddingValues(horizontal = 8.dp),
     content: @Composable () -> Unit,
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -190,7 +190,7 @@ fun TitleBarGroupButton(
 
     CompositionLocalProvider(
         LocalDarwinContentColor provides contentColor,
-        LocalDarwinTextStyle provides DarwinTheme.typography.labelMedium,
+        LocalDarwinTextStyle provides DarwinTheme.typography.caption1,
     ) {
         Box(
             modifier = modifier
@@ -217,7 +217,7 @@ fun TitleBarGroupButton(
  */
 @Composable
 fun TitleBarGroupDivider(modifier: Modifier = Modifier) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     Spacer(
         modifier = modifier
             .width(1.dp)

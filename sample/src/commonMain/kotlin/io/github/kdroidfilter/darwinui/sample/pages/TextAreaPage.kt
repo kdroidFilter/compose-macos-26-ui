@@ -36,8 +36,8 @@ fun TextAreaDefaultExample() {
         Row(modifier = Modifier.fillMaxWidth().padding(top = 4.dp, end = 2.dp), horizontalArrangement = Arrangement.End) {
             Text(
                 text = "${text.length}/$maxChars",
-                style = DarwinTheme.typography.bodySmall,
-                color = if (text.length >= maxChars) DarwinTheme.colors.destructive else DarwinTheme.colors.textTertiary,
+                style = DarwinTheme.typography.caption1,
+                color = if (text.length >= maxChars) DarwinTheme.colorScheme.destructive else DarwinTheme.colorScheme.textTertiary,
             )
         }
     }

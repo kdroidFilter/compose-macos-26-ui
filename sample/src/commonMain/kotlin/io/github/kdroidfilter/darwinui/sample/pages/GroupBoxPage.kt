@@ -38,7 +38,7 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
 @Composable
 private fun RadioButton(selected: Boolean, onClick: () -> Unit) {
-    val accent = DarwinTheme.colors.accent
+    val accent = DarwinTheme.colorScheme.accent
     Box(
         modifier = Modifier
             .size(18.dp)
@@ -69,8 +69,8 @@ private fun GroupBoxPreview() {
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Icon(if (darkMode) LucideMoon else LucideSun, modifier = Modifier.size(16.dp), tint = DarwinTheme.colors.textSecondary)
-                        Text("Dark Mode", style = DarwinTheme.typography.bodyMedium)
+                        Icon(if (darkMode) LucideMoon else LucideSun, modifier = Modifier.size(16.dp), tint = DarwinTheme.colorScheme.textSecondary)
+                        Text("Dark Mode", style = DarwinTheme.typography.subheadline)
                     }
                     Switch(checked = darkMode, onCheckedChange = { darkMode = it })
                 }
@@ -79,7 +79,7 @@ private fun GroupBoxPreview() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text("Follow system", style = DarwinTheme.typography.bodyMedium)
+                    Text("Follow system", style = DarwinTheme.typography.subheadline)
                     Switch(checked = autoTheme, onCheckedChange = { autoTheme = it })
                 }
             }
@@ -92,8 +92,8 @@ private fun GroupBoxPreview() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text("Size", style = DarwinTheme.typography.bodySmall, color = DarwinTheme.colors.textTertiary)
-                    Text("${size.toInt()}pt", style = DarwinTheme.typography.bodySmall, color = DarwinTheme.colors.textTertiary)
+                    Text("Size", style = DarwinTheme.typography.caption1, color = DarwinTheme.colorScheme.textTertiary)
+                    Text("${size.toInt()}pt", style = DarwinTheme.typography.caption1, color = DarwinTheme.colorScheme.textTertiary)
                 }
                 Slider(value = size, onValueChange = { size = it }, valueRange = 10f..24f)
             }
@@ -115,7 +115,7 @@ fun GroupBoxSwitchesExample() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Allow notifications", style = DarwinTheme.typography.bodyMedium)
+                Text("Allow notifications", style = DarwinTheme.typography.subheadline)
                 Switch(checked = notifications, onCheckedChange = { notifications = it })
             }
             Row(
@@ -123,7 +123,7 @@ fun GroupBoxSwitchesExample() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Sounds", style = DarwinTheme.typography.bodyMedium)
+                Text("Sounds", style = DarwinTheme.typography.subheadline)
                 Switch(checked = sounds, onCheckedChange = { sounds = it })
             }
             Row(
@@ -131,7 +131,7 @@ fun GroupBoxSwitchesExample() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Badges", style = DarwinTheme.typography.bodyMedium)
+                Text("Badges", style = DarwinTheme.typography.subheadline)
                 Switch(checked = badges, onCheckedChange = { badges = it })
             }
         }
@@ -171,7 +171,7 @@ fun GroupBoxRadioExample() {
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     RadioButton(selected = selected == option, onClick = { selected = option })
-                    Text(option, style = DarwinTheme.typography.bodyMedium)
+                    Text(option, style = DarwinTheme.typography.subheadline)
                 }
             }
         }
@@ -213,7 +213,7 @@ fun GroupBoxPreferencesPanelExample() {
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         RadioButton(selected = theme == t, onClick = { theme = t })
-                        Text(t, style = DarwinTheme.typography.bodyMedium)
+                        Text(t, style = DarwinTheme.typography.subheadline)
                     }
                 }
             }
@@ -226,7 +226,7 @@ fun GroupBoxPreferencesPanelExample() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text("Auto Save", style = DarwinTheme.typography.bodyMedium)
+                    Text("Auto Save", style = DarwinTheme.typography.subheadline)
                     Switch(checked = autoSave, onCheckedChange = { autoSave = it })
                 }
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -234,8 +234,8 @@ fun GroupBoxPreferencesPanelExample() {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Text("Font Size", style = DarwinTheme.typography.bodyMedium)
-                        Text("${fontSize.toInt()}px", style = DarwinTheme.typography.bodySmall, color = DarwinTheme.colors.textTertiary)
+                        Text("Font Size", style = DarwinTheme.typography.subheadline)
+                        Text("${fontSize.toInt()}px", style = DarwinTheme.typography.caption1, color = DarwinTheme.colorScheme.textTertiary)
                     }
                     Slider(value = fontSize, onValueChange = { fontSize = it }, valueRange = 10f..24f)
                 }

@@ -40,21 +40,21 @@ fun TabsDefaultExample() {
         TabsContent(value = "account") {
             Card {
                 CardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    Text("Account settings and profile information.", color = DarwinTheme.colors.textSecondary)
+                    Text("Account settings and profile information.", color = DarwinTheme.colorScheme.textSecondary)
                 }
             }
         }
         TabsContent(value = "settings") {
             Card {
                 CardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    Text("Application preferences and configuration.", color = DarwinTheme.colors.textSecondary)
+                    Text("Application preferences and configuration.", color = DarwinTheme.colorScheme.textSecondary)
                 }
             }
         }
         TabsContent(value = "notifications") {
             Card {
                 CardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    Text("Notification preferences and history.", color = DarwinTheme.colors.textSecondary)
+                    Text("Notification preferences and history.", color = DarwinTheme.colorScheme.textSecondary)
                 }
             }
         }
@@ -74,21 +74,21 @@ fun TabsSmallExample() {
         TabsContent(value = "account") {
             Card {
                 CardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    Text("Account settings and profile information.", color = DarwinTheme.colors.textSecondary)
+                    Text("Account settings and profile information.", color = DarwinTheme.colorScheme.textSecondary)
                 }
             }
         }
         TabsContent(value = "settings") {
             Card {
                 CardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    Text("Application preferences and configuration.", color = DarwinTheme.colors.textSecondary)
+                    Text("Application preferences and configuration.", color = DarwinTheme.colorScheme.textSecondary)
                 }
             }
         }
         TabsContent(value = "notifications") {
             Card {
                 CardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    Text("Notification preferences and history.", color = DarwinTheme.colors.textSecondary)
+                    Text("Notification preferences and history.", color = DarwinTheme.colorScheme.textSecondary)
                 }
             }
         }
@@ -108,21 +108,21 @@ fun TabsLargeExample() {
         TabsContent(value = "search") {
             Card {
                 CardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    Text("Search across all your content.", color = DarwinTheme.colors.textSecondary)
+                    Text("Search across all your content.", color = DarwinTheme.colorScheme.textSecondary)
                 }
             }
         }
         TabsContent(value = "favorites") {
             Card {
                 CardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    Text("Your starred and bookmarked items.", color = DarwinTheme.colors.textSecondary)
+                    Text("Your starred and bookmarked items.", color = DarwinTheme.colorScheme.textSecondary)
                 }
             }
         }
         TabsContent(value = "settings") {
             Card {
                 CardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    Text("Manage your preferences.", color = DarwinTheme.colors.textSecondary)
+                    Text("Manage your preferences.", color = DarwinTheme.colorScheme.textSecondary)
                 }
             }
         }
@@ -142,21 +142,21 @@ fun TabsWithIconsExample() {
         TabsContent(value = "search") {
             Card {
                 CardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    Text("Search across all your content.", color = DarwinTheme.colors.textSecondary)
+                    Text("Search across all your content.", color = DarwinTheme.colorScheme.textSecondary)
                 }
             }
         }
         TabsContent(value = "favorites") {
             Card {
                 CardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    Text("Your starred and bookmarked items.", color = DarwinTheme.colors.textSecondary)
+                    Text("Your starred and bookmarked items.", color = DarwinTheme.colorScheme.textSecondary)
                 }
             }
         }
         TabsContent(value = "settings") {
             Card {
                 CardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    Text("Manage your preferences.", color = DarwinTheme.colors.textSecondary)
+                    Text("Manage your preferences.", color = DarwinTheme.colorScheme.textSecondary)
                 }
             }
         }

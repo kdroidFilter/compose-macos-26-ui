@@ -69,29 +69,29 @@ fun ComparisonSection(
                     .fillMaxWidth()
                     .padding(top = 8.dp)
                     .clip(DarwinTheme.shapes.large)
-                    .border(1.dp, DarwinTheme.colors.border, DarwinTheme.shapes.large)
-                    .background(DarwinTheme.colors.card),
+                    .border(1.dp, DarwinTheme.colorScheme.border, DarwinTheme.shapes.large)
+                    .background(DarwinTheme.colorScheme.card),
             ) {
                 // Toggle header
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { expanded = !expanded }
-                        .background(DarwinTheme.colors.backgroundSubtle)
+                        .background(DarwinTheme.colorScheme.backgroundSubtle)
                         .padding(horizontal = 16.dp, vertical = 10.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = "Darwin Code",
-                        style = DarwinTheme.typography.labelMedium,
+                        style = DarwinTheme.typography.caption1,
                         fontWeight = FontWeight.SemiBold,
-                        color = DarwinTheme.colors.textSecondary,
+                        color = DarwinTheme.colorScheme.textSecondary,
                     )
                     Text(
                         text = if (expanded) "Hide" else "Show",
-                        style = DarwinTheme.typography.labelSmall,
-                        color = DarwinTheme.colors.textTertiary,
+                        style = DarwinTheme.typography.caption2,
+                        color = DarwinTheme.colorScheme.textTertiary,
                     )
                 }
 
@@ -105,7 +105,7 @@ fun ComparisonSection(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(DarwinTheme.colors.border)
+                                .background(DarwinTheme.colorScheme.border)
                                 .defaultMinSize(minHeight = 1.dp),
                         )
                         Box(modifier = Modifier.padding(12.dp)) {
@@ -127,28 +127,28 @@ private fun ComparisonPane(
     Column(
         modifier = modifier
             .clip(DarwinTheme.shapes.large)
-            .border(1.dp, DarwinTheme.colors.border, DarwinTheme.shapes.large)
-            .background(DarwinTheme.colors.card),
+            .border(1.dp, DarwinTheme.colorScheme.border, DarwinTheme.shapes.large)
+            .background(DarwinTheme.colorScheme.card),
     ) {
         // Header
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(DarwinTheme.colors.backgroundSubtle)
+                .background(DarwinTheme.colorScheme.backgroundSubtle)
                 .padding(horizontal = 16.dp, vertical = 10.dp),
         ) {
             Text(
                 text = title,
-                style = DarwinTheme.typography.labelMedium,
+                style = DarwinTheme.typography.caption1,
                 fontWeight = FontWeight.SemiBold,
-                color = DarwinTheme.colors.textSecondary,
+                color = DarwinTheme.colorScheme.textSecondary,
             )
         }
         // Separator
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(DarwinTheme.colors.border)
+                .background(DarwinTheme.colorScheme.border)
                 .defaultMinSize(minHeight = 1.dp),
         )
         // Content

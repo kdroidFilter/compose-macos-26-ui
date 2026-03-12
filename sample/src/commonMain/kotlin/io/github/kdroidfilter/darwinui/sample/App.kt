@@ -218,12 +218,12 @@ fun App() {
                                         text = "Darwin UI",
                                         fontSize = 18.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = DarwinTheme.colors.textPrimary,
+                                        color = DarwinTheme.colorScheme.textPrimary,
                                     )
                                     Text(
                                         text = "Component Docs",
-                                        style = DarwinTheme.typography.bodySmall,
-                                        color = DarwinTheme.colors.textTertiary,
+                                        style = DarwinTheme.typography.caption1,
+                                        color = DarwinTheme.colorScheme.textTertiary,
                                     )
                                 }
                                 IconButton(onClick = { sidebarVisible = false }) {
@@ -266,9 +266,9 @@ fun App() {
                                 ) {
                                     Text(
                                         text = "Accent Color",
-                                        style = DarwinTheme.typography.labelMedium,
+                                        style = DarwinTheme.typography.caption1,
                                         fontWeight = FontWeight.SemiBold,
-                                        color = DarwinTheme.colors.textSecondary,
+                                        color = DarwinTheme.colorScheme.textSecondary,
                                     )
                                     AccentColorPicker(
                                         selected = accentColor,
@@ -276,9 +276,9 @@ fun App() {
                                     )
                                     Text(
                                         text = "Sidebar Icon Size",
-                                        style = DarwinTheme.typography.labelMedium,
+                                        style = DarwinTheme.typography.caption1,
                                         fontWeight = FontWeight.SemiBold,
-                                        color = DarwinTheme.colors.textSecondary,
+                                        color = DarwinTheme.colorScheme.textSecondary,
                                     )
                                     SegmentedControl(
                                         options = listOf("S", "M", "L"),
@@ -397,7 +397,7 @@ private fun AccentColorPicker(
     ) {
         AccentColor.entries.filter { it != AccentColor.Teal }.forEach { color ->
             val isSelected = color == selected
-            val displayColor = if (DarwinTheme.colors.isDark) color.dark else color.light
+            val displayColor = if (DarwinTheme.colorScheme.isDark) color.dark else color.light
             Box(
                 modifier = Modifier
                     .size(20.dp)
@@ -405,7 +405,7 @@ private fun AccentColorPicker(
                     .background(displayColor, CircleShape)
                     .then(
                         if (isSelected) {
-                            Modifier.border(2.dp, DarwinTheme.colors.textPrimary, CircleShape)
+                            Modifier.border(2.dp, DarwinTheme.colorScheme.textPrimary, CircleShape)
                         } else {
                             Modifier
                         }

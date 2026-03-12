@@ -196,7 +196,7 @@ fun RadioButton(
             Spacer(modifier = Modifier.width(8.dp))
             BasicText(
                 text = label,
-                style = DarwinTheme.typography.bodyMedium.merge(
+                style = DarwinTheme.typography.subheadline.merge(
                     TextStyle(color = DarwinTheme.colorScheme.textPrimary, fontSize = 13.sp)
                 ),
             )

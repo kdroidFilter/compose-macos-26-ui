@@ -66,7 +66,7 @@ import io.github.kdroidfilter.darwinui.theme.darwinTween
 @Composable
 fun DarwinScaffold(
     modifier: Modifier = Modifier,
-    containerColor: Color = DarwinTheme.colors.background,
+    containerColor: Color = DarwinTheme.colorScheme.background,
     sidebarVisible: Boolean = true,
     onSidebarVisibleChange: ((Boolean) -> Unit)? = null,
     sidebar: (@Composable () -> Unit)? = null,
@@ -82,7 +82,7 @@ fun DarwinScaffold(
     // Reuse the root liquid state from DarwinTheme for button-level glass
     val rootLiquidState = LocalDarwinLiquidState.current
 
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val glassTint = if (isDark) Color.Black.copy(alpha = 0.15f)
                     else Color.White.copy(alpha = 0.15f)
 

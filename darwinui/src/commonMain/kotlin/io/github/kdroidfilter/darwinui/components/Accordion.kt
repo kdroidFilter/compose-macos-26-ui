@@ -149,7 +149,7 @@ fun AccordionItem(
     trigger: @Composable () -> Unit,
     content: @Composable () -> Unit,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val borderColor = colors.border
 
     val backgroundColor = Color.Transparent
@@ -207,7 +207,7 @@ fun AccordionTrigger(
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
 
     val interactionSource = remember { MutableInteractionSource() }
@@ -223,7 +223,7 @@ fun AccordionTrigger(
     // Hover: textTertiary (zinc-500) gives clear contrast from textPrimary in both themes
     val textColor = if (isHovered) colors.textTertiary else colors.textPrimary
 
-    val textStyle = typography.bodyMedium.merge(
+    val textStyle = typography.subheadline.merge(
         TextStyle(
             color = textColor,
             fontWeight = FontWeight.Medium,
@@ -306,10 +306,10 @@ fun AccordionContent(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
 
-    val textStyle = typography.bodySmall.merge(
+    val textStyle = typography.caption1.merge(
         TextStyle(color = colors.textSecondary)
     )
 

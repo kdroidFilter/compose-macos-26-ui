@@ -48,11 +48,11 @@ object ProgressRingSize {
 
 @Composable
 private fun variantColor(variant: ProgressVariant): Color = when (variant) {
-    ProgressVariant.Default -> DarwinTheme.colors.accent
+    ProgressVariant.Default -> DarwinTheme.colorScheme.accent
     ProgressVariant.Success -> Emerald500
     ProgressVariant.Warning -> Amber500
     ProgressVariant.Danger -> Red500
-    ProgressVariant.Gradient -> DarwinTheme.colors.accent
+    ProgressVariant.Gradient -> DarwinTheme.colorScheme.accent
 }
 
 private fun gradientBrush(width: Float): Brush = Brush.linearGradient(
@@ -73,7 +73,7 @@ fun LinearProgress(
     showValue: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
 
     val trackColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 
@@ -167,7 +167,7 @@ fun LinearProgress(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "$percentage%",
-                style = DarwinTheme.typography.labelSmall,
+                style = DarwinTheme.typography.caption2,
                 color = if (isDark) Zinc400 else Zinc600,
                 textAlign = TextAlign.End,
                 modifier = Modifier.fillMaxWidth(),
@@ -193,9 +193,9 @@ fun ProgressRing(
     modifier: Modifier = Modifier,
     size: Dp = ProgressRingSize.Medium,
     width: Dp = size * 3 / 32,
-    color: Color = DarwinTheme.colors.accent,
+    color: Color = DarwinTheme.colorScheme.accent,
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val trackColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 
     val targetFraction = progress.coerceIn(0f, 1f)
@@ -258,9 +258,9 @@ fun ProgressRing(
     modifier: Modifier = Modifier,
     size: Dp = ProgressRingSize.Medium,
     width: Dp = size * 3 / 32,
-    color: Color = DarwinTheme.colors.accent,
+    color: Color = DarwinTheme.colorScheme.accent,
 ) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val trackColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 
     val infiniteTransition = rememberInfiniteTransition(label = "circular_indeterminate")
@@ -331,8 +331,8 @@ fun ProgressRing(
 fun LinearProgressIndicator(
     progress: () -> Float,
     modifier: Modifier = Modifier,
-    color: Color = DarwinTheme.colors.accent,
-    trackColor: Color = if (DarwinTheme.colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
+    color: Color = DarwinTheme.colorScheme.accent,
+    trackColor: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
     strokeCap: androidx.compose.ui.graphics.StrokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
 ) {
     LinearProgress(
@@ -348,8 +348,8 @@ fun LinearProgressIndicator(
 @Composable
 fun LinearProgressIndicator(
     modifier: Modifier = Modifier,
-    color: Color = DarwinTheme.colors.accent,
-    trackColor: Color = if (DarwinTheme.colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
+    color: Color = DarwinTheme.colorScheme.accent,
+    trackColor: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
     strokeCap: androidx.compose.ui.graphics.StrokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
 ) {
     LinearProgress(indeterminate = true, modifier = modifier)
@@ -362,9 +362,9 @@ fun LinearProgressIndicator(
 fun CircularProgressIndicator(
     progress: () -> Float,
     modifier: Modifier = Modifier,
-    color: Color = DarwinTheme.colors.accent,
+    color: Color = DarwinTheme.colorScheme.accent,
     strokeWidth: Dp = 4.dp,
-    trackColor: Color = if (DarwinTheme.colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
+    trackColor: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
     strokeCap: androidx.compose.ui.graphics.StrokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
 ) {
     ProgressRing(progress = progress(), color = color, modifier = modifier)
@@ -376,9 +376,9 @@ fun CircularProgressIndicator(
 @Composable
 fun CircularProgressIndicator(
     modifier: Modifier = Modifier,
-    color: Color = DarwinTheme.colors.accent,
+    color: Color = DarwinTheme.colorScheme.accent,
     strokeWidth: Dp = 4.dp,
-    trackColor: Color = if (DarwinTheme.colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
+    trackColor: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
     strokeCap: androidx.compose.ui.graphics.StrokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
 ) {
     ProgressRing(color = color, modifier = modifier)

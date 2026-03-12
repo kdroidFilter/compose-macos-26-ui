@@ -8,11 +8,9 @@ import io.github.fletchmckee.liquid.liquefiable
 import io.github.fletchmckee.liquid.rememberLiquidState
 
 /**
- * Darwin UI Theme — a macOS-inspired design system for Compose Multiplatform.
- * The API mirrors Material3's MaterialTheme for familiarity.
+ * Darwin UI Theme — macOS-inspired design system for Compose Multiplatform.
  *
- * @param liquidGlass When true, overlay components (dialogs, menus, popovers) render with a
- *   frosted backdrop blur effect using Cloudy. Disable to fall back to opaque surfaces.
+ * @param liquidGlass When true, overlay components render with a frosted backdrop blur effect.
  *
  * Usage:
  * ```
@@ -29,19 +27,26 @@ fun DarwinTheme(
     typography: DarwinTypography = DarwinTypography(),
     shapes: DarwinShapes = DarwinShapes(),
     animations: DarwinAnimations = DarwinAnimations(),
+    globalMetrics: GlobalMetrics = GlobalMetrics(),
+    componentStyling: ComponentStyling = defaultComponentStyling(colorScheme),
     liquidGlass: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     val manrope = ManropeFontFamily()
     val resolvedTypography = typography.withFontFamily(manrope)
     val liquidState = rememberLiquidState()
+    val accentColorValue = if (darkTheme) accentColor.dark else accentColor.light
+    val globalColors = if (darkTheme) GlobalColors.dark(accentColorValue) else GlobalColors.light(accentColorValue)
 
     CompositionLocalProvider(
         LocalDarwinColors provides colorScheme,
         LocalDarwinTypography provides resolvedTypography,
         LocalDarwinShapes provides shapes,
         LocalDarwinAnimations provides animations,
-        LocalDarwinTextStyle provides resolvedTypography.bodyMedium,
+        LocalDarwinGlobalColors provides globalColors,
+        LocalDarwinGlobalMetrics provides globalMetrics,
+        LocalDarwinComponentStyling provides componentStyling,
+        LocalDarwinTextStyle provides resolvedTypography.body,
         LocalDarwinContentColor provides colorScheme.textPrimary,
         LocalDarwinLiquidState provides if (liquidGlass) liquidState else null,
     ) {
@@ -64,12 +69,6 @@ object DarwinTheme {
         @ReadOnlyComposable
         get() = LocalDarwinColors.current
 
-    /** Backward-compatible alias for [colorScheme]. */
-    val colors: ColorScheme
-        @Composable
-        @ReadOnlyComposable
-        get() = colorScheme
-
     val typography: DarwinTypography
         @Composable
         @ReadOnlyComposable
@@ -84,4 +83,22 @@ object DarwinTheme {
         @Composable
         @ReadOnlyComposable
         get() = LocalDarwinAnimations.current
+
+    /** Global semantic colors: borders, outline rings, semantic content tints. */
+    val globalColors: GlobalColors
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalDarwinGlobalColors.current
+
+    /** Global sizing metrics shared across all components. */
+    val globalMetrics: GlobalMetrics
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalDarwinGlobalMetrics.current
+
+    /** Default styles for all Darwin UI components. */
+    val componentStyling: ComponentStyling
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalDarwinComponentStyling.current
 }

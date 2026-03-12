@@ -44,11 +44,11 @@ fun TextArea(
     focusRequester: FocusRequester = remember { FocusRequester() },
     textStyle: TextStyle? = null,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
     val shapes = DarwinTheme.shapes
 
-    val resolvedTextStyle = textStyle ?: typography.bodyMedium.copy(color = colors.textPrimary)
+    val resolvedTextStyle = textStyle ?: typography.subheadline.copy(color = colors.textPrimary)
     val mergedTextStyle = resolvedTextStyle.copy(
         color = if (enabled) resolvedTextStyle.color else colors.textTertiary,
     )
@@ -100,7 +100,7 @@ fun TextArea(
         if (label != null) {
             androidx.compose.foundation.text.BasicText(
                 text = label,
-                style = typography.labelMedium.copy(
+                style = typography.caption1.copy(
                     color = when {
                         isError -> colors.destructive
                         else -> colors.textSecondary
@@ -148,7 +148,7 @@ fun TextArea(
                     if (value.isEmpty() && placeholder.isNotEmpty()) {
                         androidx.compose.foundation.text.BasicText(
                             text = placeholder,
-                            style = typography.bodyMedium.copy(
+                            style = typography.subheadline.copy(
                                 color = colors.textTertiary,
                             ),
                         )
@@ -162,7 +162,7 @@ fun TextArea(
         if (supportingText != null) {
             androidx.compose.foundation.text.BasicText(
                 text = supportingText,
-                style = typography.bodySmall.copy(
+                style = typography.caption1.copy(
                     color = when {
                         isError -> colors.destructive
                         isSuccess -> colors.success

@@ -83,7 +83,7 @@ private data class BadgeColors(
 
 @Composable
 private fun resolveColors(variant: BadgeVariant): BadgeColors {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
 
     val subtleBg = if (isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f)
     val zincText = if (isDark) Zinc300 else Zinc700
@@ -191,7 +191,7 @@ fun Badge(
     val badgeColors = resolveColors(variant)
     val shape = DarwinTheme.shapes.full // rounded-full
 
-    val textStyle = DarwinTheme.typography.labelSmall.merge(
+    val textStyle = DarwinTheme.typography.caption2.merge(
         TextStyle(color = badgeColors.text)
     )
 
@@ -234,8 +234,8 @@ fun Badge(
 @Composable
 fun Badge(
     modifier: Modifier = Modifier,
-    containerColor: Color = DarwinTheme.colors.destructive,
-    contentColor: Color = DarwinTheme.colors.onDestructive,
+    containerColor: Color = DarwinTheme.colorScheme.destructive,
+    contentColor: Color = DarwinTheme.colorScheme.onDestructive,
     content: (@Composable () -> Unit)? = null,
 ) {
     val shape = DarwinTheme.shapes.full
@@ -247,7 +247,7 @@ fun Badge(
                 .size(8.dp),
         )
     } else {
-        val textStyle = DarwinTheme.typography.labelSmall.merge(TextStyle(color = contentColor))
+        val textStyle = DarwinTheme.typography.caption2.merge(TextStyle(color = contentColor))
         Box(
             modifier = modifier
                 .clip(shape)

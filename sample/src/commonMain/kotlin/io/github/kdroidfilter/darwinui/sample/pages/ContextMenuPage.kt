@@ -39,7 +39,7 @@ fun ContextMenuDefaultExample() {
                     .fillMaxWidth()
                     .border(
                         width = 1.dp,
-                        color = DarwinTheme.colors.border,
+                        color = DarwinTheme.colorScheme.border,
                         shape = DarwinTheme.shapes.large,
                     )
                     .clip(DarwinTheme.shapes.large)
@@ -48,8 +48,8 @@ fun ContextMenuDefaultExample() {
             ) {
                 Text(
                     text = "Right-click here to open context menu",
-                    style = DarwinTheme.typography.bodyMedium,
-                    color = DarwinTheme.colors.mutedForeground,
+                    style = DarwinTheme.typography.subheadline,
+                    color = DarwinTheme.colorScheme.mutedForeground,
                 )
             }
         },
@@ -72,7 +72,7 @@ fun ContextMenuWithIconsExample() {
                     .fillMaxWidth()
                     .border(
                         width = 1.dp,
-                        color = DarwinTheme.colors.border,
+                        color = DarwinTheme.colorScheme.border,
                         shape = DarwinTheme.shapes.large,
                     )
                     .clip(DarwinTheme.shapes.large)
@@ -81,8 +81,8 @@ fun ContextMenuWithIconsExample() {
             ) {
                 Text(
                     text = "Right-click here to open context menu",
-                    style = DarwinTheme.typography.bodyMedium,
-                    color = DarwinTheme.colors.mutedForeground,
+                    style = DarwinTheme.typography.subheadline,
+                    color = DarwinTheme.colorScheme.mutedForeground,
                 )
             }
         },

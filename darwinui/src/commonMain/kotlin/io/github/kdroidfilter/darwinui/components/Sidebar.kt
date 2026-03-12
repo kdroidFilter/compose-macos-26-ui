@@ -165,7 +165,7 @@ fun Sidebar(
     header: (@Composable () -> Unit)? = null,
     pinnedItems: List<SidebarItem> = emptyList(),
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val isDark = colors.isDark
 
     val hasGroups = remember(items) { items.any { it.group != null } }
@@ -405,7 +405,7 @@ private fun SidebarItemWithVisibility(
 @Composable
 private fun GroupHeader(text: String, isCollapsed: Boolean, sidebarIconSize: SidebarIconSize = SidebarIconSize.Medium) {
     val typography = DarwinTheme.typography
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
 
     val alpha by animateFloatAsState(
         targetValue = if (isCollapsed) 0f else 1f,
@@ -424,7 +424,7 @@ private fun GroupHeader(text: String, isCollapsed: Boolean, sidebarIconSize: Sid
     ) {
         Text(
             text = text,
-            style = typography.labelSmall,
+            style = typography.caption2,
             color = colors.textTertiary,
             modifier = Modifier.padding(start = sidebarIconSize.hPadding, end = 8.dp, top = 12.dp, bottom = 2.dp),
         )
@@ -452,7 +452,7 @@ private fun SidebarItemRow(
     iconModifier: Modifier = Modifier,
     iconContentDescription: String? = null,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
 
     val interactionSource = remember { MutableInteractionSource() }
@@ -486,9 +486,9 @@ private fun SidebarItemRow(
     val labelAlpha = 1f - collapseFraction
 
     val textStyle = when (sidebarIconSize) {
-        SidebarIconSize.Small -> typography.bodySmall
-        SidebarIconSize.Medium -> typography.bodyMedium
-        SidebarIconSize.Large -> typography.bodyLarge
+        SidebarIconSize.Small -> typography.caption1
+        SidebarIconSize.Medium -> typography.subheadline
+        SidebarIconSize.Large -> typography.callout
     }
 
     Row(

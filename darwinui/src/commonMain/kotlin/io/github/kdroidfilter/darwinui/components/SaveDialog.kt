@@ -111,7 +111,7 @@ fun SaveDialog(
             onDismissRequest = onDismissRequest,
             properties = PopupProperties(focusable = true),
         ) {
-            val colors = DarwinTheme.colors
+            val colors = DarwinTheme.colorScheme
             val isDark = colors.isDark
             val scrimColor = if (isDark) Color.Black.copy(alpha = 0.50f) else Color.Black.copy(alpha = 0.30f)
 
@@ -200,7 +200,7 @@ private fun SaveDialogContent(
     size: DialogSize,
     modifier: Modifier,
 ) {
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val isDark = colors.isDark
 
     val shape = RoundedCornerShape(16.dp)
@@ -231,7 +231,7 @@ private fun SaveDialogContent(
         ) {
             Text(
                 text = title,
-                style = DarwinTheme.typography.titleMedium,
+                style = DarwinTheme.typography.subheadline,
                 color = colors.textPrimary,
                 textAlign = TextAlign.Center,
             )
@@ -239,7 +239,7 @@ private fun SaveDialogContent(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = message,
-                    style = DarwinTheme.typography.bodySmall,
+                    style = DarwinTheme.typography.caption1,
                     color = colors.textSecondary,
                     textAlign = TextAlign.Center,
                 )
@@ -327,8 +327,8 @@ private fun SaveDialogRow(
     ) {
         Text(
             text = label,
-            style = DarwinTheme.typography.bodySmall,
-            color = DarwinTheme.colors.textTertiary,
+            style = DarwinTheme.typography.caption1,
+            color = DarwinTheme.colorScheme.textTertiary,
             textAlign = TextAlign.End,
             modifier = Modifier.width(SaveDialogLabelWidth),
         )

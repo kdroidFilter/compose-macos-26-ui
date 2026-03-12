@@ -59,7 +59,7 @@ fun ButtonDisclosureExample() {
             Text(if (expanded) "Collapse" else "Expand")
         }
         if (expanded) {
-            Text("Hidden content revealed after toggle.", color = DarwinTheme.colors.textSecondary)
+            Text("Hidden content revealed after toggle.", color = DarwinTheme.colorScheme.textSecondary)
         }
     }
 }

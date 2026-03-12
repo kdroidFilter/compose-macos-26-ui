@@ -57,25 +57,25 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 @Composable
 fun FormLeadingAccessoryExample() {
     var selectedRadio by remember { mutableStateOf(1) }
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
 
     GroupedList {
         // Title only
         GroupedListItem {
-            Text("Title only", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Title only", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Subtitle only
         GroupedListItem {
-            Text("Subtitle only", style = typography.bodySmall, color = colors.textSecondary)
+            Text("Subtitle only", style = typography.caption1, color = colors.textSecondary)
         }
 
         // Subtitle + Subtitle
         GroupedListItem {
             Column {
-                Text("Subtitle", style = typography.bodySmall, color = colors.textSecondary)
-                Text("Subtitle", style = typography.bodySmall, color = colors.textSecondary)
+                Text("Subtitle", style = typography.caption1, color = colors.textSecondary)
+                Text("Subtitle", style = typography.caption1, color = colors.textSecondary)
             }
         }
 
@@ -84,11 +84,11 @@ fun FormLeadingAccessoryExample() {
             Column {
                 Text(
                     "Title",
-                    style = typography.bodyMedium,
+                    style = typography.subheadline,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.textPrimary,
                 )
-                Text("Subtitle", style = typography.bodySmall, color = colors.textSecondary)
+                Text("Subtitle", style = typography.caption1, color = colors.textSecondary)
             }
         }
 
@@ -98,14 +98,14 @@ fun FormLeadingAccessoryExample() {
                 Icon(Lucide.Copy, modifier = Modifier.size(20.dp), tint = colors.textSecondary)
             },
         ) {
-            Text("Title + Symbol", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Title + Symbol", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Title + Image
         GroupedListItem(
             leading = { CheckeredImage(size = 28.dp) },
         ) {
-            Text("Title + Image", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Title + Image", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Title + Large icon
@@ -116,7 +116,7 @@ fun FormLeadingAccessoryExample() {
                 }
             },
         ) {
-            Text("Title + Large icon", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Title + Large icon", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Title + Icon
@@ -127,7 +127,7 @@ fun FormLeadingAccessoryExample() {
                 }
             },
         ) {
-            Text("Title + Icon", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Title + Icon", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Disclosure
@@ -136,7 +136,7 @@ fun FormLeadingAccessoryExample() {
                 Icon(Lucide.ChevronRight, modifier = Modifier.size(16.dp), tint = colors.textSecondary)
             },
         ) {
-            Text("Disclosure", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Disclosure", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Disclosure + Title + Subtitle
@@ -148,17 +148,17 @@ fun FormLeadingAccessoryExample() {
             Column {
                 Text(
                     "Disclosure + Title + Subtitle",
-                    style = typography.bodyMedium,
+                    style = typography.subheadline,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.textPrimary,
                 )
-                Text("Subtitle", style = typography.bodySmall, color = colors.textSecondary)
+                Text("Subtitle", style = typography.caption1, color = colors.textSecondary)
             }
         }
 
         // Radio button group
         GroupedListItem {
-            Text("Radio button group", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Radio button group", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Radio button group + subtitle
@@ -166,11 +166,11 @@ fun FormLeadingAccessoryExample() {
             Column {
                 Text(
                     "Radio button group + subtitle",
-                    style = typography.bodyMedium,
+                    style = typography.subheadline,
                     fontWeight = FontWeight.SemiBold,
                     color = colors.textPrimary,
                 )
-                Text("Subtitle", style = typography.bodySmall, color = colors.textSecondary)
+                Text("Subtitle", style = typography.caption1, color = colors.textSecondary)
             }
         }
 
@@ -179,7 +179,7 @@ fun FormLeadingAccessoryExample() {
             onClick = { selectedRadio = 0 },
             leading = { RadioButton(selected = selectedRadio == 0, onClick = { selectedRadio = 0 }) },
         ) {
-            Text("This is a very long radio label", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("This is a very long radio label", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Radio option 2
@@ -188,7 +188,7 @@ fun FormLeadingAccessoryExample() {
             showDivider = false,
             leading = { RadioButton(selected = selectedRadio == 1, onClick = { selectedRadio = 1 }) },
         ) {
-            Text("This is a very long radio label", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("This is a very long radio label", style = typography.subheadline, color = colors.textPrimary)
         }
     }
 }
@@ -207,7 +207,7 @@ fun FormTrailingAccessoryExample() {
     var selectedRadio by remember { mutableStateOf(0) }
     var comboBoxSelection by remember { mutableStateOf(0) }
 
-    val colors = DarwinTheme.colors
+    val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
 
     val stepperText = remember(stepperValue) {
@@ -219,9 +219,9 @@ fun FormTrailingAccessoryExample() {
     GroupedList {
         // Label
         GroupedListItem(
-            trailing = { Text("Label", style = typography.bodyMedium, color = colors.textSecondary) },
+            trailing = { Text("Label", style = typography.subheadline, color = colors.textSecondary) },
         ) {
-            Text("Label", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Label", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Info
@@ -232,21 +232,21 @@ fun FormTrailingAccessoryExample() {
                 }
             },
         ) {
-            Text("Info", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Info", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Popup
         GroupedListItem(
             trailing = { PulldownButton(text = "Label", onClick = {}) },
         ) {
-            Text("Popup", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Popup", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Toggle
         GroupedListItem(
             trailing = { Switch(checked = toggleState, onCheckedChange = { toggleState = it }) },
         ) {
-            Text("Toggle", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Toggle", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Info Button + Toggle
@@ -263,7 +263,7 @@ fun FormTrailingAccessoryExample() {
                 }
             },
         ) {
-            Text("Info Button + Toggle", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Info Button + Toggle", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Label + Info Button
@@ -273,14 +273,14 @@ fun FormTrailingAccessoryExample() {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Text("Label", style = typography.bodyMedium, color = colors.textSecondary)
+                    Text("Label", style = typography.subheadline, color = colors.textSecondary)
                     IconButton(onClick = {}, size = 20.dp) {
                         Icon(LucideInfo, modifier = Modifier.size(16.dp), tint = colors.textSecondary)
                     }
                 }
             },
         ) {
-            Text("Label + Info Button", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Label + Info Button", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Stepper
@@ -304,7 +304,7 @@ fun FormTrailingAccessoryExample() {
                 }
             },
         ) {
-            Text("Stepper", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Stepper", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Stepper + Label
@@ -325,11 +325,11 @@ fun FormTrailingAccessoryExample() {
                         onIncrement = { stepperValue++ },
                         onDecrement = { if (stepperValue > 0) stepperValue-- },
                     )
-                    Text("seconds", style = typography.bodySmall, color = colors.textSecondary)
+                    Text("seconds", style = typography.caption1, color = colors.textSecondary)
                 }
             },
         ) {
-            Text("Stepper + Label", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Stepper + Label", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Text Field
@@ -344,7 +344,7 @@ fun FormTrailingAccessoryExample() {
                 )
             },
         ) {
-            Text("Text Field", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Text Field", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Radio buttons
@@ -367,7 +367,7 @@ fun FormTrailingAccessoryExample() {
                 }
             },
         ) {
-            Text("Radio buttons", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Radio buttons", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // More button
@@ -378,7 +378,7 @@ fun FormTrailingAccessoryExample() {
                 }
             },
         ) {
-            Text("More button", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("More button", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Combo Box
@@ -392,7 +392,7 @@ fun FormTrailingAccessoryExample() {
                 )
             },
         ) {
-            Text("Combo Box", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Combo Box", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Menu + Button
@@ -407,7 +407,7 @@ fun FormTrailingAccessoryExample() {
                 }
             },
         ) {
-            Text("Menu + Button", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Menu + Button", style = typography.subheadline, color = colors.textPrimary)
         }
 
         // Button
@@ -415,7 +415,7 @@ fun FormTrailingAccessoryExample() {
             showDivider = false,
             trailing = { PushButton(text = "Advanced...", onClick = {}) },
         ) {
-            Text("Button", style = typography.bodyMedium, color = colors.textPrimary)
+            Text("Button", style = typography.subheadline, color = colors.textPrimary)
         }
     }
 }
@@ -426,7 +426,7 @@ fun FormTrailingAccessoryExample() {
 
 @Composable
 private fun CheckeredImage(size: Dp) {
-    val isDark = DarwinTheme.colors.isDark
+    val isDark = DarwinTheme.colorScheme.isDark
     val darkSquare = if (isDark) Color(0xFF555555) else Color(0xFFCCCCCC)
     val lightSquare = if (isDark) Color(0xFF333333) else Color.White
 
@@ -451,7 +451,7 @@ private fun CheckeredImage(size: Dp) {
 
 @Composable
 private fun AppIconBox(size: Dp, content: @Composable () -> Unit) {
-    val bgColor = if (DarwinTheme.colors.isDark) {
+    val bgColor = if (DarwinTheme.colorScheme.isDark) {
         Color.White.copy(alpha = 0.08f)
     } else {
         Color.Black.copy(alpha = 0.05f)

@@ -179,7 +179,7 @@ fun CardTitle(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
 
 @Composable
 fun CardDescription(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    val style = DarwinTheme.typography.bodyMedium.merge(
+    val style = DarwinTheme.typography.subheadline.merge(
         TextStyle(color = DarwinTheme.colorScheme.mutedForeground)
     )
     CompositionLocalProvider(LocalDarwinTextStyle provides style) {
