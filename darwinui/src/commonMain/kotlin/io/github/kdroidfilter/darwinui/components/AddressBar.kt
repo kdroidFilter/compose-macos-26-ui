@@ -2,6 +2,7 @@ package io.github.kdroidfilter.darwinui.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -20,10 +21,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -70,18 +75,45 @@ fun AddressBar(
     val colors = DarwinTheme.colors
     val typography = DarwinTheme.typography
     val isDark = colors.isDark
+    val accentColor = colors.accent
+
+    var isFocused by remember { mutableStateOf(false) }
 
     val shape = DarwinTheme.shapes.full
-    val bgColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.055f)
+
+    val bgColor by animateColorAsState(
+        targetValue = when {
+            isFocused -> if (isDark) Color.White.copy(alpha = 0.12f) else Color.Black.copy(alpha = 0.03f)
+            else -> if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.055f)
+        },
+        animationSpec = darwinTween(DarwinDuration.Normal),
+        label = "address_bg",
+    )
+
+    val ringColor by animateColorAsState(
+        targetValue = if (isFocused) accentColor.copy(alpha = 0.4f) else Color.Transparent,
+        animationSpec = darwinTween(DarwinDuration.Normal),
+        label = "address_ring",
+    )
+
     val textColor = colors.textPrimary
     val placeholderColor = colors.textTertiary
     val iconColor = colors.textTertiary
 
     Row(
         modifier = modifier
+            .onFocusChanged { isFocused = it.hasFocus }
             .height(28.dp)
+            .shadow(
+                elevation = if (isFocused) 4.dp else 0.dp,
+                shape = shape,
+                clip = false,
+                ambientColor = accentColor.copy(alpha = 0.25f),
+                spotColor = accentColor.copy(alpha = 0.25f),
+            )
             .clip(shape)
             .background(bgColor, shape)
+            .border(1.5.dp, ringColor, shape)
             .padding(horizontal = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

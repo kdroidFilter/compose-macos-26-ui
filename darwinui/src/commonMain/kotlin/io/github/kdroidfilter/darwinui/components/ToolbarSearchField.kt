@@ -177,7 +177,7 @@ private fun ExpandedField(
 
     val shape = DarwinTheme.shapes.full
     val bgColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.055f)
-    val ringColor = colors.ring.copy(alpha = 0.5f)
+    val ringColor = colors.accent.copy(alpha = 0.4f)
     val textColor = colors.textPrimary
     val placeholderColor = colors.textTertiary
     val iconColor = colors.textTertiary
@@ -198,6 +198,13 @@ private fun ExpandedField(
                 modifier = Modifier
                     .width(expandedWidth)
                     .height(28.dp)
+                    .shadow(
+                        elevation = 4.dp,
+                        shape = shape,
+                        clip = false,
+                        ambientColor = colors.accent.copy(alpha = 0.25f),
+                        spotColor = colors.accent.copy(alpha = 0.25f),
+                    )
                     .clip(shape)
                     .background(bgColor, shape)
                     .border(1.5.dp, ringColor, shape)
