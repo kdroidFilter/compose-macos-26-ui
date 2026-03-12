@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.HorizontalScrollbar
 import io.github.kdroidfilter.darwinui.components.Text
+import io.github.kdroidfilter.darwinui.components.TrackClickBehavior
 import io.github.kdroidfilter.darwinui.components.VerticalScrollbar
 import io.github.kdroidfilter.darwinui.components.rememberScrollbarState
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
@@ -114,6 +115,94 @@ fun ScrollbarLazyVerticalExample() {
     }
 }
 
+@GalleryExample("Scrollbar", "Track Click — Jump")
+@Composable
+fun ScrollbarTrackJumpExample() {
+    val scrollState = rememberScrollState()
+    val scrollbarState = rememberScrollbarState(scrollState)
+
+    Box(modifier = Modifier.height(160.dp).fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth()
+                .verticalScroll(scrollState)
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            repeat(20) { i ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(28.dp)
+                        .background(
+                            DarwinTheme.colorScheme.textPrimary.copy(alpha = 0.04f),
+                            DarwinTheme.shapes.small,
+                        ),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    Text(
+                        text = "Item ${i + 1}",
+                        style = DarwinTheme.typography.subheadline,
+                        color = DarwinTheme.colorScheme.textPrimary,
+                        modifier = Modifier.padding(horizontal = 10.dp),
+                    )
+                }
+            }
+        }
+
+        VerticalScrollbar(
+            state = scrollbarState,
+            modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+            trackClickBehavior = TrackClickBehavior.Jump,
+        )
+    }
+}
+
+@GalleryExample("Scrollbar", "Track Click — Seek")
+@Composable
+fun ScrollbarTrackSeekExample() {
+    val scrollState = rememberScrollState()
+    val scrollbarState = rememberScrollbarState(scrollState)
+
+    Box(modifier = Modifier.height(160.dp).fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth()
+                .verticalScroll(scrollState)
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            repeat(20) { i ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(28.dp)
+                        .background(
+                            DarwinTheme.colorScheme.textPrimary.copy(alpha = 0.04f),
+                            DarwinTheme.shapes.small,
+                        ),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    Text(
+                        text = "Item ${i + 1}",
+                        style = DarwinTheme.typography.subheadline,
+                        color = DarwinTheme.colorScheme.textPrimary,
+                        modifier = Modifier.padding(horizontal = 10.dp),
+                    )
+                }
+            }
+        }
+
+        VerticalScrollbar(
+            state = scrollbarState,
+            modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+            trackClickBehavior = TrackClickBehavior.Seek,
+        )
+    }
+}
+
 @GalleryExample("Scrollbar", "Horizontal")
 @Composable
 fun ScrollbarHorizontalExample() {
@@ -173,6 +262,18 @@ internal fun ScrollbarPage() {
             description = "Overlay vertical scrollbar with LazyListState",
             sourceCode = GallerySources.ScrollbarLazyVerticalExample,
         ) { ScrollbarLazyVerticalExample() }
+
+        SectionHeader("Track Click Behavior")
+        ExampleCard(
+            title = "Jump (default)",
+            description = "Click on track scrolls one viewport toward the click position",
+            sourceCode = GallerySources.ScrollbarTrackJumpExample,
+        ) { ScrollbarTrackJumpExample() }
+        ExampleCard(
+            title = "Seek",
+            description = "Click on track seeks directly to the clicked position",
+            sourceCode = GallerySources.ScrollbarTrackSeekExample,
+        ) { ScrollbarTrackSeekExample() }
 
         SectionHeader("Horizontal")
         ExampleCard(

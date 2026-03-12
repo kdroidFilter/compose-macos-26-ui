@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Constraints
@@ -292,7 +293,10 @@ private fun DarwinScrollbarImpl(
             .pointerInput(state, isVertical, trackClickBehavior) {
                 if (trackClickBehavior == TrackClickBehavior.None) return@pointerInput
                 awaitEachGesture {
-                    val down = awaitFirstDown(requireUnconsumed = false)
+                    // PointerEventPass.Final: the underlying scrollable composable processes
+                    // scroll (wheel) events on the Main pass first. By using Final, this
+                    // handler only runs after that — so mouse-wheel scrolling is never blocked.
+                    val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Final)
                     val clickPos = if (isVertical) down.position.y else down.position.x
                     val minPx = THUMB_MIN_LENGTH.toPx()
                     val (thumbLen, thumbOff) = computeThumb(

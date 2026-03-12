@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -43,6 +44,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
+import io.github.kdroidfilter.darwinui.components.VerticalScrollbar
+import io.github.kdroidfilter.darwinui.components.TrackClickBehavior
+import io.github.kdroidfilter.darwinui.components.rememberScrollbarState
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideChevronsLeft
@@ -162,6 +166,7 @@ fun Sidebar(
     onCollapsedChange: ((Boolean) -> Unit)? = null,
     collapsible: Boolean = false,
     showBorder: Boolean = false,
+    scrollbarTrackClickBehavior: TrackClickBehavior = TrackClickBehavior.Jump,
     header: (@Composable () -> Unit)? = null,
     pinnedItems: List<SidebarItem> = emptyList(),
 ) {
@@ -249,19 +254,33 @@ fun Sidebar(
             }
 
             // ---- Scrollable items ----
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 4.dp, vertical = 2.dp),
-                verticalArrangement = Arrangement.spacedBy(iconSize.itemSpacing),
-            ) {
-                if (hasGroups && groupedItems != null) {
-                    for ((group, groupItems) in groupedItems) {
-                        if (group != null) {
-                            GroupHeader(text = group, isCollapsed = collapsed, sidebarIconSize = iconSize)
+            val itemsScrollState = rememberScrollState()
+            Box(modifier = Modifier.weight(1f)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(itemsScrollState)
+                        .padding(horizontal = 4.dp, vertical = 2.dp),
+                    verticalArrangement = Arrangement.spacedBy(iconSize.itemSpacing),
+                ) {
+                    if (hasGroups && groupedItems != null) {
+                        for ((group, groupItems) in groupedItems) {
+                            if (group != null) {
+                                GroupHeader(text = group, isCollapsed = collapsed, sidebarIconSize = iconSize)
+                            }
+                            groupItems.forEach { item ->
+                                key(item.id) {
+                                    SidebarItemWithVisibility(
+                                        item = item,
+                                        activeItem = activeItem,
+                                        collapsed = collapsed,
+                                        sidebarIconSize = iconSize,
+                                    )
+                                }
+                            }
                         }
-                        groupItems.forEach { item ->
+                    } else {
+                        items.forEach { item ->
                             key(item.id) {
                                 SidebarItemWithVisibility(
                                     item = item,
@@ -272,18 +291,13 @@ fun Sidebar(
                             }
                         }
                     }
-                } else {
-                    items.forEach { item ->
-                        key(item.id) {
-                            SidebarItemWithVisibility(
-                                item = item,
-                                activeItem = activeItem,
-                                collapsed = collapsed,
-                                sidebarIconSize = iconSize,
-                            )
-                        }
-                    }
                 }
+
+                VerticalScrollbar(
+                    state = rememberScrollbarState(itemsScrollState),
+                    modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+                    trackClickBehavior = scrollbarTrackClickBehavior,
+                )
             }
 
             // ---- Bottom section ----

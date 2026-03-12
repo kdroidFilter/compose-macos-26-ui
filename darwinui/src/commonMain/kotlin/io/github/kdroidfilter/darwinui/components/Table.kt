@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -28,6 +30,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -43,7 +46,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.darwinui.components.HorizontalScrollbar
 import io.github.kdroidfilter.darwinui.components.Text
+import io.github.kdroidfilter.darwinui.components.TrackClickBehavior
+import io.github.kdroidfilter.darwinui.components.VerticalScrollbar
+import io.github.kdroidfilter.darwinui.components.rememberScrollbarState
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
@@ -63,33 +70,71 @@ import io.github.kdroidfilter.darwinui.theme.darwinTween
  */
 enum class TableLayout { Fluid, Scroll }
 
+// Shared vertical scroll state provided by Table(Scroll) to TableBody
+private val LocalTableVerticalScrollState = compositionLocalOf<ScrollState?> { null }
+
 // ==================== Table ====================
 
 @Composable
 fun Table(
     modifier: Modifier = Modifier,
     layout: TableLayout = TableLayout.Fluid,
+    scrollbarTrackClickBehavior: TrackClickBehavior = TrackClickBehavior.Jump,
     content: @Composable () -> Unit,
 ) {
     val shape = DarwinTheme.shapes.large
     val backgroundColor = DarwinTheme.colorScheme.card
     val borderColor = DarwinTheme.colorScheme.borderSubtle
 
-    val containerModifier = when (layout) {
-        TableLayout.Fluid -> modifier
-            .fillMaxWidth()
-            .clip(shape)
-            .background(backgroundColor, shape)
-            .border(width = 1.dp, color = borderColor, shape = shape)
-        TableLayout.Scroll -> modifier
-            .clip(shape)
-            .background(backgroundColor, shape)
-            .border(width = 1.dp, color = borderColor, shape = shape)
-            .horizontalScroll(rememberScrollState())
-    }
+    when (layout) {
+        TableLayout.Fluid -> {
+            Column(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .clip(shape)
+                    .background(backgroundColor, shape)
+                    .border(width = 1.dp, color = borderColor, shape = shape),
+            ) {
+                content()
+            }
+        }
+        TableLayout.Scroll -> {
+            val hScrollState = rememberScrollState()
+            val vScrollState = rememberScrollState()
 
-    Column(modifier = containerModifier) {
-        content()
+            Column(
+                modifier = modifier
+                    .clip(shape)
+                    .background(backgroundColor, shape)
+                    .border(width = 1.dp, color = borderColor, shape = shape),
+            ) {
+                // Scrollable content area (weight=1 fills remaining height after H scrollbar)
+                Box(modifier = Modifier.weight(1f)) {
+                    // Horizontally scrollable column containing head + body
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .horizontalScroll(hScrollState),
+                    ) {
+                        CompositionLocalProvider(LocalTableVerticalScrollState provides vScrollState) {
+                            content()
+                        }
+                    }
+                    // Vertical scrollbar — sibling of the horizontal scroll column,
+                    // so it stays pinned at the right edge regardless of H scroll position.
+                    VerticalScrollbar(
+                        state = rememberScrollbarState(vScrollState),
+                        modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+                        trackClickBehavior = scrollbarTrackClickBehavior,
+                    )
+                }
+                HorizontalScrollbar(
+                    state = rememberScrollbarState(hScrollState),
+                    modifier = Modifier.fillMaxWidth(),
+                    trackClickBehavior = scrollbarTrackClickBehavior,
+                )
+            }
+        }
     }
 }
 
@@ -144,8 +189,12 @@ fun TableBody(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
+    // Use the scroll state provided by Table(Scroll) if available, otherwise own state
+    val inheritedScrollState = LocalTableVerticalScrollState.current
+    val scrollState = inheritedScrollState ?: rememberScrollState()
+
     val scrollModifier = if (scrollable) {
-        Modifier.verticalScroll(rememberScrollState())
+        Modifier.verticalScroll(scrollState)
     } else {
         Modifier
     }
