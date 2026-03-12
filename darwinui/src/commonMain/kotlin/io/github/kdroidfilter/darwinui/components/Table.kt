@@ -70,8 +70,12 @@ import io.github.kdroidfilter.darwinui.theme.darwinTween
  */
 enum class TableLayout { Fluid, Scroll }
 
-// Shared vertical scroll state provided by Table(Scroll) to TableBody
-private val LocalTableVerticalScrollState = compositionLocalOf<ScrollState?> { null }
+// Scroll config shared from Table(Scroll) to TableBody via CompositionLocal
+private data class TableScrollConfig(
+    val verticalScrollState: ScrollState,
+    val trackClickBehavior: TrackClickBehavior,
+)
+private val LocalTableScrollConfig = compositionLocalOf<TableScrollConfig?> { null }
 
 // ==================== Table ====================
 
@@ -101,6 +105,7 @@ fun Table(
         TableLayout.Scroll -> {
             val hScrollState = rememberScrollState()
             val vScrollState = rememberScrollState()
+            val scrollConfig = TableScrollConfig(vScrollState, scrollbarTrackClickBehavior)
 
             Column(
                 modifier = modifier
@@ -108,25 +113,16 @@ fun Table(
                     .background(backgroundColor, shape)
                     .border(width = 1.dp, color = borderColor, shape = shape),
             ) {
-                // Scrollable content area (weight=1 fills remaining height after H scrollbar)
-                Box(modifier = Modifier.weight(1f)) {
-                    // Horizontally scrollable column containing head + body
-                    Column(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .horizontalScroll(hScrollState),
-                    ) {
-                        CompositionLocalProvider(LocalTableVerticalScrollState provides vScrollState) {
-                            content()
-                        }
+                // Horizontally scrollable content (head + body).
+                // VerticalScrollbar is rendered inside TableBody to align with the body area only.
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .horizontalScroll(hScrollState),
+                ) {
+                    CompositionLocalProvider(LocalTableScrollConfig provides scrollConfig) {
+                        content()
                     }
-                    // Vertical scrollbar — sibling of the horizontal scroll column,
-                    // so it stays pinned at the right edge regardless of H scroll position.
-                    VerticalScrollbar(
-                        state = rememberScrollbarState(vScrollState),
-                        modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
-                        trackClickBehavior = scrollbarTrackClickBehavior,
-                    )
                 }
                 HorizontalScrollbar(
                     state = rememberScrollbarState(hScrollState),
@@ -189,9 +185,8 @@ fun TableBody(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    // Use the scroll state provided by Table(Scroll) if available, otherwise own state
-    val inheritedScrollState = LocalTableVerticalScrollState.current
-    val scrollState = inheritedScrollState ?: rememberScrollState()
+    val config = LocalTableScrollConfig.current
+    val scrollState = config?.verticalScrollState ?: rememberScrollState()
 
     val scrollModifier = if (scrollable) {
         Modifier.verticalScroll(scrollState)
@@ -199,12 +194,31 @@ fun TableBody(
         Modifier
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .then(scrollModifier),
-    ) {
-        content()
+    // When inside Table(Scroll), wrap with Box to overlay a VerticalScrollbar
+    // aligned with the body area only (not the header).
+    if (config != null && scrollable) {
+        Box {
+            Column(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .then(scrollModifier),
+            ) {
+                content()
+            }
+            VerticalScrollbar(
+                state = rememberScrollbarState(scrollState),
+                modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+                trackClickBehavior = config.trackClickBehavior,
+            )
+        }
+    } else {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .then(scrollModifier),
+        ) {
+            content()
+        }
     }
 }
 

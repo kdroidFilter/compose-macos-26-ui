@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.drag
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
@@ -291,40 +292,62 @@ private fun DarwinScrollbarImpl(
             )
             .hoverable(trackInteraction)
             .pointerInput(state, isVertical, trackClickBehavior) {
-                if (trackClickBehavior == TrackClickBehavior.None) return@pointerInput
-                awaitEachGesture {
-                    // PointerEventPass.Final: the underlying scrollable composable processes
-                    // scroll (wheel) events on the Main pass first. By using Final, this
-                    // handler only runs after that — so mouse-wheel scrolling is never blocked.
-                    val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Final)
-                    val clickPos = if (isVertical) down.position.y else down.position.x
-                    val minPx = THUMB_MIN_LENGTH.toPx()
-                    val (thumbLen, thumbOff) = computeThumb(
-                        trackSizePx = trackSizePx.toFloat(),
-                        scrollOffset = state.scrollOffsetPx,
-                        maxScroll = state.maxScrollPx,
-                        minLength = minPx,
-                    )
-                    // Only act if the click lands outside the thumb
-                    val isOutsideThumb = clickPos < thumbOff || clickPos > thumbOff + thumbLen
-                    if (isOutsideThumb && trackSizePx > 0) {
-                        when (trackClickBehavior) {
-                            TrackClickBehavior.Seek -> {
-                                val ratio = (clickPos / trackSizePx).coerceIn(0f, 1f)
-                                scope.launch {
-                                    state.scrollTo(ratio * state.maxScrollPx)
+                // Manual event loop instead of awaitEachGesture — we need to
+                // explicitly forward scroll (wheel) events to the scroll state,
+                // otherwise the overlay scrollbar blocks mouse-wheel scrolling
+                // on the 12dp track area that overlaps with the scrollable content.
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent()
+                        when (event.type) {
+                            PointerEventType.Scroll -> {
+                                val delta = event.changes.fold(0f) { acc, c ->
+                                    acc + if (isVertical) c.scrollDelta.y else c.scrollDelta.x
+                                }
+                                if (delta != 0f) {
+                                    cancelHide()
+                                    showThumb = true
+                                    scope.launch {
+                                        state.scrollTo(
+                                            (state.scrollOffsetPx + delta).coerceIn(0f, state.maxScrollPx),
+                                        )
+                                    }
+                                    scheduleHide()
+                                    event.changes.forEach { it.consume() }
                                 }
                             }
-                            TrackClickBehavior.Jump -> {
-                                val direction = if (clickPos < thumbOff) -1f else 1f
-                                scope.launch {
-                                    state.scrollTo(
-                                        (state.scrollOffsetPx + direction * trackSizePx)
-                                            .coerceIn(0f, state.maxScrollPx),
-                                    )
+                            PointerEventType.Press -> {
+                                if (trackClickBehavior == TrackClickBehavior.None) continue
+                                val down = event.changes.firstOrNull() ?: continue
+                                val clickPos = if (isVertical) down.position.y else down.position.x
+                                val minPx = THUMB_MIN_LENGTH.toPx()
+                                val (thumbLen, thumbOff) = computeThumb(
+                                    trackSizePx = trackSizePx.toFloat(),
+                                    scrollOffset = state.scrollOffsetPx,
+                                    maxScroll = state.maxScrollPx,
+                                    minLength = minPx,
+                                )
+                                val isOutsideThumb = clickPos < thumbOff || clickPos > thumbOff + thumbLen
+                                if (isOutsideThumb && trackSizePx > 0) {
+                                    when (trackClickBehavior) {
+                                        TrackClickBehavior.Seek -> {
+                                            val ratio = (clickPos / trackSizePx).coerceIn(0f, 1f)
+                                            scope.launch { state.scrollTo(ratio * state.maxScrollPx) }
+                                        }
+                                        TrackClickBehavior.Jump -> {
+                                            val direction = if (clickPos < thumbOff) -1f else 1f
+                                            scope.launch {
+                                                state.scrollTo(
+                                                    (state.scrollOffsetPx + direction * trackSizePx)
+                                                        .coerceIn(0f, state.maxScrollPx),
+                                                )
+                                            }
+                                        }
+                                        TrackClickBehavior.None -> Unit
+                                    }
                                 }
                             }
-                            TrackClickBehavior.None -> Unit
+                            else -> {} // Move, Enter, Exit, Release — handled by hoverable or thumb drag
                         }
                     }
                 }
