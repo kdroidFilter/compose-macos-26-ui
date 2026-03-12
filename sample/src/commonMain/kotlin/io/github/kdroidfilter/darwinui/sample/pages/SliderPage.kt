@@ -13,6 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.darwinui.components.CircularSlider
+import io.github.kdroidfilter.darwinui.components.CircularSliderSize
 import io.github.kdroidfilter.darwinui.components.Slider
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
@@ -61,11 +63,66 @@ fun SliderWithValueExample() {
     }
 }
 
+@GalleryExample("Slider", "Circular Knob")
+@Composable
+fun SliderCircularKnobExample() {
+    var value by remember { mutableStateOf(0.35f) }
+    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        CircularSlider(
+            value = value,
+            onValueChange = { value = it },
+            size = CircularSliderSize.Large,
+        )
+        Text(
+            text = "${(value * 100).toInt()}%",
+            style = DarwinTheme.typography.bodySmall,
+            color = DarwinTheme.colors.textTertiary,
+        )
+    }
+}
+
+@GalleryExample("Slider", "Circular Sizes")
+@Composable
+fun SliderCircularSizesExample() {
+    var small by remember { mutableStateOf(0.25f) }
+    var medium by remember { mutableStateOf(0.5f) }
+    var large by remember { mutableStateOf(0.75f) }
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            CircularSlider(value = small, onValueChange = { small = it }, size = CircularSliderSize.Small)
+            Text("S", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary)
+        }
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            CircularSlider(value = medium, onValueChange = { medium = it }, size = CircularSliderSize.Medium)
+            Text("M", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary)
+        }
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            CircularSlider(value = large, onValueChange = { large = it }, size = CircularSliderSize.Large)
+            Text("L", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary)
+        }
+    }
+}
+
 @Composable
 internal fun SliderPage() {
     GalleryPage("Slider", "An input where the user selects a value from within a given range.") {
-        SectionHeader("Examples")
+        SectionHeader("Linear")
         ExampleCard(title = "Volume", sourceCode = GallerySources.SliderVolumeExample) { SliderVolumeExample() }
         ExampleCard(title = "With Value Display", sourceCode = GallerySources.SliderWithValueExample) { SliderWithValueExample() }
+
+        SectionHeader("Circular")
+        ExampleCard(
+            title = "Circular Knob",
+            description = "macOS-style circular slider with rotating tick indicator",
+            sourceCode = GallerySources.SliderCircularKnobExample,
+        ) { SliderCircularKnobExample() }
+        ExampleCard(
+            title = "Sizes",
+            description = "Small (32dp), Medium (48dp), and Large (64dp) presets",
+            sourceCode = GallerySources.SliderCircularSizesExample,
+        ) { SliderCircularSizesExample() }
     }
 }
