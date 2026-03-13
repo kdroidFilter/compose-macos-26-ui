@@ -33,9 +33,11 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -44,9 +46,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -71,6 +78,49 @@ import io.github.kdroidfilter.darwinui.theme.Zinc500
 import io.github.kdroidfilter.darwinui.theme.Zinc700
 import io.github.kdroidfilter.darwinui.theme.Zinc900
 import io.github.kdroidfilter.darwinui.theme.darwinGlass
+
+// =============================================================================
+// Keyboard navigation state
+// =============================================================================
+
+internal class DropdownMenuKeyboardState {
+    var focusedIndex by mutableIntStateOf(-1)
+    private val items = mutableListOf<DropdownMenuItemRegistration>()
+
+    fun register(registration: DropdownMenuItemRegistration): Int {
+        val index = items.size
+        items.add(registration)
+        return index
+    }
+
+    fun moveFocus(delta: Int) {
+        if (items.isEmpty()) return
+        val enabledIndices = items.indices.filter { items[it].enabled }
+        if (enabledIndices.isEmpty()) return
+
+        val currentPos = enabledIndices.indexOf(focusedIndex)
+        val nextPos = when {
+            currentPos == -1 && delta > 0 -> 0
+            currentPos == -1 && delta < 0 -> enabledIndices.lastIndex
+            else -> (currentPos + delta).coerceIn(0, enabledIndices.lastIndex)
+        }
+        focusedIndex = enabledIndices[nextPos]
+    }
+
+    fun activateFocused() {
+        if (focusedIndex in items.indices && items[focusedIndex].enabled) {
+            items[focusedIndex].onClick()
+        }
+    }
+}
+
+internal data class DropdownMenuItemRegistration(
+    val enabled: Boolean,
+    val onClick: () -> Unit,
+)
+
+internal val LocalDropdownMenuKeyboardState =
+    compositionLocalOf<DropdownMenuKeyboardState?> { null }
 
 // =============================================================================
 // DropdownMenu — main component
@@ -107,6 +157,7 @@ fun DropdownMenu(
     val borderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 
     if (expanded) {
+        val keyboardState = remember { DropdownMenuKeyboardState() }
         Popup(
             offset = offset,
             onDismissRequest = onDismissRequest,
@@ -131,18 +182,42 @@ fun DropdownMenu(
             ) {
                 val scrollState = rememberScrollState()
 
-                Column(
-                    modifier = modifier
-                        .width(IntrinsicSize.Max)
-                        .widthIn(min = 180.dp)
-                        .shadow(elevation = 8.dp, shape = shapes.large)
-                        .darwinGlass(shape = shapes.large, fallbackColor = fallbackBg)
-                        .border(1.dp, borderColor, shapes.large)
-                        .heightIn(max = 360.dp)
-                        .verticalScroll(scrollState)
-                        .padding(vertical = 4.dp), // p-1 top/bottom
-                    content = content,
-                )
+                CompositionLocalProvider(LocalDropdownMenuKeyboardState provides keyboardState) {
+                    Column(
+                        modifier = modifier
+                            .onKeyEvent { event ->
+                                if (event.type != KeyEventType.KeyDown) return@onKeyEvent false
+                                when (event.key) {
+                                    Key.DirectionDown -> {
+                                        keyboardState.moveFocus(1)
+                                        true
+                                    }
+                                    Key.DirectionUp -> {
+                                        keyboardState.moveFocus(-1)
+                                        true
+                                    }
+                                    Key.Enter -> {
+                                        keyboardState.activateFocused()
+                                        true
+                                    }
+                                    Key.Escape -> {
+                                        onDismissRequest()
+                                        true
+                                    }
+                                    else -> false
+                                }
+                            }
+                            .width(IntrinsicSize.Max)
+                            .widthIn(min = 180.dp)
+                            .shadow(elevation = 8.dp, shape = shapes.large)
+                            .darwinGlass(shape = shapes.large, fallbackColor = fallbackBg)
+                            .border(1.dp, borderColor, shapes.large)
+                            .heightIn(max = 360.dp)
+                            .verticalScroll(scrollState)
+                            .padding(vertical = 4.dp), // p-1 top/bottom
+                        content = content,
+                    )
+                }
             }
         }
     }
@@ -180,18 +255,34 @@ fun DropdownMenuItem(
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
 
+    // Register for keyboard navigation
+    val keyboardState = LocalDropdownMenuKeyboardState.current
+    val itemIndex = remember {
+        keyboardState?.register(
+            DropdownMenuItemRegistration(enabled = enabled, onClick = onClick),
+        ) ?: -1
+    }
+    val isKeyboardFocused = keyboardState != null && keyboardState.focusedIndex == itemIndex
+
+    // Clear keyboard focus when mouse enters any item
+    if (isHovered && keyboardState != null && keyboardState.focusedIndex != -1) {
+        keyboardState.focusedIndex = -1
+    }
+
+    val isHighlighted = isHovered || isKeyboardFocused
+
     // Destructive: hover:bg-red-500/10
     val itemBackground = when {
         !enabled -> Color.Transparent
-        destructive && isHovered -> Red500.copy(alpha = 0.10f)
-        isHovered -> if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.05f)
+        destructive && isHighlighted -> Red500.copy(alpha = 0.10f)
+        isHighlighted -> if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.05f)
         else -> Color.Transparent
     }
 
     // Destructive: text-red-500 (always)
     val textColor = when {
         destructive -> Red500
-        isHovered -> if (isDark) Zinc100 else Zinc900
+        isHighlighted -> if (isDark) Zinc100 else Zinc900
         else -> if (isDark) Zinc300 else Zinc700
     }
 
