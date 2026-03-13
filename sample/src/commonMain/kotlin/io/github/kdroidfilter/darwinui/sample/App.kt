@@ -89,6 +89,7 @@ import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideMoon
 import io.github.kdroidfilter.darwinui.icons.LucideSettings
 import io.github.kdroidfilter.darwinui.icons.LucideSun
+import io.github.kdroidfilter.darwinui.sample.pages.AddressBarPage
 import io.github.kdroidfilter.darwinui.sample.pages.AccordionPage
 import io.github.kdroidfilter.darwinui.sample.pages.AlertPage
 import io.github.kdroidfilter.darwinui.sample.pages.AvatarPage
@@ -96,6 +97,8 @@ import io.github.kdroidfilter.darwinui.sample.pages.BadgePage
 import io.github.kdroidfilter.darwinui.sample.pages.ButtonPage
 import io.github.kdroidfilter.darwinui.sample.pages.CardPage
 import io.github.kdroidfilter.darwinui.sample.pages.CheckboxPage
+import io.github.kdroidfilter.darwinui.sample.pages.CircularSliderPage
+import io.github.kdroidfilter.darwinui.sample.pages.ComboBoxPage
 import io.github.kdroidfilter.darwinui.sample.pages.ColorWellPage
 import io.github.kdroidfilter.darwinui.sample.pages.ContextMenuPage
 import io.github.kdroidfilter.darwinui.sample.pages.DialogPage
@@ -113,7 +116,6 @@ import io.github.kdroidfilter.darwinui.sample.pages.ScaffoldPage
 import io.github.kdroidfilter.darwinui.sample.pages.ScrollbarPage
 import io.github.kdroidfilter.darwinui.sample.pages.SearchInputPage
 import io.github.kdroidfilter.darwinui.sample.pages.SegmentedControlPage
-import io.github.kdroidfilter.darwinui.sample.pages.SelectPage
 import io.github.kdroidfilter.darwinui.sample.pages.SidebarPage
 import io.github.kdroidfilter.darwinui.sample.pages.SkeletonPage
 import io.github.kdroidfilter.darwinui.sample.pages.SliderPage
@@ -138,10 +140,11 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("checkbox", "Checkbox", "FORM CONTROLS", Lucide.SquareCheck),
     SidebarEntryDef("radiobutton", "Radio Button", "FORM CONTROLS", Lucide.CircleDot),
     SidebarEntryDef("switch", "Switch", "FORM CONTROLS", Lucide.ToggleLeft),
-    SidebarEntryDef("select", "Select", "FORM CONTROLS", Lucide.ChevronsUpDown),
+    SidebarEntryDef("combobox", "Combo Box", "FORM CONTROLS", Lucide.ChevronsUpDown),
     SidebarEntryDef("multiselect", "Multi Select", "FORM CONTROLS", Lucide.ListChecks),
     SidebarEntryDef("searchinput", "Search Input", "FORM CONTROLS", Lucide.Search),
     SidebarEntryDef("slider", "Slider", "FORM CONTROLS", Lucide.SlidersHorizontal),
+    SidebarEntryDef("circularslider", "Circular Slider", "FORM CONTROLS", Lucide.Loader),
     SidebarEntryDef("colorwell", "Color Well", "FORM CONTROLS", Lucide.Scan),
     SidebarEntryDef("scrollbar", "Scrollbar", "DATA DISPLAY", Lucide.GripVertical),
     SidebarEntryDef("groupbox", "Group Box", "DATA DISPLAY", Lucide.SquareDashed),
@@ -165,6 +168,7 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("sidebar", "Sidebar", "NAVIGATION", LucidePanelLeft),
     SidebarEntryDef("segmentedcontrol", "Segmented Control", "NAVIGATION", Lucide.Columns3),
     SidebarEntryDef("titlebar", "Title Bar", "NAVIGATION", Lucide.PanelTopOpen),
+    SidebarEntryDef("addressbar", "Address Bar", "NAVIGATION", Lucide.Search),
     SidebarEntryDef("scaffold", "Scaffold", "NAVIGATION", LucidePanelLeft),
 )
 
@@ -367,9 +371,10 @@ fun App() {
                         "checkbox" -> CheckboxPage()
                         "radiobutton" -> RadioButtonPage()
                         "switch" -> SwitchPage()
-                        "select" -> SelectPage()
+                        "combobox" -> ComboBoxPage()
                         "multiselect" -> MultiSelectPage()
                         "slider" -> SliderPage()
+                        "circularslider" -> CircularSliderPage()
                         "scrollbar" -> ScrollbarPage()
                         "groupbox" -> GroupBoxPage()
                         "groupedlist" -> GroupedListPage()
@@ -392,6 +397,7 @@ fun App() {
                         "sidebar" -> SidebarPage()
                         "segmentedcontrol" -> SegmentedControlPage()
                         "titlebar" -> TitleBarPage()
+                        "addressbar" -> AddressBarPage()
                         "scaffold" -> ScaffoldPage()
                         "colorwell" -> ColorWellPage()
                     }

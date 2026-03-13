@@ -145,6 +145,47 @@ fun SidebarCollapsibleExample() {
     }
 }
 
+@GalleryExample("Sidebar", "Disclosure Groups")
+@Composable
+fun SidebarDisclosureExample() {
+    var active by remember { mutableStateOf("Inbox") }
+    val items = remember {
+        listOf(
+            SidebarItem(
+                "Mailboxes", onClick = {}, icon = LucideFolder, group = "Mail",
+                children = listOf(
+                    SidebarItem("Inbox", onClick = { active = "Inbox" }, icon = LucideStar),
+                    SidebarItem("Sent", onClick = { active = "Sent" }, icon = LucideCalendar),
+                    SidebarItem("Trash", onClick = { active = "Trash" }, icon = LucideTrash2),
+                ),
+            ),
+            SidebarItem(
+                "Smart Mailboxes", onClick = {}, icon = LucideSettings, group = "Mail",
+                children = listOf(
+                    SidebarItem("Unread", onClick = { active = "Unread" }, icon = LucideHome),
+                    SidebarItem("Flagged", onClick = { active = "Flagged" }, icon = LucideStar),
+                ),
+            ),
+            SidebarItem("Downloads", onClick = { active = "Downloads" }, icon = LucideDownload, group = "Locations"),
+            SidebarItem("Documents", onClick = { active = "Documents" }, icon = LucideFolder, group = "Locations"),
+        )
+    }
+    Card(modifier = Modifier.fillMaxWidth().height(350.dp)) {
+        Row(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.fillMaxHeight().background(DarwinTheme.colorScheme.muted)) {
+                Sidebar(
+                    items = items,
+                    activeItem = active,
+                )
+            }
+            Box(modifier = Modifier.width(1.dp).fillMaxHeight().background(DarwinTheme.colorScheme.border))
+            Box(modifier = Modifier.weight(1f).fillMaxHeight().padding(16.dp), contentAlignment = Alignment.Center) {
+                Text(text = "Selected: $active", color = DarwinTheme.colorScheme.textSecondary)
+            }
+        }
+    }
+}
+
 @Composable
 internal fun SidebarPage() {
     GalleryPage("Sidebar", "A macOS-style navigation sidebar with collapsible state.") {
@@ -155,5 +196,10 @@ internal fun SidebarPage() {
             description = "Sidebar with collapse toggle",
             sourceCode = GallerySources.SidebarCollapsibleExample,
         ) { SidebarCollapsibleExample() }
+        ExampleCard(
+            title = "Disclosure Groups",
+            description = "Sidebar with collapsible children using disclosure chevrons",
+            sourceCode = GallerySources.SidebarDisclosureExample,
+        ) { SidebarDisclosureExample() }
     }
 }
