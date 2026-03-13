@@ -6,19 +6,22 @@ import androidx.compose.foundation.ContextMenuRepresentation
 import androidx.compose.foundation.ContextMenuState
 import androidx.compose.foundation.LocalContextMenuRepresentation
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -33,6 +36,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.window.rememberPopupPositionProviderAtPosition
@@ -46,13 +50,8 @@ private class DarwinContextMenuRepresentation : ContextMenuRepresentation {
         val status = state.status
         if (status is ContextMenuState.Status.Open) {
             val colors = DarwinTheme.colorScheme
-            val shapes = DarwinTheme.shapes
-
-            val bgColor = if (colors.isDark) Zinc900.copy(alpha = 0.95f)
-            else Color.White.copy(alpha = 0.95f)
-            val borderColor = if (colors.isDark) Color.White.copy(alpha = 0.10f)
-            else Color.Black.copy(alpha = 0.10f)
-            val shape = shapes.large // rounded-xl = 12dp
+            val fallbackBg = if (colors.isDark) Color(0xFF262626) else Color(0xFFF5F5F5)
+            val menuShape = RoundedCornerShape(13.dp)
 
             val positionProvider = rememberPopupPositionProviderAtPosition(status.rect.center)
 
@@ -64,12 +63,15 @@ private class DarwinContextMenuRepresentation : ContextMenuRepresentation {
                 Column(
                     modifier = Modifier
                         .width(IntrinsicSize.Max)
-                        .widthIn(min = 180.dp) // min-w-45
-                        .shadow(elevation = 8.dp, shape = shape)
-                        .clip(shape)
-                        .background(bgColor, shape)
-                        .border(1.dp, borderColor, shape)
-                        .padding(vertical = 4.dp) // p-1 vertical
+                        .widthIn(min = 200.dp)
+                        .shadow(
+                            elevation = 25.dp,
+                            shape = menuShape,
+                            ambientColor = Color.Black.copy(alpha = 0.16f),
+                            spotColor = Color.Black.copy(alpha = 0.16f),
+                        )
+                        .darwinGlass(shape = menuShape, fallbackColor = fallbackBg)
+                        .padding(vertical = 5.dp)
                         .verticalScroll(rememberScrollState()),
                 ) {
                     items().forEach { item ->
@@ -94,28 +96,31 @@ private fun DarwinContextMenuItemRow(
     onClick: () -> Unit,
     colors: ColorScheme,
 ) {
+    val accentColor = colors.accent
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val isHighlighted = isHovered || isPressed
 
-    // hover:bg-black/10 dark:hover:bg-white/10
-    val itemBg = if (isHovered) {
-        if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
-    } else {
-        Color.Transparent
+    val itemBg = when {
+        isHighlighted -> accentColor
+        else -> Color.Transparent
     }
 
-    // text-zinc-700 dark:text-zinc-300 / hover:text-zinc-900 dark:hover:text-zinc-100
-    val textColor = if (isHovered) {
-        if (colors.isDark) Zinc100 else Zinc900
-    } else {
-        if (colors.isDark) Zinc300 else Zinc700
+    val textColor = when {
+        isHighlighted -> Color.White
+        else -> if (colors.isDark) Color.White.copy(alpha = 0.85f)
+        else Color(0xFF1A1A1A)
     }
+
+    val itemShape = RoundedCornerShape(12.dp)
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 4.dp) // p-1 horizontal
-            .clip(DarwinTheme.shapes.small) // rounded-lg = 8dp
+            .padding(horizontal = 5.dp)
+            .height(24.dp)
+            .clip(itemShape)
             .hoverable(interactionSource)
             .clickable(
                 interactionSource = interactionSource,
@@ -123,13 +128,15 @@ private fun DarwinContextMenuItemRow(
                 onClick = onClick,
             )
             .background(itemBg)
-            .padding(horizontal = 8.dp, vertical = 6.dp), // px-2 py-1.5
+            .padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         BasicText(
             text = label,
-            style = DarwinTheme.typography.subheadline.merge(
-                TextStyle(color = textColor)
+            style = TextStyle(
+                fontSize = 13.sp,
+                color = textColor,
+                letterSpacing = 0.sp,
             ),
         )
     }

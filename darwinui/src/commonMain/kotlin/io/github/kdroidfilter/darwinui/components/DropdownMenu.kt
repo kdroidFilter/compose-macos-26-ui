@@ -33,6 +33,8 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.text.TextStyle
@@ -56,6 +59,8 @@ import io.github.kdroidfilter.darwinui.components.PushButton
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideCheck
+import io.github.kdroidfilter.darwinui.icons.LucideChevronRight
+import kotlinx.coroutines.delay
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
 import io.github.kdroidfilter.darwinui.theme.Red500
@@ -91,6 +96,7 @@ fun DropdownMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
+    offset: IntOffset = IntOffset(0, 0),
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = DarwinTheme.colorScheme
@@ -102,7 +108,7 @@ fun DropdownMenu(
 
     if (expanded) {
         Popup(
-            offset = IntOffset(0, 0),
+            offset = offset,
             onDismissRequest = onDismissRequest,
             properties = PopupProperties(focusable = true),
         ) {
@@ -232,6 +238,165 @@ fun DropdownMenuItem(
         if (trailingContent != null) {
             Spacer(modifier = Modifier.width(8.dp))
             trailingContent()
+        }
+    }
+}
+
+// =============================================================================
+// Submenu parent signaling
+// =============================================================================
+
+/**
+ * CompositionLocal that allows a child submenu to signal its parent that it
+ * is still active (expanded), preventing the parent from closing while a
+ * descendant submenu is open.
+ */
+private val LocalParentSubmenuKeepAlive = compositionLocalOf<((Boolean) -> Unit)?> { null }
+
+// =============================================================================
+// DropdownMenuSubMenu
+// =============================================================================
+
+/**
+ * A menu item that opens a submenu to the right when hovered or clicked.
+ * Matches macOS native submenu behavior with a chevron-right indicator.
+ * Supports arbitrary nesting depth.
+ *
+ * @param enabled Whether the item is interactive.
+ * @param modifier Modifier applied to the item row.
+ * @param leadingIcon Optional composable displayed before the label.
+ * @param submenuContent The submenu content, using the same [ColumnScope] as [DropdownMenu].
+ * @param content The item label content.
+ */
+@Composable
+fun DropdownMenuSubMenu(
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    leadingIcon: (@Composable () -> Unit)? = null,
+    submenuContent: @Composable ColumnScope.() -> Unit,
+    content: @Composable () -> Unit,
+) {
+    val isDark = DarwinTheme.colorScheme.isDark
+    val typography = DarwinTheme.typography
+    val shapes = DarwinTheme.shapes
+
+    val triggerInteractionSource = remember { MutableInteractionSource() }
+    val isTriggerHovered by triggerInteractionSource.collectIsHoveredAsState()
+    val submenuInteractionSource = remember { MutableInteractionSource() }
+    val isSubmenuHovered by submenuInteractionSource.collectIsHoveredAsState()
+    var submenuExpanded by remember { mutableStateOf(false) }
+    var childActive by remember { mutableStateOf(false) }
+    var itemWidthPx by remember { mutableStateOf(0) }
+
+    // Signal parent that we're active
+    val parentKeepAlive = LocalParentSubmenuKeepAlive.current
+    LaunchedEffect(submenuExpanded) {
+        parentKeepAlive?.invoke(submenuExpanded)
+    }
+
+    val isAnyHovered = isTriggerHovered || isSubmenuHovered || childActive
+
+    // Open immediately on hover, close with delay only when nothing is hovered
+    LaunchedEffect(isAnyHovered) {
+        if (isAnyHovered && enabled) {
+            submenuExpanded = true
+        } else if (!isAnyHovered) {
+            delay(300)
+            submenuExpanded = false
+        }
+    }
+
+    val isActive = isTriggerHovered || submenuExpanded
+
+    val itemBackground = when {
+        !enabled -> Color.Transparent
+        isActive -> if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.05f)
+        else -> Color.Transparent
+    }
+
+    val textColor = when {
+        isActive -> if (isDark) Zinc100 else Zinc900
+        else -> if (isDark) Zinc300 else Zinc700
+    }
+
+    val contentStyle = typography.subheadline.merge(TextStyle(color = textColor))
+
+    // Callback for children to signal they're active
+    val keepAliveCallback = remember<(Boolean) -> Unit> { { active -> childActive = active } }
+
+    Box {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .onGloballyPositioned { itemWidthPx = it.size.width }
+                .padding(horizontal = 4.dp)
+                .clip(shapes.small)
+                .background(itemBackground, shapes.small)
+                .then(
+                    if (enabled) {
+                        Modifier
+                            .hoverable(triggerInteractionSource)
+                            .clickable(
+                                interactionSource = triggerInteractionSource,
+                                indication = null,
+                                onClick = { submenuExpanded = !submenuExpanded },
+                            )
+                    } else {
+                        Modifier
+                    }
+                )
+                .padding(horizontal = 8.dp, vertical = 6.dp)
+                .alpha(if (enabled) 1f else 0.5f),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start,
+        ) {
+            if (leadingIcon != null) {
+                leadingIcon()
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+
+            Box(modifier = Modifier.weight(1f)) {
+                CompositionLocalProvider(
+                    LocalDarwinTextStyle provides contentStyle,
+                ) {
+                    content()
+                }
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                LucideChevronRight,
+                modifier = Modifier.size(12.dp),
+                tint = if (isDark) Zinc400 else Zinc500,
+            )
+        }
+
+        if (submenuExpanded) {
+            val fallbackBg = if (isDark) Zinc900.copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
+            val borderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
+
+            Popup(
+                offset = IntOffset(itemWidthPx, 0),
+                properties = PopupProperties(focusable = false),
+            ) {
+                val scrollState = rememberScrollState()
+
+                CompositionLocalProvider(LocalParentSubmenuKeepAlive provides keepAliveCallback) {
+                    Column(
+                        modifier = Modifier
+                            .hoverable(submenuInteractionSource)
+                            .width(IntrinsicSize.Max)
+                            .widthIn(min = 180.dp)
+                            .shadow(elevation = 8.dp, shape = shapes.large)
+                            .darwinGlass(shape = shapes.large, fallbackColor = fallbackBg)
+                            .border(1.dp, borderColor, shapes.large)
+                            .heightIn(max = 360.dp)
+                            .verticalScroll(scrollState)
+                            .padding(vertical = 4.dp),
+                        content = submenuContent,
+                    )
+                }
+            }
         }
     }
 }

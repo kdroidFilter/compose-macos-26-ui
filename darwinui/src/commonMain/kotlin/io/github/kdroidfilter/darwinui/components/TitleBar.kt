@@ -18,7 +18,9 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import io.github.fletchmckee.liquid.liquid
 import io.github.kdroidfilter.darwinui.icons.Icon
@@ -363,9 +365,12 @@ fun SidebarButton(
     menuContent: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
+    var buttonHeightPx by remember { mutableStateOf(0) }
 
     Box {
-        TitleBarButtonGroup(modifier = modifier) {
+        TitleBarButtonGroup(
+            modifier = modifier.onGloballyPositioned { buttonHeightPx = it.size.height },
+        ) {
             TitleBarGroupButton(
                 onClick = onClick,
                 enabled = enabled,
@@ -388,6 +393,7 @@ fun SidebarButton(
             DropdownMenu(
                 expanded = menuExpanded,
                 onDismissRequest = { menuExpanded = false },
+                offset = IntOffset(0, buttonHeightPx),
                 content = menuContent,
             )
         }
