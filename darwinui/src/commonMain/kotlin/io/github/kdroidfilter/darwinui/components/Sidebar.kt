@@ -260,7 +260,7 @@ fun Sidebar(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(itemsScrollState)
-                        .padding(horizontal = 4.dp, vertical = 2.dp),
+                        .padding(start = TRACK_BREADTH, end = TRACK_BREADTH, top = 2.dp, bottom = 2.dp),
                     verticalArrangement = Arrangement.spacedBy(iconSize.itemSpacing),
                 ) {
                     if (hasGroups && groupedItems != null) {

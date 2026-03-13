@@ -8,8 +8,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.drag
-import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.foundation.hoverable
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Box
@@ -27,7 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Constraints
@@ -54,7 +53,7 @@ import kotlin.math.roundToInt
 // Alpha idle        : 0.15  (fill-opacity)
 // ============================================================
 
-private val TRACK_BREADTH = 12.dp
+internal val TRACK_BREADTH = 12.dp
 private val THUMB_BREADTH_IDLE = 6.dp
 private val THUMB_BREADTH_HOVER = 8.dp   // expands toward content on hover
 private val THUMB_TRAILING_PAD = 3.dp    // fixed gap from window edge (right/bottom)
@@ -292,62 +291,38 @@ private fun DarwinScrollbarImpl(
             )
             .hoverable(trackInteraction)
             .pointerInput(state, isVertical, trackClickBehavior) {
-                // Manual event loop instead of awaitEachGesture — we need to
-                // explicitly forward scroll (wheel) events to the scroll state,
-                // otherwise the overlay scrollbar blocks mouse-wheel scrolling
-                // on the 12dp track area that overlaps with the scrollable content.
+                if (trackClickBehavior == TrackClickBehavior.None) return@pointerInput
                 awaitPointerEventScope {
                     while (true) {
                         val event = awaitPointerEvent()
-                        when (event.type) {
-                            PointerEventType.Scroll -> {
-                                val delta = event.changes.fold(0f) { acc, c ->
-                                    acc + if (isVertical) c.scrollDelta.y else c.scrollDelta.x
+                        if (event.type != PointerEventType.Press) continue
+                        val down = event.changes.firstOrNull() ?: continue
+                        val clickPos = if (isVertical) down.position.y else down.position.x
+                        val minPx = THUMB_MIN_LENGTH.toPx()
+                        val (thumbLen, thumbOff) = computeThumb(
+                            trackSizePx = trackSizePx.toFloat(),
+                            scrollOffset = state.scrollOffsetPx,
+                            maxScroll = state.maxScrollPx,
+                            minLength = minPx,
+                        )
+                        val isOutsideThumb = clickPos < thumbOff || clickPos > thumbOff + thumbLen
+                        if (isOutsideThumb && trackSizePx > 0) {
+                            when (trackClickBehavior) {
+                                TrackClickBehavior.Seek -> {
+                                    val ratio = (clickPos / trackSizePx).coerceIn(0f, 1f)
+                                    scope.launch { state.scrollTo(ratio * state.maxScrollPx) }
                                 }
-                                if (delta != 0f) {
-                                    cancelHide()
-                                    showThumb = true
+                                TrackClickBehavior.Jump -> {
+                                    val direction = if (clickPos < thumbOff) -1f else 1f
                                     scope.launch {
                                         state.scrollTo(
-                                            (state.scrollOffsetPx + delta).coerceIn(0f, state.maxScrollPx),
+                                            (state.scrollOffsetPx + direction * trackSizePx)
+                                                .coerceIn(0f, state.maxScrollPx),
                                         )
                                     }
-                                    scheduleHide()
-                                    event.changes.forEach { it.consume() }
                                 }
+                                TrackClickBehavior.None -> Unit
                             }
-                            PointerEventType.Press -> {
-                                if (trackClickBehavior == TrackClickBehavior.None) continue
-                                val down = event.changes.firstOrNull() ?: continue
-                                val clickPos = if (isVertical) down.position.y else down.position.x
-                                val minPx = THUMB_MIN_LENGTH.toPx()
-                                val (thumbLen, thumbOff) = computeThumb(
-                                    trackSizePx = trackSizePx.toFloat(),
-                                    scrollOffset = state.scrollOffsetPx,
-                                    maxScroll = state.maxScrollPx,
-                                    minLength = minPx,
-                                )
-                                val isOutsideThumb = clickPos < thumbOff || clickPos > thumbOff + thumbLen
-                                if (isOutsideThumb && trackSizePx > 0) {
-                                    when (trackClickBehavior) {
-                                        TrackClickBehavior.Seek -> {
-                                            val ratio = (clickPos / trackSizePx).coerceIn(0f, 1f)
-                                            scope.launch { state.scrollTo(ratio * state.maxScrollPx) }
-                                        }
-                                        TrackClickBehavior.Jump -> {
-                                            val direction = if (clickPos < thumbOff) -1f else 1f
-                                            scope.launch {
-                                                state.scrollTo(
-                                                    (state.scrollOffsetPx + direction * trackSizePx)
-                                                        .coerceIn(0f, state.maxScrollPx),
-                                                )
-                                            }
-                                        }
-                                        TrackClickBehavior.None -> Unit
-                                    }
-                                }
-                            }
-                            else -> {} // Move, Enter, Exit, Release — handled by hoverable or thumb drag
                         }
                     }
                 }
