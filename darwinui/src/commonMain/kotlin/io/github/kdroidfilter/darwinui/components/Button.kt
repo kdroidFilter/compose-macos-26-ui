@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
@@ -143,6 +144,7 @@ fun PushButton(
     val contentColor by animateColorAsState(
         targetValue = when {
             !enabled -> colors.contentDisabled
+            isPressed && colors.contentPressed != Color.Unspecified -> colors.contentPressed
             selected && (style == PushButtonStyle.Borderless || style == PushButtonStyle.BorderlessBezel) -> colors.contentSelected
             else -> colors.content
         },
@@ -249,6 +251,7 @@ private data class PushButtonResolvedColors(
     val backgroundDisabled: Color,
     val backgroundSelected: Color,
     val content: Color,
+    val contentPressed: Color = Color.Unspecified,
     val contentDisabled: Color,
     val contentSelected: Color,
     /** Overlay applied on press (layered on top of background). */
@@ -319,12 +322,15 @@ private fun resolvePushButtonColors(
         )
 
         PushButtonStyle.Borderless -> {
+            // Sketch: Clicked state has text fills accent + black 20% = darkened accent
+            val pressedAccent = lerp(accent, Color.Black, 0.20f)
             PushButtonResolvedColors(
                 background = Color.Transparent,
                 backgroundPressed = Color.Transparent,
                 backgroundDisabled = Color.Transparent,
                 backgroundSelected = Color.Transparent,
                 content = accent,
+                contentPressed = pressedAccent,
                 contentDisabled = accent.copy(alpha = 0.40f),
                 contentSelected = accent,
                 pressOverlay = Color.Transparent,

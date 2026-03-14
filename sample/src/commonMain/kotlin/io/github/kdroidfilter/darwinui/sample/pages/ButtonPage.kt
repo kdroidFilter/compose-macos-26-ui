@@ -21,7 +21,11 @@ import io.github.kdroidfilter.darwinui.components.PushButtonStyle
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.icons.LucideDownload
 import io.github.kdroidfilter.darwinui.icons.LucideHeart
+import io.github.kdroidfilter.darwinui.icons.LucideMoon
 import io.github.kdroidfilter.darwinui.icons.LucideShare2
+import io.github.kdroidfilter.darwinui.icons.LucideStar
+import io.github.kdroidfilter.darwinui.icons.LucideStarOff
+import io.github.kdroidfilter.darwinui.icons.LucideSun
 import io.github.kdroidfilter.darwinui.icons.LucideTrash2
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
@@ -171,19 +175,33 @@ fun ButtonBorderedSecondaryExample() {
 @GalleryExample("Button", "Borderless")
 @Composable
 fun ButtonBorderlessExample() {
-    var selected by remember { mutableStateOf(false) }
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        PushButton(
-            text = if (selected) "On" else "Off",
-            onClick = { selected = !selected },
-            style = PushButtonStyle.Borderless,
-            selected = selected,
+    var starred by remember { mutableStateOf(false) }
+    var darkMode by remember { mutableStateOf(false) }
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            PushButton(
+                text = if (starred) "Starred" else "Star",
+                icon = if (starred) LucideStar else LucideStarOff,
+                onClick = { starred = !starred },
+                style = PushButtonStyle.Borderless,
+            )
+            PushButton(
+                text = if (darkMode) "Dark" else "Light",
+                icon = if (darkMode) LucideMoon else LucideSun,
+                onClick = { darkMode = !darkMode },
+                style = PushButtonStyle.Borderless,
+            )
+            PushButton(text = "Label", onClick = {}, style = PushButtonStyle.Borderless)
+            PushButton(text = "Disabled", onClick = {}, style = PushButtonStyle.Borderless, enabled = false)
+        }
+        Text(
+            text = "No visual change on toggle — only the icon and label text switch.",
+            style = DarwinTheme.typography.caption1,
+            color = DarwinTheme.colorScheme.textSecondary,
         )
-        PushButton(text = "Label", onClick = {}, style = PushButtonStyle.Borderless)
-        PushButton(text = "Disabled", onClick = {}, style = PushButtonStyle.Borderless, enabled = false)
     }
 }
 
