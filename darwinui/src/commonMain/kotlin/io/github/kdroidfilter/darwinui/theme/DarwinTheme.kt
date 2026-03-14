@@ -107,4 +107,10 @@ object DarwinTheme {
         @Composable
         @ReadOnlyComposable
         get() = LocalControlSize.current
+
+    /** Current surface appearance (ContentArea or OverGlass). */
+    val surface: DarwinSurface
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalDarwinSurface.current
 }

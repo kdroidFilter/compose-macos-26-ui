@@ -28,8 +28,10 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
+import io.github.kdroidfilter.darwinui.theme.DarwinSurface
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalControlSize
+import io.github.kdroidfilter.darwinui.theme.LocalDarwinSurface
 import io.github.kdroidfilter.darwinui.theme.LocalWindowActive
 import io.github.kdroidfilter.darwinui.theme.SwitchStyle
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
@@ -157,6 +159,7 @@ fun TriStateSwitch(
 ) {
     val controlSize = LocalControlSize.current
     val isWindowActive = LocalWindowActive.current
+    val surface = LocalDarwinSurface.current
     val metrics = DarwinTheme.componentStyling.switch.metrics
 
     val trackWidth = metrics.trackWidthFor(controlSize)
@@ -194,6 +197,17 @@ fun TriStateSwitch(
         label = "switchThumbAlpha",
     )
 
+    // Pressed track overlay — Over-glass uses stronger darkening for depth
+    val pressedOverlayStrength = when (surface) {
+        DarwinSurface.ContentArea -> 0.08f
+        DarwinSurface.OverGlass -> 0.13f
+    }
+    val pressedOverlayAlpha by animateFloatAsState(
+        targetValue = if (isPressed) pressedOverlayStrength else 0f,
+        animationSpec = darwinSpring(preset = DarwinSpringPreset.Snappy),
+        label = "switchPressedOverlay",
+    )
+
     val toggleModifier = if (onClick != null) {
         modifier.triStateToggleable(
             state = state,
@@ -221,6 +235,15 @@ fun TriStateSwitch(
             .clip(pillShape)
             .background(trackColor, pillShape),
     ) {
+        // Pressed darkening overlay
+        if (pressedOverlayAlpha > 0f) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(Color.Black.copy(alpha = pressedOverlayAlpha), pillShape),
+            )
+        }
+
         // On-state indicator "|" on the left
         if (state == ToggleableState.On) {
             Box(
