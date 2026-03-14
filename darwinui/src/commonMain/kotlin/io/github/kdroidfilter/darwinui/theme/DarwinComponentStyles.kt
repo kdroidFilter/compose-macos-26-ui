@@ -245,46 +245,84 @@ data class SwitchStyle(
     val colors: Colors,
     val metrics: Metrics = Metrics(),
 ) {
+    /**
+     * Color tokens for the Switch component covering all Apple states:
+     * - Toggle state: On / Off / Mixed (indeterminate)
+     * - Window state: Active (foreground) / Inactive (background)
+     * - Interaction state: Idle / Pressed / Disabled
+     *
+     * Disabled state is handled via alpha in the component rather than
+     * separate color tokens, matching Apple's approach.
+     */
     @Immutable
     data class Colors(
-        val checkedTrack: Color,
-        val uncheckedTrack: Color,
-        val disabledCheckedTrack: Color,
-        val disabledUncheckedTrack: Color,
+        // Active window — track colors by toggle state
+        val onTrack: Color,
+        val offTrack: Color,
+        val mixedTrack: Color,
+
+        // Inactive window — track colors by toggle state
+        val inactiveOnTrack: Color,
+        val inactiveOffTrack: Color,
+        val inactiveMixedTrack: Color,
+
+        // Thumb
         val thumb: Color,
-        val thumbDisabled: Color,
         val thumbShadow: Color,
+
+        // Track-level state indicators (macOS 26 style)
+        val onIndicator: Color,
+        val offIndicator: Color,
+        val mixedIndicator: Color,
     )
 
     @Immutable
     data class Metrics(
-        val trackWidth: Dp = 36.dp,
-        val trackHeight: Dp = 22.dp,
-        val thumbSize: Dp = 18.dp,
+        val trackWidth: Dp = 54.dp,
+        val trackHeight: Dp = 24.dp,
+        val thumbWidth: Dp = 32.dp,
+        val thumbHeight: Dp = 20.dp,
         val thumbPadding: Dp = 2.dp,
+        val disabledAlpha: Float = 0.5f,
     ) {
         fun trackWidthFor(controlSize: ControlSize): Dp = when (controlSize) {
-            ControlSize.Mini -> 28.dp
-            ControlSize.Small -> 32.dp
+            ControlSize.Mini -> 36.dp
+            ControlSize.Small -> 44.dp
             ControlSize.Regular -> trackWidth
-            ControlSize.Large -> 42.dp
-            ControlSize.ExtraLarge -> 50.dp
+            ControlSize.Large -> 64.dp
+            ControlSize.ExtraLarge -> 80.dp
         }
 
         fun trackHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
             ControlSize.Mini -> 16.dp
-            ControlSize.Small -> 18.dp
+            ControlSize.Small -> 20.dp
             ControlSize.Regular -> trackHeight
-            ControlSize.Large -> 26.dp
-            ControlSize.ExtraLarge -> 30.dp
+            ControlSize.Large -> 28.dp
+            ControlSize.ExtraLarge -> 36.dp
         }
 
-        fun thumbSizeFor(controlSize: ControlSize): Dp = when (controlSize) {
-            ControlSize.Mini -> 12.dp
-            ControlSize.Small -> 14.dp
-            ControlSize.Regular -> thumbSize
-            ControlSize.Large -> 22.dp
-            ControlSize.ExtraLarge -> 26.dp
+        fun thumbWidthFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 21.dp
+            ControlSize.Small -> 26.dp
+            ControlSize.Regular -> thumbWidth
+            ControlSize.Large -> 37.dp
+            ControlSize.ExtraLarge -> 47.dp
+        }
+
+        fun thumbHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 13.dp
+            ControlSize.Small -> 16.dp
+            ControlSize.Regular -> thumbHeight
+            ControlSize.Large -> 23.dp
+            ControlSize.ExtraLarge -> 29.dp
+        }
+
+        fun thumbPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 1.5.dp
+            ControlSize.Small -> 2.dp
+            ControlSize.Regular -> thumbPadding
+            ControlSize.Large -> 2.5.dp
+            ControlSize.ExtraLarge -> 3.5.dp
         }
     }
 }

@@ -183,17 +183,35 @@ private fun defaultRadioButtonStyle(cs: ColorScheme) = RadioButtonStyle(
     ),
 )
 
-private fun defaultSwitchStyle(cs: ColorScheme) = SwitchStyle(
-    colors = SwitchStyle.Colors(
-        checkedTrack = cs.accent,
-        uncheckedTrack = if (cs.isDark) Color(0xFF3A3A3C) else Color(0xFFD1D1D6),
-        disabledCheckedTrack = cs.accent.copy(alpha = 0.5f),
-        disabledUncheckedTrack = (if (cs.isDark) Color(0xFF3A3A3C) else Color(0xFFD1D1D6)).copy(alpha = 0.5f),
-        thumb = Color.White,
-        thumbDisabled = Color.White.copy(alpha = 0.7f),
-        thumbShadow = Color.Black.copy(alpha = 0.15f),
-    ),
-)
+private fun defaultSwitchStyle(cs: ColorScheme): SwitchStyle {
+    val offTrack = if (cs.isDark) Color(0xFF3A3A3C) else Color(0xFFD1D1D6)
+    // Inactive window: accent-colored tracks become neutral gray
+    val inactiveOnTrack = if (cs.isDark) Color(0xFF636366) else Color(0xFFAEAEB2)
+    val inactiveOffTrack = if (cs.isDark) Color(0xFF3A3A3C) else Color(0xFFD1D1D6)
+
+    return SwitchStyle(
+        colors = SwitchStyle.Colors(
+            // Active window track colors
+            onTrack = cs.accent,
+            offTrack = offTrack,
+            mixedTrack = cs.accent,
+
+            // Inactive window track colors
+            inactiveOnTrack = inactiveOnTrack,
+            inactiveOffTrack = inactiveOffTrack,
+            inactiveMixedTrack = inactiveOnTrack,
+
+            // Thumb
+            thumb = Color.White,
+            thumbShadow = Color.Black.copy(alpha = 0.15f),
+
+            // Track-level state indicators (macOS 26)
+            onIndicator = Color.White,
+            offIndicator = if (cs.isDark) Color(0xFF8E8E93) else Color(0xFFC6C6C6),
+            mixedIndicator = Color.White,
+        ),
+    )
+}
 
 private fun defaultSliderStyle(cs: ColorScheme) = SliderStyle(
     colors = SliderStyle.Colors(

@@ -2,13 +2,15 @@ package io.github.kdroidfilter.darwinui.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.selection.triStateToggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -22,78 +24,98 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalControlSize
+import io.github.kdroidfilter.darwinui.theme.LocalWindowActive
+import io.github.kdroidfilter.darwinui.theme.SwitchStyle
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 
 // ===========================================================================
-// SwitchColors — mirrors M3's SwitchColors
+// SwitchColors — all color tokens for every visual state
 // ===========================================================================
 
 @Immutable
 class SwitchColors(
-    val checkedThumbColor: Color,
-    val checkedTrackColor: Color,
-    val checkedBorderColor: Color,
-    val uncheckedThumbColor: Color,
-    val uncheckedTrackColor: Color,
-    val uncheckedBorderColor: Color,
-    val disabledCheckedThumbColor: Color,
-    val disabledCheckedTrackColor: Color,
-    val disabledUncheckedThumbColor: Color,
-    val disabledUncheckedTrackColor: Color,
+    // Active window — track colors
+    val onTrackColor: Color,
+    val offTrackColor: Color,
+    val mixedTrackColor: Color,
+
+    // Inactive window — track colors
+    val inactiveOnTrackColor: Color,
+    val inactiveOffTrackColor: Color,
+    val inactiveMixedTrackColor: Color,
+
+    // Thumb
+    val thumbColor: Color,
+
+    // Track-level state indicators (macOS 26)
+    val onIndicatorColor: Color,
+    val offIndicatorColor: Color,
+    val mixedIndicatorColor: Color,
 ) {
-    fun copy(
-        checkedThumbColor: Color = this.checkedThumbColor,
-        checkedTrackColor: Color = this.checkedTrackColor,
-        checkedBorderColor: Color = this.checkedBorderColor,
-        uncheckedThumbColor: Color = this.uncheckedThumbColor,
-        uncheckedTrackColor: Color = this.uncheckedTrackColor,
-        uncheckedBorderColor: Color = this.uncheckedBorderColor,
-        disabledCheckedThumbColor: Color = this.disabledCheckedThumbColor,
-        disabledCheckedTrackColor: Color = this.disabledCheckedTrackColor,
-        disabledUncheckedThumbColor: Color = this.disabledUncheckedThumbColor,
-        disabledUncheckedTrackColor: Color = this.disabledUncheckedTrackColor,
-    ) = SwitchColors(
-        checkedThumbColor, checkedTrackColor, checkedBorderColor,
-        uncheckedThumbColor, uncheckedTrackColor, uncheckedBorderColor,
-        disabledCheckedThumbColor, disabledCheckedTrackColor,
-        disabledUncheckedThumbColor, disabledUncheckedTrackColor,
-    )
+    fun trackColor(
+        toggleState: ToggleableState,
+        isWindowActive: Boolean,
+    ): Color = if (isWindowActive) {
+        when (toggleState) {
+            ToggleableState.On -> onTrackColor
+            ToggleableState.Off -> offTrackColor
+            ToggleableState.Indeterminate -> mixedTrackColor
+        }
+    } else {
+        when (toggleState) {
+            ToggleableState.On -> inactiveOnTrackColor
+            ToggleableState.Off -> inactiveOffTrackColor
+            ToggleableState.Indeterminate -> inactiveMixedTrackColor
+        }
+    }
 }
 
 // ===========================================================================
-// SwitchDefaults — mirrors M3's SwitchDefaults
+// SwitchDefaults
 // ===========================================================================
 
 object SwitchDefaults {
+
     @Composable
     fun colors(
-        checkedThumbColor: Color = Color.White,
-        checkedTrackColor: Color = DarwinTheme.colorScheme.accent,
-        checkedBorderColor: Color = Color.Transparent,
-        uncheckedThumbColor: Color = Color.White,
-        // macOS unchecked track: #78788C in dark / #E5E5EA in light
-        uncheckedTrackColor: Color = if (DarwinTheme.colorScheme.isDark) Color(0xFF78788C) else Color(0xFFE5E5EA),
-        uncheckedBorderColor: Color = Color.Transparent,
-        disabledCheckedThumbColor: Color = checkedThumbColor.copy(alpha = 0.5f),
-        disabledCheckedTrackColor: Color = checkedTrackColor.copy(alpha = 0.5f),
-        disabledUncheckedThumbColor: Color = uncheckedThumbColor.copy(alpha = 0.5f),
-        disabledUncheckedTrackColor: Color = uncheckedTrackColor.copy(alpha = 0.5f),
-    ) = SwitchColors(
-        checkedThumbColor, checkedTrackColor, checkedBorderColor,
-        uncheckedThumbColor, uncheckedTrackColor, uncheckedBorderColor,
-        disabledCheckedThumbColor, disabledCheckedTrackColor,
-        disabledUncheckedThumbColor, disabledUncheckedTrackColor,
-    )
+        onTrackColor: Color = Color.Unspecified,
+        offTrackColor: Color = Color.Unspecified,
+        mixedTrackColor: Color = Color.Unspecified,
+        inactiveOnTrackColor: Color = Color.Unspecified,
+        inactiveOffTrackColor: Color = Color.Unspecified,
+        inactiveMixedTrackColor: Color = Color.Unspecified,
+        thumbColor: Color = Color.Unspecified,
+        onIndicatorColor: Color = Color.Unspecified,
+        offIndicatorColor: Color = Color.Unspecified,
+        mixedIndicatorColor: Color = Color.Unspecified,
+    ): SwitchColors {
+        val style = DarwinTheme.componentStyling.switch.colors
+        return SwitchColors(
+            onTrackColor = onTrackColor.takeOrElse(style.onTrack),
+            offTrackColor = offTrackColor.takeOrElse(style.offTrack),
+            mixedTrackColor = mixedTrackColor.takeOrElse(style.mixedTrack),
+            inactiveOnTrackColor = inactiveOnTrackColor.takeOrElse(style.inactiveOnTrack),
+            inactiveOffTrackColor = inactiveOffTrackColor.takeOrElse(style.inactiveOffTrack),
+            inactiveMixedTrackColor = inactiveMixedTrackColor.takeOrElse(style.inactiveMixedTrack),
+            thumbColor = thumbColor.takeOrElse(style.thumb),
+            onIndicatorColor = onIndicatorColor.takeOrElse(style.onIndicator),
+            offIndicatorColor = offIndicatorColor.takeOrElse(style.offIndicator),
+            mixedIndicatorColor = mixedIndicatorColor.takeOrElse(style.mixedIndicator),
+        )
+    }
 }
 
+private fun Color.takeOrElse(other: Color): Color =
+    if (this != Color.Unspecified) this else other
+
 // ===========================================================================
-// Switch — macOS-style (Apple Human Interface Guidelines proportions)
-// SVG is @1.3x → Track: 41.5x18.5dp  Thumb pill: 24.6x15.4dp rx=7.7dp  Padding: 1.5dp
+// Switch — two-state convenience wrapper
 // ===========================================================================
 
 @Composable
@@ -106,48 +128,76 @@ fun Switch(
     colors: SwitchColors = SwitchDefaults.colors(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
+    TriStateSwitch(
+        state = if (checked) ToggleableState.On else ToggleableState.Off,
+        onClick = if (onCheckedChange != null) {
+            { onCheckedChange(!checked) }
+        } else null,
+        modifier = modifier,
+        thumbContent = thumbContent,
+        enabled = enabled,
+        colors = colors,
+        interactionSource = interactionSource,
+    )
+}
+
+// ===========================================================================
+// TriStateSwitch — full three-state implementation (macOS 26)
+// ===========================================================================
+
+@Composable
+fun TriStateSwitch(
+    state: ToggleableState,
+    onClick: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+    thumbContent: (@Composable () -> Unit)? = null,
+    enabled: Boolean = true,
+    colors: SwitchColors = SwitchDefaults.colors(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+) {
     val controlSize = LocalControlSize.current
+    val isWindowActive = LocalWindowActive.current
     val metrics = DarwinTheme.componentStyling.switch.metrics
 
     val trackWidth = metrics.trackWidthFor(controlSize)
     val trackHeight = metrics.trackHeightFor(controlSize)
-    val thumbWidth = metrics.thumbSizeFor(controlSize)
-    val thumbHeight = metrics.thumbSizeFor(controlSize)
-    val thumbPadding = metrics.thumbPadding
-    val thumbShape = RoundedCornerShape(50)
-    val trackShape = RoundedCornerShape(50)
+    val thumbWidth = metrics.thumbWidthFor(controlSize)
+    val thumbHeight = metrics.thumbHeightFor(controlSize)
+    val thumbPadding = metrics.thumbPaddingFor(controlSize)
+    val pillShape = RoundedCornerShape(50)
 
-    // Thumb translates between left and right positions
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    // Thumb X offset: Off → left, On → right, Mixed → center
+    val thumbTargetOffset = when (state) {
+        ToggleableState.Off -> thumbPadding
+        ToggleableState.On -> trackWidth - thumbWidth - thumbPadding
+        ToggleableState.Indeterminate -> (trackWidth - thumbWidth) / 2
+    }
+
     val thumbOffset by animateDpAsState(
-        targetValue = if (checked) (trackWidth - thumbWidth - thumbPadding) else thumbPadding,
+        targetValue = thumbTargetOffset,
         animationSpec = darwinSpring(preset = DarwinSpringPreset.Snappy),
         label = "switchThumbOffset",
     )
 
     val trackColor by animateColorAsState(
-        targetValue = if (checked) {
-            if (enabled) colors.checkedTrackColor else colors.disabledCheckedTrackColor
-        } else {
-            if (enabled) colors.uncheckedTrackColor else colors.disabledUncheckedTrackColor
-        },
+        targetValue = colors.trackColor(state, isWindowActive),
         animationSpec = darwinSpring(preset = DarwinSpringPreset.Snappy),
         label = "switchTrackColor",
     )
 
-    val thumbColor by animateColorAsState(
-        targetValue = if (checked) {
-            if (enabled) colors.checkedThumbColor else colors.disabledCheckedThumbColor
-        } else {
-            if (enabled) colors.uncheckedThumbColor else colors.disabledUncheckedThumbColor
-        },
+    // macOS 26: thumb becomes transparent on press
+    val thumbAlpha by animateFloatAsState(
+        targetValue = if (isPressed) 0f else 1f,
         animationSpec = darwinSpring(preset = DarwinSpringPreset.Snappy),
-        label = "switchThumbColor",
+        label = "switchThumbAlpha",
     )
 
-    val toggleModifier = if (onCheckedChange != null) {
-        modifier.toggleable(
-            value = checked,
-            onValueChange = { if (enabled) onCheckedChange(it) },
+    val toggleModifier = if (onClick != null) {
+        modifier.triStateToggleable(
+            state = state,
+            onClick = { if (enabled) onClick() },
             enabled = enabled,
             role = Role.Switch,
             interactionSource = interactionSource,
@@ -155,31 +205,65 @@ fun Switch(
         )
     } else modifier
 
+    val contentAlpha = if (enabled) 1f else metrics.disabledAlpha
+
+    // Indicator sizes (proportional to track height)
+    val indicatorBarThickness = trackHeight * 0.125f
+    val onIndicatorHeight = trackHeight * 0.5f
+    val mixedIndicatorHeight = trackHeight * 0.4375f
+    val offIndicatorSize = trackHeight * 0.375f
+    val indicatorCenterOffset = trackHeight / 2
+
     Box(
         modifier = toggleModifier
-            .alpha(if (enabled) 1f else 0.4f)
+            .alpha(contentAlpha)
             .size(width = trackWidth, height = trackHeight)
-            .clip(trackShape)
-            .background(trackColor, trackShape),
+            .clip(pillShape)
+            .background(trackColor, pillShape),
     ) {
-        // Indicator dot visible on the unchecked side (SVG x=40.75/1.7, centered vertically)
-        Box(
-            modifier = Modifier
-                .offset(x = (40.75f / 1.3f).dp)
-                .align(Alignment.CenterStart)
-                .size((4.5f / 1.3f).dp)
-                .border((1.5f / 1.3f).dp, Color(0xFFC6C6C6), CircleShape),
-        )
+        // On-state indicator "|" on the left
+        if (state == ToggleableState.On) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .offset(x = indicatorCenterOffset - indicatorBarThickness / 2)
+                    .size(width = indicatorBarThickness, height = onIndicatorHeight)
+                    .background(colors.onIndicatorColor, pillShape),
+            )
+        }
 
-        // Thumb pill
+        // Mixed-state indicator "|" (shorter) on the left
+        if (state == ToggleableState.Indeterminate) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .offset(x = indicatorCenterOffset - indicatorBarThickness / 2)
+                    .size(width = indicatorBarThickness, height = mixedIndicatorHeight)
+                    .background(colors.mixedIndicatorColor, pillShape),
+            )
+        }
+
+        // Off-state indicator "○" on the right
+        if (state == ToggleableState.Off) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .offset(x = -(indicatorCenterOffset - offIndicatorSize / 2))
+                    .size(offIndicatorSize)
+                    .border(indicatorBarThickness, colors.offIndicatorColor, CircleShape),
+            )
+        }
+
+        // Pill-shaped thumb (macOS 26: wider than tall)
         Box(
             modifier = Modifier
                 .offset(x = thumbOffset)
                 .align(Alignment.CenterStart)
                 .size(width = thumbWidth, height = thumbHeight)
-                .shadow(elevation = 2.dp, shape = thumbShape, clip = false)
-                .clip(thumbShape)
-                .background(thumbColor, thumbShape),
+                .alpha(thumbAlpha)
+                .shadow(elevation = 2.dp, shape = pillShape, clip = false)
+                .clip(pillShape)
+                .background(colors.thumbColor, pillShape),
             contentAlignment = Alignment.Center,
         ) {
             thumbContent?.invoke()
@@ -188,7 +272,7 @@ fun Switch(
 }
 
 // ===========================================================================
-// Switcher — backward-compatible alias
+// Switcher — convenience wrapper with optional label
 // ===========================================================================
 
 @Composable
