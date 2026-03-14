@@ -29,8 +29,9 @@ import io.github.kdroidfilter.darwinui.components.Card
 import io.github.kdroidfilter.darwinui.components.ColumnVisibility
 import io.github.kdroidfilter.darwinui.components.DarwinColumnWidth
 import io.github.kdroidfilter.darwinui.components.DarwinScaffold
-import io.github.kdroidfilter.darwinui.components.IconButton
 import io.github.kdroidfilter.darwinui.components.NavigationButtons
+import io.github.kdroidfilter.darwinui.components.TitleBarButtonGroup
+import io.github.kdroidfilter.darwinui.components.TitleBarGroupButton
 import io.github.kdroidfilter.darwinui.components.Sidebar
 import io.github.kdroidfilter.darwinui.components.SidebarItem
 import io.github.kdroidfilter.darwinui.components.Text
@@ -128,8 +129,10 @@ fun ScaffoldFullLayoutExample() {
                     },
                     title = { Text(selectedPage) },
                     actions = {
-                        IconButton(onClick = {}) {
-                            Icon(LucideSettings, modifier = Modifier.size(16.dp))
+                        TitleBarButtonGroup {
+                            TitleBarGroupButton(onClick = {}) {
+                                Icon(LucideSettings, modifier = Modifier.size(16.dp))
+                            }
                         }
                     },
                 )
@@ -172,11 +175,13 @@ fun ScaffoldNoSidebarExample() {
                 TitleBar(
                     title = { Text("My App") },
                     actions = {
-                        IconButton(onClick = { isDark = !isDark }) {
-                            Icon(
-                                if (isDark) LucideSun else LucideMoon,
-                                modifier = Modifier.size(16.dp),
-                            )
+                        TitleBarButtonGroup {
+                            TitleBarGroupButton(onClick = { isDark = !isDark }) {
+                                Icon(
+                                    if (isDark) LucideSun else LucideMoon,
+                                    modifier = Modifier.size(16.dp),
+                                )
+                            }
                         }
                     },
                 )
@@ -355,8 +360,10 @@ fun ScaffoldInspectorExample() {
                 TitleBar(
                     title = { Text("Document") },
                     actions = {
-                        IconButton(onClick = { inspectorVisible = !inspectorVisible }) {
-                            Icon(LucideInfo, modifier = Modifier.size(16.dp))
+                        TitleBarButtonGroup {
+                            TitleBarGroupButton(onClick = { inspectorVisible = !inspectorVisible }) {
+                                Icon(LucideInfo, modifier = Modifier.size(16.dp))
+                            }
                         }
                     },
                 )

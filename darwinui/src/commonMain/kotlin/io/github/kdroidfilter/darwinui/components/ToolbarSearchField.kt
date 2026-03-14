@@ -152,14 +152,16 @@ fun ToolbarSearchField(
     }
 
     Box(modifier = modifier, contentAlignment = Alignment.CenterEnd) {
-        // Collapsed: icon button
+        // Collapsed: toolbar button
         AnimatedVisibility(
             visible = !expanded,
             enter = fadeIn(darwinTween(DarwinDuration.Normal)),
             exit = fadeOut(darwinTween(DarwinDuration.Fast)),
         ) {
-            IconButton(onClick = { onExpandedChange(true) }) {
-                Icon(LucideSearch, modifier = Modifier.size(16.dp))
+            TitleBarButtonGroup {
+                TitleBarGroupButton(onClick = { onExpandedChange(true) }) {
+                    Icon(LucideSearch, modifier = Modifier.size(16.dp))
+                }
             }
         }
 

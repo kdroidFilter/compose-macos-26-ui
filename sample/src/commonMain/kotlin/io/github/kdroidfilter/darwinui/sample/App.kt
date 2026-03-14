@@ -68,8 +68,9 @@ import io.github.kdroidfilter.darwinui.components.DarwinScaffold
 import io.github.kdroidfilter.darwinui.components.TrackClickBehavior
 import io.github.kdroidfilter.darwinui.components.VerticalScrollbar
 import io.github.kdroidfilter.darwinui.components.rememberScrollbarState
-import io.github.kdroidfilter.darwinui.components.IconButton
 import io.github.kdroidfilter.darwinui.components.NavigationButtons
+import io.github.kdroidfilter.darwinui.components.TitleBarButtonGroup
+import io.github.kdroidfilter.darwinui.components.TitleBarGroupButton
 import io.github.kdroidfilter.darwinui.components.Popover
 import io.github.kdroidfilter.darwinui.components.PopoverPlacement
 import io.github.kdroidfilter.darwinui.components.SearchSuggestionHeader
@@ -106,7 +107,6 @@ import io.github.kdroidfilter.darwinui.sample.pages.MaterialPage
 import io.github.kdroidfilter.darwinui.sample.pages.GroupBoxPage
 import io.github.kdroidfilter.darwinui.sample.pages.FormPage
 import io.github.kdroidfilter.darwinui.sample.pages.GroupedListPage
-import io.github.kdroidfilter.darwinui.sample.pages.IconButtonPage
 import io.github.kdroidfilter.darwinui.sample.pages.InputPage
 import io.github.kdroidfilter.darwinui.sample.pages.MultiSelectPage
 import io.github.kdroidfilter.darwinui.sample.pages.PopoverPage
@@ -138,7 +138,6 @@ private data class SidebarEntryDef(val id: String, val label: String, val group:
 
 private val sidebarEntryDefs = listOf(
     SidebarEntryDef("button", "Button", "FORM CONTROLS", Lucide.MousePointerClick),
-    SidebarEntryDef("iconbutton", "Icon Button", "FORM CONTROLS", Lucide.CircleUser),
     SidebarEntryDef("input", "Input", "FORM CONTROLS", Lucide.TextCursorInput),
     SidebarEntryDef("textarea", "Textarea", "FORM CONTROLS", Lucide.TextAlignStart),
     SidebarEntryDef("checkbox", "Checkbox", "FORM CONTROLS", Lucide.SquareCheck),
@@ -295,8 +294,10 @@ fun App() {
                                 onDismissRequest = { settingsExpanded = false },
                                 placement = PopoverPlacement.Bottom,
                                 trigger = {
-                                    IconButton(onClick = { settingsExpanded = !settingsExpanded }) {
-                                        Icon(LucideSettings, modifier = Modifier.size(18.dp))
+                                    TitleBarButtonGroup {
+                                        TitleBarGroupButton(onClick = { settingsExpanded = !settingsExpanded }) {
+                                            Icon(LucideSettings, modifier = Modifier.size(14.dp))
+                                        }
                                     }
                                 },
                             ) {
@@ -348,8 +349,10 @@ fun App() {
                                     }
                                 }
                             }
-                            IconButton(onClick = { isDark = !isDark }) {
-                                Icon(if (isDark) LucideSun else LucideMoon, modifier = Modifier.size(18.dp))
+                            TitleBarButtonGroup {
+                                TitleBarGroupButton(onClick = { isDark = !isDark }) {
+                                    Icon(if (isDark) LucideSun else LucideMoon, modifier = Modifier.size(14.dp))
+                                }
                             }
                             ToolbarSearchField(
                                 value = searchQuery,
@@ -404,7 +407,6 @@ fun App() {
                 ) {
                     when (selectedPage) {
                         "button" -> ButtonPage()
-                        "iconbutton" -> IconButtonPage()
                         "input" -> InputPage()
                         "searchinput" -> SearchInputPage()
                         "textarea" -> TextAreaPage()

@@ -31,7 +31,8 @@ import io.github.kdroidfilter.darwinui.components.ArrowButton
 import io.github.kdroidfilter.darwinui.components.ComboBox
 import io.github.kdroidfilter.darwinui.components.GroupedList
 import io.github.kdroidfilter.darwinui.components.GroupedListItem
-import io.github.kdroidfilter.darwinui.components.IconButton
+import io.github.kdroidfilter.darwinui.components.PushButton
+import io.github.kdroidfilter.darwinui.components.PushButtonStyle
 import io.github.kdroidfilter.darwinui.components.PulldownButton
 import io.github.kdroidfilter.darwinui.components.PushButton
 import io.github.kdroidfilter.darwinui.components.RadioButton
@@ -227,7 +228,7 @@ fun FormTrailingAccessoryExample() {
         // Info
         GroupedListItem(
             trailing = {
-                IconButton(onClick = {}, size = 20.dp) {
+                PushButton(onClick = {}, style = PushButtonStyle.Borderless) {
                     Icon(LucideInfo, modifier = Modifier.size(16.dp), tint = colors.textSecondary)
                 }
             },
@@ -256,7 +257,7 @@ fun FormTrailingAccessoryExample() {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    IconButton(onClick = {}, size = 20.dp) {
+                    PushButton(onClick = {}, style = PushButtonStyle.Borderless) {
                         Icon(LucideInfo, modifier = Modifier.size(16.dp), tint = colors.textSecondary)
                     }
                     Switch(checked = infoToggleState, onCheckedChange = { infoToggleState = it })
@@ -274,7 +275,7 @@ fun FormTrailingAccessoryExample() {
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text("Label", style = typography.subheadline, color = colors.textSecondary)
-                    IconButton(onClick = {}, size = 20.dp) {
+                    PushButton(onClick = {}, style = PushButtonStyle.Borderless) {
                         Icon(LucideInfo, modifier = Modifier.size(16.dp), tint = colors.textSecondary)
                     }
                 }
@@ -376,7 +377,7 @@ fun FormTrailingAccessoryExample() {
         // More button
         GroupedListItem(
             trailing = {
-                IconButton(onClick = {}, size = 20.dp) {
+                PushButton(onClick = {}, style = PushButtonStyle.Borderless) {
                     Icon(LucideEllipsis, modifier = Modifier.size(16.dp), tint = colors.textSecondary)
                 }
             },

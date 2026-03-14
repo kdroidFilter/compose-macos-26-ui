@@ -2,13 +2,13 @@ package io.github.kdroidfilter.darwinui.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,7 +22,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import io.github.fletchmckee.liquid.liquid
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.icons.LucideChevronLeft
@@ -184,17 +183,76 @@ private fun TitleBarContent(
 }
 
 // =============================================================================
+// WindowTitle — centered title + optional subtitle
+// =============================================================================
+
+/**
+ * A macOS-style centered window title with optional subtitle and proxy icon.
+ * Matches the macOS title bar layout from the Sketch specs:
+ *
+ * - **Title Only**: centered title text
+ * - **Title + Symbol**: title with a trailing proxy icon (e.g. document icon)
+ * - **Title + Subtitle**: title with subtitle row below (e.g. "Subtitle — Edited")
+ *
+ * Intended to be used inside the [TitleBar] `title` slot.
+ *
+ * @param title The main window title.
+ * @param subtitle Optional subtitle displayed below the title in a smaller, secondary style.
+ * @param proxyIcon Optional trailing icon shown next to the title (e.g. a document proxy icon).
+ */
+@Composable
+fun WindowTitle(
+    title: String,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+    proxyIcon: (@Composable () -> Unit)? = null,
+) {
+    val colors = DarwinTheme.colorScheme
+    val typography = DarwinTheme.typography
+
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(
+                text = title,
+                style = typography.body,
+                color = colors.textPrimary,
+            )
+            if (proxyIcon != null) {
+                CompositionLocalProvider(
+                    LocalDarwinContentColor provides colors.textSecondary,
+                ) {
+                    proxyIcon()
+                }
+            }
+        }
+        if (subtitle != null) {
+            Text(
+                text = subtitle,
+                style = typography.caption2,
+                color = colors.textSecondary,
+            )
+        }
+    }
+}
+
+// =============================================================================
 // TitleBarButtonGroup — shared pill container for grouped toolbar buttons
 // =============================================================================
 
 private val TitleBarGroupShape = RoundedCornerShape(percent = 50)
 
 /**
- * A pill-shaped container grouping toolbar buttons, matching the macOS NSToolbar
- * button-group style (e.g. Safari's back/forward or action clusters).
+ * A pill-shaped container grouping toolbar buttons with a liquid glass background,
+ * matching the macOS Toolbar button-group style (e.g. Safari's back/forward or action clusters).
  *
  * Adapts its height to the current [TitleBarStyle] via [LocalTitleBarStyle].
- * Place [TitleBarGroupButton] and [TitleBarGroupDivider] inside.
+ * Place [TitleBarGroupButton] composables inside.
  */
 @Composable
 fun TitleBarButtonGroup(
@@ -203,14 +261,14 @@ fun TitleBarButtonGroup(
 ) {
     val isDark = DarwinTheme.colorScheme.isDark
     val style = LocalTitleBarStyle.current
-    val borderColor = if (isDark) Color.White.copy(alpha = 0.12f) else Color.Black.copy(alpha = 0.12f)
+
+    val pillBg = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.06f)
 
     Row(
         modifier = modifier
             .height(style.buttonHeight)
             .clip(TitleBarGroupShape)
-            .border(0.5.dp, borderColor, TitleBarGroupShape)
-            .clip(TitleBarGroupShape),
+            .background(pillBg, TitleBarGroupShape),
         verticalAlignment = Alignment.CenterVertically,
         content = content,
     )
@@ -225,10 +283,10 @@ fun TitleBarGroupButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    contentPadding: PaddingValues = PaddingValues(horizontal = 8.dp),
     content: @Composable () -> Unit,
 ) {
     val isDark = DarwinTheme.colorScheme.isDark
+    val style = LocalTitleBarStyle.current
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -242,15 +300,19 @@ fun TitleBarGroupButton(
         animationSpec = darwinTween(DarwinDuration.Fast),
         label = "tbar_grp_btn_bg",
     )
+    // Sketch: default #1a1a1a, disabled #bfbfbf (light); dark inverted
     val contentColor by animateColorAsState(
         targetValue = if (!enabled) {
-            if (isDark) Color.White.copy(alpha = 0.28f) else Color(0xFFC6C6C6)
+            if (isDark) Color.White.copy(alpha = 0.28f) else Color(0xFFBFBFBF)
         } else {
-            if (isDark) Color.White.copy(alpha = 0.85f) else Color(0xFF4C4C4C)
+            if (isDark) Color.White.copy(alpha = 0.85f) else Color(0xFF1A1A1A)
         },
         animationSpec = darwinTween(DarwinDuration.Fast),
         label = "tbar_grp_btn_content",
     )
+
+    // Icon area size matches Sketch: XL=28dp, Medium=20dp
+    val iconAreaSize = style.buttonHeight - (style.buttonPadding * 2)
 
     CompositionLocalProvider(
         LocalDarwinContentColor provides contentColor,
@@ -258,8 +320,7 @@ fun TitleBarGroupButton(
     ) {
         Box(
             modifier = modifier
-                .fillMaxHeight()
-                .background(bgOverlay)
+                .size(style.buttonHeight)
                 .hoverable(interactionSource = interactionSource)
                 .clickable(
                     interactionSource = interactionSource,
@@ -267,29 +328,34 @@ fun TitleBarGroupButton(
                     enabled = enabled,
                     role = Role.Button,
                     onClick = onClick,
-                )
-                .padding(contentPadding),
+                ),
             contentAlignment = Alignment.Center,
         ) {
+            // Circular hover/press highlight inside the button
+            Box(
+                modifier = Modifier
+                    .size(iconAreaSize)
+                    .background(bgOverlay, CircleShape),
+            )
             content()
         }
     }
 }
 
 /**
- * A vertical separator between buttons inside a [TitleBarButtonGroup].
+ * A vertical separator placed between toolbar items (button groups, search fields, etc.)
+ * inside a [TitleBar] actions slot. Equivalent to SwiftUI's `Divider()` in a `.toolbar`.
+ *
+ * Sketch: `_Separator` — 1px wide, 16px tall, #f2f2f2 (light) / white 18% (dark).
  */
 @Composable
-fun TitleBarGroupDivider(modifier: Modifier = Modifier) {
+fun ToolbarSeparator(modifier: Modifier = Modifier) {
     val isDark = DarwinTheme.colorScheme.isDark
-    val style = LocalTitleBarStyle.current
-    // Scale divider height proportionally to button height
-    val dividerHeight = (style.buttonHeight - 12.dp).coerceAtLeast(16.dp)
     Spacer(
         modifier = modifier
             .width(1.dp)
-            .height(dividerHeight)
-            .background(if (isDark) Color.White.copy(alpha = 0.18f) else Color(0xFFE6E6E6)),
+            .height(16.dp)
+            .background(if (isDark) Color.White.copy(alpha = 0.18f) else Color(0xFFF2F2F2)),
     )
 }
 
@@ -319,15 +385,13 @@ fun NavigationButtons(
         TitleBarGroupButton(
             onClick = onBack,
             enabled = backEnabled,
-            contentPadding = PaddingValues(horizontal = 6.dp),
         ) {
             Icon(LucideChevronLeft, modifier = Modifier.size(style.iconSize + 4.dp))
         }
-        TitleBarGroupDivider()
+        ToolbarSeparator()
         TitleBarGroupButton(
             onClick = onForward,
             enabled = forwardEnabled,
-            contentPadding = PaddingValues(horizontal = 6.dp),
         ) {
             Icon(LucideChevronRight, modifier = Modifier.size(style.iconSize + 4.dp))
         }
@@ -374,12 +438,11 @@ fun SidebarButton(
             TitleBarGroupButton(
                 onClick = onClick,
                 enabled = enabled,
-                contentPadding = PaddingValues(horizontal = 6.dp),
             ) {
                 icon()
             }
             if (menuContent != null) {
-                TitleBarGroupDivider()
+                ToolbarSeparator()
                 TitleBarGroupButton(
                     onClick = { menuExpanded = true },
                     enabled = enabled,

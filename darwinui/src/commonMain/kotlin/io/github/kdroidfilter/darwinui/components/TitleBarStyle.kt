@@ -25,31 +25,34 @@ enum class TitleBarStyle(
     val actionsMinWidth: Dp,
     val actionSpacing: Dp,
     val buttonHeight: Dp,
+    val buttonPadding: Dp,
     val iconSize: Dp,
 ) {
-    /** Standard macOS toolbar (Safari, Finder). */
+    /** Standard macOS toolbar (Safari, Finder). Sketch: Toolbar/XL — 36px buttons, 28px icons. */
     Unified(
         height = 52,
         horizontalPadding = 12.dp,
         navMinWidth = 80.dp,
         actionsMinWidth = 80.dp,
         actionSpacing = 8.dp,
-        buttonHeight = 32.dp,
-        iconSize = 20.dp,
+        buttonHeight = 36.dp,
+        buttonPadding = 4.dp,
+        iconSize = 14.dp,
     ),
 
-    /** Compact toolbar (Finder compact mode, System Preferences). */
+    /** Compact toolbar (Finder compact mode). Sketch: Toolbar/Medium — 24px buttons, 20px icons. */
     UnifiedCompact(
         height = 38,
         horizontalPadding = 10.dp,
         navMinWidth = 60.dp,
         actionsMinWidth = 60.dp,
         actionSpacing = 6.dp,
-        buttonHeight = 28.dp,
-        iconSize = 18.dp,
+        buttonHeight = 24.dp,
+        buttonPadding = 2.dp,
+        iconSize = 10.dp,
     ),
 
-    /** Expanded toolbar for creative/content-heavy apps. */
+    /** Expanded toolbar for creative/content-heavy apps. Same button size as Unified. */
     Expanded(
         height = 60,
         horizontalPadding = 16.dp,
@@ -57,7 +60,8 @@ enum class TitleBarStyle(
         actionsMinWidth = 100.dp,
         actionSpacing = 10.dp,
         buttonHeight = 36.dp,
-        iconSize = 20.dp,
+        buttonPadding = 4.dp,
+        iconSize = 14.dp,
     ),
 }
 
