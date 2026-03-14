@@ -102,6 +102,7 @@ import io.github.kdroidfilter.darwinui.sample.pages.ControlSizePage
 import io.github.kdroidfilter.darwinui.sample.pages.ContextMenuPage
 import io.github.kdroidfilter.darwinui.sample.pages.DialogPage
 import io.github.kdroidfilter.darwinui.sample.pages.DropdownMenuPage
+import io.github.kdroidfilter.darwinui.sample.pages.MaterialPage
 import io.github.kdroidfilter.darwinui.sample.pages.GroupBoxPage
 import io.github.kdroidfilter.darwinui.sample.pages.FormPage
 import io.github.kdroidfilter.darwinui.sample.pages.GroupedListPage
@@ -173,6 +174,7 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("titlebar", "Title Bar", "NAVIGATION", Lucide.PanelTopOpen),
     SidebarEntryDef("addressbar", "Address Bar", "NAVIGATION", Lucide.Search),
     SidebarEntryDef("scaffold", "Scaffold", "NAVIGATION", LucidePanelLeft),
+    SidebarEntryDef("material", "Material", "THEME", Lucide.Scan),
     SidebarEntryDef("controlsize", "Control Size", "THEME", Lucide.SlidersHorizontal),
 )
 
@@ -438,6 +440,7 @@ fun App() {
                         "addressbar" -> AddressBarPage()
                         "scaffold" -> ScaffoldPage()
                         "colorwell" -> ColorWellPage()
+                        "material" -> MaterialPage()
                         "controlsize" -> ControlSizePage()
                     }
                     Spacer(modifier = Modifier.height(48.dp))

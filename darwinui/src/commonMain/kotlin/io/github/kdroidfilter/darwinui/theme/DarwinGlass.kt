@@ -2,9 +2,11 @@ package io.github.kdroidfilter.darwinui.theme
 
 import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
@@ -63,6 +65,125 @@ val LocalDarwinLiquidState = compositionLocalOf<LiquidState?> { null }
  */
 val LocalToolbarGlassState = compositionLocalOf<LiquidState?> { null }
 
+// ===========================================================================
+// Liquid Glass Materials — macOS 26
+//
+// Apple defines three material sizes (Small, Medium, Large) with different
+// blur radii, tint opacities, and shadow styles.  Each has a light and dark
+// variant, plus optional "Tinted" versions that overlay the accent color.
+//
+// Values extracted from Apple macOS 26 UI Kit (Sketch shared layer styles
+// named "Liquid Glass/{Light,Dark}/Regular - {Small,Medium,Large}").
+// ===========================================================================
+
+/**
+ * Predefined Liquid Glass material sizes matching macOS 26.
+ *
+ * Each size defines blur radius, tint color, and shadow parameters
+ * for both light and dark appearances.
+ */
+enum class GlassMaterialSize {
+    /** Small pill-shaped controls (toolbar buttons). Blur r=6. */
+    Small,
+    /** Medium panels (popovers, floating panels). Blur r=8–10. */
+    Medium,
+    /** Large panels (sheets, sidebars, dialogs). Blur r=15–16. */
+    Large,
+}
+
+/**
+ * Resolved parameters for a liquid glass material.
+ */
+@Immutable
+data class GlassMaterialSpec(
+    /** Translucent overlay tint (Black 40% dark, White 40–70% light). */
+    val tint: Color,
+    /** Opaque base color behind the blur. */
+    val baseColor: Color,
+    /** Backdrop blur radius in dp. */
+    val blurRadius: Dp,
+    /** Primary drop shadow color. */
+    val shadowColor: Color,
+    /** Primary shadow Y offset. */
+    val shadowY: Dp,
+    /** Primary shadow blur radius. */
+    val shadowBlur: Dp,
+    /** Secondary (edge) shadow color. */
+    val edgeShadowColor: Color,
+    /** Secondary shadow blur radius. */
+    val edgeShadowBlur: Dp,
+)
+
+/**
+ * Resolves a [GlassMaterialSpec] for the given [size] and dark/light mode.
+ */
+fun resolveGlassMaterial(size: GlassMaterialSize, isDark: Boolean): GlassMaterialSpec = when {
+    isDark -> when (size) {
+        GlassMaterialSize.Small -> GlassMaterialSpec(
+            tint = Color.Black.copy(alpha = 0.40f),
+            baseColor = Color(0xFF1A1A1A),
+            blurRadius = 6.dp,
+            shadowColor = Color.Black.copy(alpha = 0.16f),
+            shadowY = 2.dp,
+            shadowBlur = 25.dp,
+            edgeShadowColor = Color.Black.copy(alpha = 0.10f),
+            edgeShadowBlur = 2.dp,
+        )
+        GlassMaterialSize.Medium -> GlassMaterialSpec(
+            tint = Color.Black.copy(alpha = 0.40f),
+            baseColor = Color(0xFF121212),
+            blurRadius = 8.dp,
+            shadowColor = Color.Black.copy(alpha = 0.12f),
+            shadowY = 8.dp,
+            shadowBlur = 40.dp,
+            edgeShadowColor = Color.Black.copy(alpha = 0.10f),
+            edgeShadowBlur = 2.dp,
+        )
+        GlassMaterialSize.Large -> GlassMaterialSpec(
+            tint = Color.Black.copy(alpha = 0.40f),
+            baseColor = Color(0xFF1A1A1A),
+            blurRadius = 16.dp,
+            shadowColor = Color.Black.copy(alpha = 0.12f),
+            shadowY = 8.dp,
+            shadowBlur = 40.dp,
+            edgeShadowColor = Color.Black.copy(alpha = 0.10f),
+            edgeShadowBlur = 2.dp,
+        )
+    }
+    else -> when (size) {
+        GlassMaterialSize.Small -> GlassMaterialSpec(
+            tint = Color.White.copy(alpha = 0.40f),
+            baseColor = Color(0xFFFAFAFA),
+            blurRadius = 6.dp,
+            shadowColor = Color.Black.copy(alpha = 0.12f),
+            shadowY = 8.dp,
+            shadowBlur = 40.dp,
+            edgeShadowColor = Color.Black.copy(alpha = 0.10f),
+            edgeShadowBlur = 2.dp,
+        )
+        GlassMaterialSize.Medium -> GlassMaterialSpec(
+            tint = Color.White.copy(alpha = 0.70f),
+            baseColor = Color(0xFFFAFAFA),
+            blurRadius = 10.dp,
+            shadowColor = Color.Black.copy(alpha = 0.12f),
+            shadowY = 8.dp,
+            shadowBlur = 40.dp,
+            edgeShadowColor = Color.Black.copy(alpha = 0.10f),
+            edgeShadowBlur = 2.dp,
+        )
+        GlassMaterialSize.Large -> GlassMaterialSpec(
+            tint = Color.White.copy(alpha = 0.70f),
+            baseColor = Color(0xFFFAFAFA),
+            blurRadius = 15.dp,
+            shadowColor = Color.Black.copy(alpha = 0.12f),
+            shadowY = 8.dp,
+            shadowBlur = 40.dp,
+            edgeShadowColor = Color.Black.copy(alpha = 0.10f),
+            edgeShadowBlur = 2.dp,
+        )
+    }
+}
+
 /**
  * Applies a liquid glass (frosted backdrop blur) effect to overlay composables.
  *
@@ -96,5 +217,56 @@ fun Modifier.darwinGlass(
         this
             .clip(shape)
             .background(fallbackColor, shape)
+    }
+}
+
+/**
+ * Applies a macOS 26 Liquid Glass material effect with the correct
+ * blur radius, tint, and shadow for the given [materialSize].
+ *
+ * When liquid glass is available, renders with backdrop blur + tint.
+ * Otherwise falls back to the material's opaque [GlassMaterialSpec.baseColor].
+ *
+ * @param shape The clipping shape for the material.
+ * @param materialSize The material size tier (Small, Medium, Large).
+ * @param tintColor Optional accent tint overlay for "tinted" glass variants.
+ */
+@Composable
+fun Modifier.darwinGlassMaterial(
+    shape: Shape,
+    materialSize: GlassMaterialSize,
+    tintColor: Color? = null,
+): Modifier {
+    val liquidState = LocalDarwinLiquidState.current
+    val isDark = LocalDarwinColors.current.isDark
+    val spec = resolveGlassMaterial(materialSize, isDark)
+
+    val withShadow = this
+        .shadow(
+            elevation = spec.shadowBlur / 2,
+            shape = shape,
+            ambientColor = spec.edgeShadowColor,
+            spotColor = spec.shadowColor,
+        )
+
+    return if (liquidState != null) {
+        var result = withShadow.liquid(liquidState) {
+            frost = spec.blurRadius
+            this.shape = shape
+            tint = spec.tint
+            saturation = 1.15f
+        }
+        if (tintColor != null) {
+            result = result.background(tintColor.copy(alpha = 0.15f), shape)
+        }
+        result
+    } else {
+        var result = withShadow
+            .clip(shape)
+            .background(spec.baseColor, shape)
+        if (tintColor != null) {
+            result = result.background(tintColor.copy(alpha = 0.15f), shape)
+        }
+        result
     }
 }
