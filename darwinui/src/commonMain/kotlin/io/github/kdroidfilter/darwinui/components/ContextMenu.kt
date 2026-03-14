@@ -46,6 +46,7 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -73,7 +74,7 @@ fun ContextMenu(
     var isOpen by remember { mutableStateOf(false) }
     var clickOffset by remember { mutableStateOf(IntOffset.Zero) }
 
-    val fallbackBg = if (colors.isDark) Color(0xFF262626) else Color(0xFFF5F5F5)
+    val fallbackBg = if (colors.isDark) Color(0xFF262626) else Color(0xFFFAFAFA)
     val menuShape = RoundedCornerShape(13.dp)
 
     Box(modifier = modifier) {
@@ -129,7 +130,7 @@ fun ContextMenu(
                                 .shadow(
                                     elevation = 25.dp,
                                     shape = menuShape,
-                                    ambientColor = Color.Black.copy(alpha = 0.16f),
+                                    ambientColor = Color.Black.copy(alpha = 0.10f),
                                     spotColor = Color.Black.copy(alpha = 0.16f),
                                 )
                                 .darwinGlass(shape = menuShape, fallbackColor = fallbackBg)
@@ -185,11 +186,11 @@ fun ContextMenuItem(
 
     val effectiveTextColor = if (enabled) textColor else disabledTextColor
 
-    val itemShape = RoundedCornerShape(12.dp)
+    val itemShape = RoundedCornerShape(8.dp)
     val contentStyle = TextStyle(
         fontSize = 13.sp,
         color = effectiveTextColor,
-        letterSpacing = 0.sp,
+        letterSpacing = (-0.2).sp,
     )
 
     Row(
@@ -285,11 +286,11 @@ fun ContextMenuCheckboxItem(
 
     val effectiveTextColor = if (enabled) textColor else disabledTextColor
 
-    val itemShape = RoundedCornerShape(12.dp)
+    val itemShape = RoundedCornerShape(8.dp)
     val contentStyle = TextStyle(
         fontSize = 13.sp,
         color = effectiveTextColor,
-        letterSpacing = 0.sp,
+        letterSpacing = (-0.2).sp,
     )
 
     Row(
@@ -359,16 +360,17 @@ fun ContextMenuLabel(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 5.dp)
-            .height(24.dp)
-            .padding(horizontal = 12.dp),
+            .height(21.dp)
+            .padding(horizontal = 13.dp),
         contentAlignment = Alignment.CenterStart,
     ) {
         BasicText(
             text = text,
             style = TextStyle(
-                fontSize = 13.sp,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Black,
                 color = labelColor,
-                letterSpacing = 0.sp,
+                letterSpacing = (-0.15).sp,
             ),
         )
     }
@@ -388,7 +390,7 @@ fun ContextMenuSeparator(modifier: Modifier = Modifier) {
     Spacer(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 11.dp)
+            .padding(horizontal = 18.dp)
             .padding(vertical = 5.dp)
             .height(1.dp)
             .background(separatorColor),

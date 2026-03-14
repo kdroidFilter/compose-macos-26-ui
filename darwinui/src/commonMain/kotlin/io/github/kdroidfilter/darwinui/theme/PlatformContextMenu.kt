@@ -131,7 +131,7 @@ private fun DarwinContextMenuPopup(
     coordinates: LayoutCoordinates,
 ) {
     val colors = DarwinTheme.colorScheme
-    val fallbackBg = if (colors.isDark) Color(0xFF262626) else Color(0xFFF5F5F5)
+    val fallbackBg = if (colors.isDark) Color(0xFF262626) else Color(0xFFFAFAFA)
     val menuShape = RoundedCornerShape(13.dp)
     val position = menuState.dataProvider.position(coordinates)
     val data = menuState.dataProvider.data()
@@ -170,7 +170,7 @@ private fun DarwinContextMenuPopup(
                 .shadow(
                     elevation = 25.dp,
                     shape = menuShape,
-                    ambientColor = Color.Black.copy(alpha = 0.16f),
+                    ambientColor = Color.Black.copy(alpha = 0.10f),
                     spotColor = Color.Black.copy(alpha = 0.16f),
                 )
                 .darwinGlass(shape = menuShape, fallbackColor = fallbackBg)
@@ -210,12 +210,12 @@ private fun DarwinContextMenuItemRow(
     }
 
     val textColor = when {
-        !enabled -> if (colors.isDark) Color.White.copy(alpha = 0.3f) else Color(0xFF1A1A1A).copy(alpha = 0.3f)
+        !enabled -> if (colors.isDark) Color.White.copy(alpha = 0.35f) else Color(0xFFBFBFBF)
         isHighlighted -> Color.White
         else -> if (colors.isDark) Color.White.copy(alpha = 0.85f) else Color(0xFF1A1A1A)
     }
 
-    val itemShape = RoundedCornerShape(12.dp)
+    val itemShape = RoundedCornerShape(8.dp)
 
     Row(
         modifier = Modifier
@@ -239,7 +239,7 @@ private fun DarwinContextMenuItemRow(
             style = TextStyle(
                 fontSize = 13.sp,
                 color = textColor,
-                letterSpacing = 0.sp,
+                letterSpacing = (-0.2).sp,
             ),
         )
     }

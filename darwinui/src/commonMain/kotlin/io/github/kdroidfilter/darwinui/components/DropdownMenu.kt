@@ -6,10 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
@@ -145,10 +142,9 @@ fun DropdownMenu(
 ) {
     val colors = DarwinTheme.colorScheme
     val isDark = colors.isDark
-    val shapes = DarwinTheme.shapes
 
-    val fallbackBg = if (isDark) Color(0xFF18181B).copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
-    val borderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
+    val fallbackBg = if (isDark) Color(0xFF18181B).copy(alpha = 0.95f) else Color(0xFFFAFAFA)
+    val menuShape = RoundedCornerShape(13.dp)
 
     if (expanded) {
         val keyboardState = remember { DropdownMenuKeyboardState() }
@@ -164,15 +160,13 @@ fun DropdownMenu(
                             initialScale = 0.95f,
                             transformOrigin = TransformOrigin(0.5f, 0f),
                             animationSpec = tween(150),
-                        ) +
-                        slideInVertically(tween(150)) { -20 },
+                        ),
                 exit = fadeOut(tween(100)) +
                         scaleOut(
                             targetScale = 0.95f,
                             transformOrigin = TransformOrigin(0.5f, 0f),
                             animationSpec = tween(100),
-                        ) +
-                        slideOutVertically(tween(100)) { -20 },
+                        ),
             ) {
                 val scrollState = rememberScrollState()
 
@@ -202,13 +196,17 @@ fun DropdownMenu(
                                 }
                             }
                             .width(IntrinsicSize.Max)
-                            .widthIn(min = 180.dp)
-                            .shadow(elevation = 8.dp, shape = shapes.large)
-                            .darwinGlass(shape = shapes.large, fallbackColor = fallbackBg)
-                            .border(1.dp, borderColor, shapes.large)
+                            .widthIn(min = 200.dp)
+                            .shadow(
+                                elevation = 25.dp,
+                                shape = menuShape,
+                                ambientColor = Color.Black.copy(alpha = 0.10f),
+                                spotColor = Color.Black.copy(alpha = 0.16f),
+                            )
+                            .darwinGlass(shape = menuShape, fallbackColor = fallbackBg)
                             .heightIn(max = 360.dp)
                             .verticalScroll(scrollState)
-                            .padding(vertical = 3.dp),
+                            .padding(vertical = 5.dp),
                         content = content,
                     )
                 }
@@ -278,14 +276,14 @@ fun DropdownMenuItem(
         else -> if (isDark) Color.White.copy(alpha = 0.85f) else Color(0xFF1A1A1A)
     }
 
-    val itemShape = RoundedCornerShape(6.dp)
-    val contentStyle = TextStyle(fontSize = 13.sp, color = textColor, letterSpacing = 0.sp)
+    val itemShape = RoundedCornerShape(8.dp)
+    val contentStyle = TextStyle(fontSize = 13.sp, color = textColor, letterSpacing = (-0.2).sp)
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 5.dp)
-            .height(22.dp)
+            .height(24.dp)
             .clip(itemShape)
             .background(itemBackground, itemShape)
             .then(
@@ -392,22 +390,27 @@ fun DropdownMenuSubMenu(
 
     val isActive = isTriggerHovered || submenuExpanded
 
+    val submenuOpenBg = if (isDark) Color.White.copy(alpha = 0.10f) else Color(0xFFE6E6E6)
+
     val itemBackground = when {
         !enabled -> Color.Transparent
-        isActive -> accentColor
+        isTriggerHovered -> accentColor
+        submenuExpanded -> submenuOpenBg
         else -> Color.Transparent
     }
 
     val textColor = when {
-        isActive && enabled -> Color.White
+        isTriggerHovered && enabled -> Color.White
         else -> if (isDark) Color.White.copy(alpha = 0.85f) else Color(0xFF1A1A1A)
     }
 
-    val chevronColor = if (isActive && enabled) Color.White
-        else if (isDark) Color(0xFFA1A1AA) else Color(0xFF71717A)
+    val chevronColor = when {
+        isTriggerHovered && enabled -> Color.White
+        else -> if (isDark) Color(0xFFA1A1AA) else Color(0xFF4C4C4C)
+    }
 
-    val itemShape = RoundedCornerShape(6.dp)
-    val contentStyle = TextStyle(fontSize = 13.sp, color = textColor, letterSpacing = 0.sp)
+    val itemShape = RoundedCornerShape(8.dp)
+    val contentStyle = TextStyle(fontSize = 13.sp, color = textColor, letterSpacing = (-0.2).sp)
 
     // Callback for children to signal they're active
     val keepAliveCallback = remember<(Boolean) -> Unit> { { active -> childActive = active } }
@@ -418,7 +421,7 @@ fun DropdownMenuSubMenu(
                 .fillMaxWidth()
                 .onGloballyPositioned { itemWidthPx = it.size.width }
                 .padding(horizontal = 5.dp)
-                .height(22.dp)
+                .height(24.dp)
                 .clip(itemShape)
                 .background(itemBackground, itemShape)
                 .then(
@@ -461,9 +464,8 @@ fun DropdownMenuSubMenu(
         }
 
         if (submenuExpanded) {
-            val fallbackBg = if (isDark) Color(0xFF18181B).copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
-            val borderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
-            val menuShape = DarwinTheme.shapes.large
+            val submenuFallbackBg = if (isDark) Color(0xFF18181B).copy(alpha = 0.95f) else Color(0xFFFAFAFA)
+            val submenuShape = RoundedCornerShape(13.dp)
 
             Popup(
                 offset = IntOffset(itemWidthPx, 0),
@@ -476,13 +478,17 @@ fun DropdownMenuSubMenu(
                         modifier = Modifier
                             .hoverable(submenuInteractionSource)
                             .width(IntrinsicSize.Max)
-                            .widthIn(min = 180.dp)
-                            .shadow(elevation = 8.dp, shape = menuShape)
-                            .darwinGlass(shape = menuShape, fallbackColor = fallbackBg)
-                            .border(1.dp, borderColor, menuShape)
+                            .widthIn(min = 200.dp)
+                            .shadow(
+                                elevation = 25.dp,
+                                shape = submenuShape,
+                                ambientColor = Color.Black.copy(alpha = 0.10f),
+                                spotColor = Color.Black.copy(alpha = 0.16f),
+                            )
+                            .darwinGlass(shape = submenuShape, fallbackColor = submenuFallbackBg)
                             .heightIn(max = 360.dp)
                             .verticalScroll(scrollState)
-                            .padding(vertical = 3.dp),
+                            .padding(vertical = 5.dp),
                         content = submenuContent,
                     )
                 }
@@ -556,17 +562,17 @@ fun DropdownMenuLabel(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 5.dp)
-            .height(22.dp)
-            .padding(horizontal = 10.dp),
+            .height(21.dp)
+            .padding(horizontal = 13.dp),
         contentAlignment = Alignment.CenterStart,
     ) {
         BasicText(
             text = text,
             style = TextStyle(
-                fontSize = 11.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = if (isDark) Color(0xFFA1A1AA) else Color(0xFF71717A),
-                letterSpacing = 0.sp,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Black,
+                color = if (isDark) Color(0xFFA1A1AA) else Color(0xFF727272),
+                letterSpacing = (-0.15).sp,
             ),
         )
     }
@@ -585,14 +591,15 @@ fun DropdownMenuLabel(
 fun DropdownMenuSeparator(modifier: Modifier = Modifier) {
     val isDark = DarwinTheme.colorScheme.isDark
 
-    Box(
+    Spacer(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 10.dp, vertical = 3.dp)
+            .padding(horizontal = 18.dp)
+            .padding(vertical = 5.dp)
             .height(1.dp)
             .background(
-                if (isDark) Color.White.copy(alpha = 0.10f)
-                else Color.Black.copy(alpha = 0.10f)
+                if (isDark) Color.White.copy(alpha = 0.08f)
+                else Color(0xFFE6E6E6)
             ),
     )
 }
@@ -612,16 +619,12 @@ fun DropdownMenuShortcut(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    val isDark = DarwinTheme.colorScheme.isDark
-    val typography = DarwinTheme.typography
+    val parentStyle = LocalDarwinTextStyle.current
 
     BasicText(
         text = text,
-        style = typography.caption1.merge(
-            TextStyle(
-                color = if (isDark) Color(0xFFA1A1AA) else Color(0xFF71717A),
-                letterSpacing = 1.2.sp, // tracking-widest ≈ 0.1em at 12sp
-            )
+        style = parentStyle.merge(
+            TextStyle(letterSpacing = 0.sp)
         ),
         modifier = modifier,
     )
