@@ -4,8 +4,8 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +16,6 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -31,98 +30,20 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import io.github.kdroidfilter.darwinui.theme.CheckboxStyle
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
+import io.github.kdroidfilter.darwinui.theme.DarwinSurface
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalControlSize
-import io.github.kdroidfilter.darwinui.theme.ToggleableComponentState
+import io.github.kdroidfilter.darwinui.theme.LocalDarwinSurface
+import io.github.kdroidfilter.darwinui.theme.LocalWindowActive
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 
 // ===========================================================================
-// CheckboxColors — mirrors M3's CheckboxColors
-// ===========================================================================
-
-@Immutable
-class CheckboxColors(
-    val checkedCheckmarkColor: Color,
-    val uncheckedCheckmarkColor: Color,
-    val checkedBoxColor: Color,
-    val uncheckedBoxColor: Color,
-    val disabledCheckedBoxColor: Color,
-    val disabledUncheckedBoxColor: Color,
-    val checkedBorderColor: Color,
-    val uncheckedBorderColor: Color,
-    val disabledBorderColor: Color,
-    val disabledIndeterminateBorderColor: Color,
-    val disabledIndeterminateBoxColor: Color,
-) {
-    fun copy(
-        checkedCheckmarkColor: Color = this.checkedCheckmarkColor,
-        uncheckedCheckmarkColor: Color = this.uncheckedCheckmarkColor,
-        checkedBoxColor: Color = this.checkedBoxColor,
-        uncheckedBoxColor: Color = this.uncheckedBoxColor,
-        disabledCheckedBoxColor: Color = this.disabledCheckedBoxColor,
-        disabledUncheckedBoxColor: Color = this.disabledUncheckedBoxColor,
-        checkedBorderColor: Color = this.checkedBorderColor,
-        uncheckedBorderColor: Color = this.uncheckedBorderColor,
-        disabledBorderColor: Color = this.disabledBorderColor,
-        disabledIndeterminateBorderColor: Color = this.disabledIndeterminateBorderColor,
-        disabledIndeterminateBoxColor: Color = this.disabledIndeterminateBoxColor,
-    ) = CheckboxColors(
-        checkedCheckmarkColor, uncheckedCheckmarkColor,
-        checkedBoxColor, uncheckedBoxColor,
-        disabledCheckedBoxColor, disabledUncheckedBoxColor,
-        checkedBorderColor, uncheckedBorderColor,
-        disabledBorderColor, disabledIndeterminateBorderColor, disabledIndeterminateBoxColor,
-    )
-}
-
-// ===========================================================================
-// CheckboxState — implements ToggleableComponentState (Phase 1.2)
-// ===========================================================================
-
-/**
- * State snapshot for a Darwin checkbox.
- * Implements [ToggleableComponentState] to integrate with the Phase 1.2 state hierarchy.
- */
-data class CheckboxState(
-    override val toggleableState: androidx.compose.ui.state.ToggleableState,
-    override val isEnabled: Boolean,
-) : ToggleableComponentState
-
-// ===========================================================================
-// CheckboxDefaults — mirrors M3's CheckboxDefaults
-// Reads defaults from DarwinTheme.componentStyling.checkbox (Phase 1.1)
-// ===========================================================================
-
-object CheckboxDefaults {
-    @Composable
-    fun colors(
-        checkedCheckmarkColor: Color = DarwinTheme.componentStyling.checkbox.colors.checkmark,
-        uncheckedCheckmarkColor: Color = Color.Transparent,
-        checkedBoxColor: Color = DarwinTheme.componentStyling.checkbox.colors.checkedBox,
-        uncheckedBoxColor: Color = DarwinTheme.componentStyling.checkbox.colors.uncheckedBox,
-        disabledCheckedBoxColor: Color = DarwinTheme.componentStyling.checkbox.colors.disabledCheckedBox,
-        disabledUncheckedBoxColor: Color = DarwinTheme.componentStyling.checkbox.colors.disabledUncheckedBox,
-        checkedBorderColor: Color = DarwinTheme.componentStyling.checkbox.colors.checkedBorder,
-        uncheckedBorderColor: Color = DarwinTheme.componentStyling.checkbox.colors.uncheckedBorder,
-        disabledBorderColor: Color = DarwinTheme.componentStyling.checkbox.colors.disabledBorder,
-        disabledIndeterminateBorderColor: Color = DarwinTheme.componentStyling.checkbox.colors.disabledBorder,
-        disabledIndeterminateBoxColor: Color = DarwinTheme.componentStyling.checkbox.colors.disabledCheckedBox,
-    ) = CheckboxColors(
-        checkedCheckmarkColor, uncheckedCheckmarkColor,
-        checkedBoxColor, uncheckedBoxColor,
-        disabledCheckedBoxColor, disabledUncheckedBoxColor,
-        checkedBorderColor, uncheckedBorderColor,
-        disabledBorderColor, disabledIndeterminateBorderColor, disabledIndeterminateBoxColor,
-    )
-}
-
-// ===========================================================================
-// Checkbox — M3-compatible
+// Checkbox — macOS 26 style (no borders, translucent fills)
 // ===========================================================================
 
 @Composable
@@ -131,125 +52,85 @@ fun Checkbox(
     onCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    colors: CheckboxColors = CheckboxDefaults.colors(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    val controlSize = LocalControlSize.current
-    val metrics = DarwinTheme.componentStyling.checkbox.metrics
-
-    val animationProgress by animateFloatAsState(
-        targetValue = if (checked) 1f else 0f,
-        animationSpec = darwinSpring(preset = DarwinSpringPreset.Snappy),
-        label = "checkboxAnimation",
+    TriStateCheckbox(
+        state = if (checked) ToggleableState.On else ToggleableState.Off,
+        onClick = if (onCheckedChange != null) {
+            { onCheckedChange(!checked) }
+        } else null,
+        modifier = modifier,
+        enabled = enabled,
+        interactionSource = interactionSource,
     )
-
-    val boxBackground by animateColorAsState(
-        targetValue = when {
-            !enabled && checked -> colors.disabledCheckedBoxColor
-            !enabled -> colors.disabledUncheckedBoxColor
-            checked -> colors.checkedBoxColor
-            else -> colors.uncheckedBoxColor
-        },
-        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
-        label = "checkboxBoxColor",
-    )
-    val borderColor by animateColorAsState(
-        targetValue = when {
-            !enabled -> colors.disabledBorderColor
-            checked -> colors.checkedBorderColor
-            else -> colors.uncheckedBorderColor
-        },
-        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
-        label = "checkboxBorderColor",
-    )
-
-    val toggleModifier = if (onCheckedChange != null) {
-        modifier.toggleable(
-            value = checked,
-            onValueChange = { if (enabled) onCheckedChange(it) },
-            enabled = enabled,
-            role = Role.Checkbox,
-            interactionSource = interactionSource,
-            indication = null,
-        )
-    } else modifier
-
-    val checkboxShape = RoundedCornerShape(metrics.cornerSizeFor(controlSize))
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = toggleModifier
-            .alpha(if (enabled) 1f else 0.5f)
-            .size(metrics.sizeFor(controlSize))
-            .clip(checkboxShape)
-            .background(boxBackground, checkboxShape)
-            .border(width = 1.dp, color = borderColor, shape = checkboxShape),
-    ) {
-        if (animationProgress > 0f) {
-            Canvas(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer {
-                        scaleX = animationProgress
-                        scaleY = animationProgress
-                        alpha = animationProgress
-                    },
-            ) {
-                drawCheckmark(colors.checkedCheckmarkColor)
-            }
-        }
-    }
 }
 
 // ===========================================================================
-// TriStateCheckbox — M3-compatible (supports indeterminate state)
+// TriStateCheckbox — full three-state implementation (macOS 26)
 // ===========================================================================
 
 @Composable
 fun TriStateCheckbox(
-    state: androidx.compose.ui.state.ToggleableState,
+    state: ToggleableState,
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    colors: CheckboxColors = CheckboxDefaults.colors(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val controlSize = LocalControlSize.current
-    val metrics = DarwinTheme.componentStyling.checkbox.metrics
+    val isWindowActive = LocalWindowActive.current
+    val surface = LocalDarwinSurface.current
+    val style = DarwinTheme.componentStyling.checkbox
+    val colors = style.colors
+    val metrics = style.metrics
 
-    val isIndeterminate = state == androidx.compose.ui.state.ToggleableState.Indeterminate
-    val isChecked = state == androidx.compose.ui.state.ToggleableState.On
-    val isActive = isChecked || isIndeterminate
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val isActive = state != ToggleableState.Off
 
+    // Resolve fill color
+    val fillTarget = resolveCheckboxFillColor(isActive, enabled, isPressed, isWindowActive, surface, colors)
+
+    val boxFill by animateColorAsState(
+        targetValue = fillTarget,
+        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+        label = "checkboxFill",
+    )
+
+    // Pressed overlay for checked/mixed state
+    val pressedOverlayStrength = when (surface) {
+        DarwinSurface.ContentArea -> 0.15f
+        DarwinSurface.OverGlass -> 0.17f
+    }
+    val pressedOverlayAlpha by animateFloatAsState(
+        targetValue = if (isPressed && isActive && enabled && isWindowActive) pressedOverlayStrength else 0f,
+        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+        label = "checkboxPressedOverlay",
+    )
+
+    // Checkmark/dash animation
     val animationProgress by animateFloatAsState(
         targetValue = if (isActive) 1f else 0f,
         animationSpec = darwinSpring(preset = DarwinSpringPreset.Snappy),
-        label = "triStateCheckboxAnimation",
+        label = "checkboxAnimation",
     )
 
-    val boxBackground by animateColorAsState(
-        targetValue = when {
-            !enabled && isActive -> colors.disabledIndeterminateBoxColor
-            !enabled -> colors.disabledUncheckedBoxColor
-            isActive -> colors.checkedBoxColor
-            else -> colors.uncheckedBoxColor
-        },
-        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
-        label = "triStateBoxColor",
-    )
-    val borderColor by animateColorAsState(
-        targetValue = when {
-            !enabled && isIndeterminate -> colors.disabledIndeterminateBorderColor
-            !enabled -> colors.disabledBorderColor
-            isActive -> colors.checkedBorderColor
-            else -> colors.uncheckedBorderColor
-        },
-        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
-        label = "triStateBorderColor",
-    )
+    // Checkmark color
+    val checkmarkColor = when {
+        !isWindowActive && !enabled -> colors.inactiveDisabledCheckmark
+        !isWindowActive -> colors.inactiveCheckmark
+        else -> colors.checkmark
+    }
 
-    val clickModifier = if (onClick != null) {
+    // Disabled alpha
+    val contentAlpha = when {
+        !enabled && isActive -> colors.disabledAlpha
+        !enabled -> 1f
+        else -> 1f
+    }
+
+    val toggleModifier = if (onClick != null) {
         modifier.toggleable(
-            value = isChecked,
+            value = state == ToggleableState.On,
             onValueChange = { if (enabled) onClick() },
             enabled = enabled,
             role = Role.Checkbox,
@@ -259,15 +140,25 @@ fun TriStateCheckbox(
     } else modifier
 
     val checkboxShape = RoundedCornerShape(metrics.cornerSizeFor(controlSize))
+
     Box(
         contentAlignment = Alignment.Center,
-        modifier = clickModifier
-            .alpha(if (enabled) 1f else 0.5f)
+        modifier = toggleModifier
+            .alpha(contentAlpha)
             .size(metrics.sizeFor(controlSize))
             .clip(checkboxShape)
-            .background(boxBackground, checkboxShape)
-            .border(width = 1.dp, color = borderColor, shape = checkboxShape),
+            .background(boxFill, checkboxShape),
     ) {
+        // Pressed darkening overlay
+        if (pressedOverlayAlpha > 0f) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(Color.Black.copy(alpha = pressedOverlayAlpha), checkboxShape),
+            )
+        }
+
+        // Checkmark or dash indicator
         if (animationProgress > 0f) {
             Canvas(
                 modifier = Modifier
@@ -278,15 +169,49 @@ fun TriStateCheckbox(
                         alpha = animationProgress
                     },
             ) {
-                if (isIndeterminate) drawIndeterminateDash(colors.checkedCheckmarkColor)
-                else drawCheckmark(colors.checkedCheckmarkColor)
+                if (state == ToggleableState.Indeterminate) {
+                    drawIndeterminateDash(checkmarkColor)
+                } else {
+                    drawCheckmark(checkmarkColor)
+                }
             }
         }
     }
 }
 
+private fun resolveCheckboxFillColor(
+    isActive: Boolean,
+    enabled: Boolean,
+    isPressed: Boolean,
+    isWindowActive: Boolean,
+    surface: DarwinSurface,
+    colors: CheckboxStyle.Colors,
+): Color = when {
+    // Disabled states
+    !enabled && isActive && isWindowActive -> colors.disabledCheckedFill
+    !enabled && isActive -> colors.inactiveDisabledFill
+    !enabled -> colors.uncheckedFill
+
+    // Active window
+    isWindowActive && isActive -> colors.checkedFill
+    isWindowActive && isPressed -> colors.pressedOverlay
+    isWindowActive -> colors.uncheckedFill
+
+    // Inactive window — Over-glass uses slightly lighter fills
+    isActive && isPressed -> when (surface) {
+        DarwinSurface.ContentArea -> colors.inactiveCheckedPressedFill
+        DarwinSurface.OverGlass -> colors.inactiveCheckedPressedFill.copy(alpha = 0.17f)
+    }
+    isActive -> when (surface) {
+        DarwinSurface.ContentArea -> colors.inactiveCheckedFill
+        DarwinSurface.OverGlass -> colors.inactiveCheckedFill.copy(alpha = 0.10f)
+    }
+    isPressed -> colors.pressedOverlay
+    else -> colors.uncheckedFill
+}
+
 // ===========================================================================
-// CheckBox — backward-compatible alias with label support
+// CheckBox — convenience wrapper with label support
 // ===========================================================================
 
 @Composable
@@ -299,27 +224,39 @@ fun CheckBox(
     enabled: Boolean = true,
 ) {
     if (indeterminate || label != null) {
+        val interactionSource = remember { MutableInteractionSource() }
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier,
+            modifier = modifier.toggleable(
+                value = checked,
+                onValueChange = { if (enabled) onCheckedChange(it) },
+                enabled = enabled,
+                role = Role.Checkbox,
+                interactionSource = interactionSource,
+                indication = null,
+            ),
         ) {
             if (indeterminate) {
                 TriStateCheckbox(
-                    state = if (indeterminate) androidx.compose.ui.state.ToggleableState.Indeterminate
-                    else if (checked) androidx.compose.ui.state.ToggleableState.On
-                    else androidx.compose.ui.state.ToggleableState.Off,
-                    onClick = { onCheckedChange(!checked) },
+                    state = ToggleableState.Indeterminate,
+                    onClick = null,
                     enabled = enabled,
+                    interactionSource = interactionSource,
                 )
             } else {
-                Checkbox(checked = checked, onCheckedChange = onCheckedChange, enabled = enabled)
+                Checkbox(
+                    checked = checked,
+                    onCheckedChange = null,
+                    enabled = enabled,
+                    interactionSource = interactionSource,
+                )
             }
             if (label != null) {
-                Spacer(modifier = Modifier.width(DarwinTheme.componentStyling.checkbox.metrics.labelSpacing))
+                Spacer(modifier = Modifier.width(DarwinTheme.componentStyling.checkbox.metrics.labelSpacingFor(LocalControlSize.current)))
                 BasicText(
                     text = label,
                     style = DarwinTheme.typography.subheadline.merge(
-                        TextStyle(color = DarwinTheme.colorScheme.textPrimary, fontSize = 13.sp)
+                        TextStyle(color = DarwinTheme.colorScheme.textPrimary),
                     ),
                 )
             }

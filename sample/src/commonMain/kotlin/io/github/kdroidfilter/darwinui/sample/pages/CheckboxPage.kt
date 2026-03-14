@@ -3,6 +3,7 @@ package io.github.kdroidfilter.darwinui.sample.pages
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
@@ -10,12 +11,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.CheckBox
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.theme.ControlSize
+import io.github.kdroidfilter.darwinui.theme.DarwinSurface
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -43,7 +46,7 @@ fun CheckboxSizesExample() {
             ControlSize(size) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = size.name,
@@ -69,6 +72,57 @@ fun CheckboxStatesExample() {
         CheckBox(checked = checked2, onCheckedChange = { checked2 = it }, label = "Enabled and checked")
         CheckBox(checked = false, onCheckedChange = {}, label = "Disabled", enabled = false)
         CheckBox(checked = true, onCheckedChange = {}, indeterminate = true, label = "Indeterminate")
+    }
+}
+
+@GalleryExample("Checkbox", "Surface")
+@Composable
+fun CheckboxSurfaceExample() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = "Content Area",
+                style = DarwinTheme.typography.caption1,
+                color = DarwinTheme.colorScheme.textSecondary,
+            )
+            DarwinSurface(DarwinSurface.ContentArea) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    var c1 by remember { mutableStateOf(true) }
+                    var c2 by remember { mutableStateOf(false) }
+                    CheckBox(checked = c1, onCheckedChange = { c1 = it }, label = "Checked")
+                    CheckBox(checked = c2, onCheckedChange = { c2 = it }, label = "Unchecked")
+                    CheckBox(checked = false, onCheckedChange = {}, label = "Disabled", enabled = false)
+                }
+            }
+        }
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = "Over Glass",
+                style = DarwinTheme.typography.caption1,
+                color = DarwinTheme.colorScheme.textSecondary,
+            )
+            DarwinSurface(DarwinSurface.OverGlass) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    var c1 by remember { mutableStateOf(true) }
+                    var c2 by remember { mutableStateOf(false) }
+                    CheckBox(checked = c1, onCheckedChange = { c1 = it }, label = "Checked")
+                    CheckBox(checked = c2, onCheckedChange = { c2 = it }, label = "Unchecked")
+                    CheckBox(checked = false, onCheckedChange = {}, label = "Disabled", enabled = false)
+                }
+            }
+        }
     }
 }
 
@@ -114,6 +168,9 @@ internal fun CheckboxPage() {
             description = "Checkbox at each ControlSize level",
             sourceCode = GallerySources.CheckboxSizesExample,
         ) { CheckboxSizesExample() }
+
+        SectionHeader("Surface Appearance")
+        ExampleCard(title = "Content Area vs Over Glass", sourceCode = GallerySources.CheckboxSurfaceExample) { CheckboxSurfaceExample() }
 
         SectionHeader("Examples")
         ExampleCard(

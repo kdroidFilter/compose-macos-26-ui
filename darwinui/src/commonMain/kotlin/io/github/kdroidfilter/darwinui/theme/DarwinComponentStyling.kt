@@ -155,19 +155,32 @@ private fun defaultTextFieldStyle(cs: ColorScheme) = TextFieldStyle(
     ),
 )
 
-private fun defaultCheckboxStyle(cs: ColorScheme) = CheckboxStyle(
-    colors = CheckboxStyle.Colors(
-        checkedBox = cs.accent,
-        uncheckedBox = if (cs.isDark) Color(0xFF27272A) else Color.White,
-        disabledCheckedBox = cs.accent.copy(alpha = 0.5f),
-        disabledUncheckedBox = (if (cs.isDark) Color(0xFF27272A) else Color.White).copy(alpha = 0.5f),
-        checkedBorder = cs.accent,
-        uncheckedBorder = if (cs.isDark) Color(0xFF52525B) else Color.Black.copy(alpha = 0.20f),
-        disabledBorder = (if (cs.isDark) Color(0xFF52525B) else Color.Black.copy(alpha = 0.20f)).copy(alpha = 0.5f),
-        checkmark = Color.White,
-        checkmarkDisabled = Color.White.copy(alpha = 0.7f),
-    ),
-)
+private fun defaultCheckboxStyle(cs: ColorScheme): CheckboxStyle {
+    val fillBase = if (cs.isDark) Color.White else Color.Black
+
+    return CheckboxStyle(
+        colors = CheckboxStyle.Colors(
+            // Active window fills
+            checkedFill = cs.accent,
+            uncheckedFill = fillBase.copy(alpha = if (cs.isDark) 0.10f else 0.05f),
+            pressedOverlay = fillBase.copy(alpha = 0.15f),
+            disabledCheckedFill = cs.accent.copy(alpha = 0.5f),
+
+            // Inactive window fills
+            inactiveCheckedFill = fillBase.copy(alpha = 0.13f),
+            inactiveCheckedPressedFill = fillBase.copy(alpha = 0.20f),
+            inactiveDisabledFill = fillBase.copy(alpha = if (cs.isDark) 0.10f else 0.05f),
+
+            // Indicators
+            checkmark = Color.White,
+            inactiveCheckmark = if (cs.isDark) Color(0xFFAEAEB2) else Color(0xFF4C4C4C),
+            inactiveDisabledCheckmark = if (cs.isDark) Color(0xFF636366) else Color(0xFFC6C6C6),
+
+            // Disabled
+            disabledAlpha = 0.5f,
+        ),
+    )
+}
 
 private fun defaultRadioButtonStyle(cs: ColorScheme): RadioButtonStyle {
     // Light mode uses translucent black fills; dark mode uses translucent white
