@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -46,9 +47,11 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
+import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalControlSize
 import io.github.kdroidfilter.darwinui.theme.Outline
@@ -97,9 +100,30 @@ fun ComboBox(
 
     val selectedLabel = selected?.let { items.getOrNull(it) }
 
+    val isDark = colors.isDark
     val backgroundColor = when {
-        isTriggerHovered -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.08f)
-        else -> if (colors.isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.05f)
+        !enabled -> if (isDark) Color.White.copy(alpha = 0.04f) else Color.White.copy(alpha = 0.50f)
+        else -> if (isDark) Color.White.copy(alpha = 0.08f) else Color.White
+    }
+    val borderColor = when {
+        !enabled -> if (isDark) Color.White.copy(alpha = 0.04f) else Color.Black.copy(alpha = 0.04f)
+        isFocused || expanded -> colors.inputFocusBorder
+        else -> if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.08f)
+    }
+    val borderWidth = if (enabled && (isFocused || expanded)) 2.dp else 1.dp
+    val chevronAlpha = when {
+        !enabled -> 0.06f
+        expanded -> 0.20f
+        else -> 0.13f
+    }
+    val chevronBg = if (isDark) Color.White.copy(alpha = chevronAlpha) else Color.Black.copy(alpha = chevronAlpha)
+    val chevronTintAlpha = if (enabled) 0.85f else 0.25f
+    val chevronTint = if (isDark) Color.White.copy(alpha = chevronTintAlpha) else Color.Black.copy(alpha = chevronTintAlpha)
+
+    val comboFontSize = when (controlSize) {
+        ControlSize.Mini -> 10.sp
+        ControlSize.Small, ControlSize.Regular -> 11.sp
+        ControlSize.Large, ControlSize.ExtraLarge -> 13.sp
     }
 
     val chevronRotation by animateFloatAsState(
@@ -126,6 +150,7 @@ fun ComboBox(
             // Outer unclipped box carries the focus/validation outline ring (Phase 1.4)
             Box(
                 modifier = Modifier
+                    .widthIn(min = comboMetrics.minWidth)
                     .fillMaxWidth()
                     .height(comboMetrics.minHeightFor(controlSize))
                     .focusOrValidationOutline(isFocused || expanded, outline, shapes.small, outlines),
@@ -139,12 +164,10 @@ fun ComboBox(
                     }
                     .clip(shapes.small)
                     .background(backgroundColor)
-                    .then(
-                        if (isFocused || expanded) Modifier.border(
-                            width = 2.dp,
-                            color = colors.inputFocusBorder,
-                            shape = shapes.small,
-                        ) else Modifier
+                    .border(
+                        width = borderWidth,
+                        color = borderColor,
+                        shape = shapes.small,
                     )
                     .then(
                         if (enabled) {
@@ -205,6 +228,7 @@ fun ComboBox(
                 Text(
                     text = selectedLabel ?: placeholder ?: "Select...",
                     style = typography.subheadline,
+                    fontSize = comboFontSize,
                     color = if (selectedLabel != null) colors.textPrimary else colors.textTertiary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -213,15 +237,18 @@ fun ComboBox(
 
                 Box(
                     modifier = Modifier
+                        .padding(2.dp)
                         .fillMaxHeight()
-                        .width(28.dp),
+                        .width(16.dp)
+                        .clip(RoundedCornerShape(3.dp))
+                        .background(chevronBg),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         imageVector = LucideChevronDown,
-                        tint = colors.textPrimary,
+                        tint = chevronTint,
                         modifier = Modifier
-                            .size(12.dp)
+                            .size(10.dp)
                             .rotate(chevronRotation),
                     )
                 }
@@ -292,6 +319,7 @@ fun ComboBox(
                             Text(
                                 text = label,
                                 style = typography.subheadline,
+                                fontSize = comboFontSize,
                                 color = when {
                                     isSelected -> colors.onAccent
                                     else -> colors.textPrimary

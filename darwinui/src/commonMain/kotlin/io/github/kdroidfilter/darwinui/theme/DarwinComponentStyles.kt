@@ -452,7 +452,8 @@ data class ComboBoxStyle(
 
     @Immutable
     data class Metrics(
-        val minHeight: Dp = 22.dp,
+        val minWidth: Dp = 120.dp,
+        val minHeight: Dp = 24.dp,
         val horizontalPadding: Dp = 8.dp,
         val cornerSize: Dp = 5.dp,
         val borderWidth: Dp = 1.dp,
@@ -461,10 +462,10 @@ data class ComboBoxStyle(
     ) {
         fun minHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
             ControlSize.Mini -> 16.dp
-            ControlSize.Small -> 18.dp
+            ControlSize.Small -> 20.dp
             ControlSize.Regular -> minHeight
             ControlSize.Large -> 28.dp
-            ControlSize.ExtraLarge -> 34.dp
+            ControlSize.ExtraLarge -> 36.dp
         }
     }
 }
