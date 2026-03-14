@@ -17,3 +17,13 @@ val LocalDarwinTextStyle = compositionLocalOf { TextStyle.Default }
  * Replaces `androidx.compose.material3.LocalContentColor`.
  */
 val LocalDarwinContentColor = compositionLocalOf { Color.Unspecified }
+
+/**
+ * Whether the host window is currently active (foreground).
+ *
+ * When `false`, controls render in their "inactive" appearance — macOS grays
+ * out controls in background windows. Defaults to `true`.
+ *
+ * Platform integrations should provide this from the actual window focus state.
+ */
+val LocalWindowActive = compositionLocalOf { true }
