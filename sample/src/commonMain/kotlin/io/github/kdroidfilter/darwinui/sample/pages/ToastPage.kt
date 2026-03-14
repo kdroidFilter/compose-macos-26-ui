@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.PushButton
 import io.github.kdroidfilter.darwinui.components.ToastState
-import io.github.kdroidfilter.darwinui.components.ToastType
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -20,27 +19,32 @@ import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 fun ToastClickToShowExample(toastState: ToastState) {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         PushButton(
-            text = "Info Toast",
+            text = "Notification",
             onClick = {
-                toastState.show("This is an info message", title = "Info", type = ToastType.Info)
+                toastState.show(
+                    title = "Calendar",
+                    message = "You have a meeting in 15 minutes",
+                    timestamp = "now",
+                )
             },
         )
         PushButton(
-            text = "Success Toast",
+            text = "Message",
             onClick = {
-                toastState.show("Operation completed!", title = "Success", type = ToastType.Success)
+                toastState.show(
+                    title = "Messages",
+                    message = "John: Hey, are you free for lunch today?",
+                    timestamp = "2m ago",
+                )
             },
         )
         PushButton(
-            text = "Warning Toast",
+            text = "Download",
             onClick = {
-                toastState.show("Proceed with caution", title = "Warning", type = ToastType.Warning)
-            },
-        )
-        PushButton(
-            text = "Error Toast",
-            onClick = {
-                toastState.show("Something went wrong", title = "Error", type = ToastType.Error)
+                toastState.show(
+                    title = "Downloads",
+                    message = "Your file has been downloaded successfully.",
+                )
             },
         )
     }
@@ -48,11 +52,11 @@ fun ToastClickToShowExample(toastState: ToastState) {
 
 @Composable
 internal fun ToastPage(toastState: ToastState) {
-    GalleryPage("Toast", "A succinct message that is displayed temporarily.") {
+    GalleryPage("Toast", "macOS-style notification banners that auto-dismiss.") {
         SectionHeader("Examples")
         ExampleCard(
             title = "Click to Show",
-            description = "Trigger different toast types",
+            description = "Trigger different notification banners",
             sourceCode = GallerySources.ToastClickToShowExample,
         ) { ToastClickToShowExample(toastState) }
     }

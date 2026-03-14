@@ -30,19 +30,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Fill
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,11 +44,12 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import io.github.kdroidfilter.darwinui.theme.darwinGlass
+import io.github.kdroidfilter.darwinui.theme.darwinGlassMaterial
+import io.github.kdroidfilter.darwinui.theme.GlassMaterialSize
 import kotlinx.coroutines.delay
 
 // ===========================================================================
-// Alert Type
+// Alert Type (used by AlertDialog)
 // ===========================================================================
 
 /**
@@ -75,137 +70,112 @@ enum class AlertType {
 }
 
 // ===========================================================================
-// Type Color Resolution
+// AlertBanner — macOS notification banner
 // ===========================================================================
 
 /**
- * Returns the accent [Color] for the given [AlertType].
- */
-@Composable
-private fun resolveAlertTypeColor(type: AlertType): Color {
-    val colors = DarwinTheme.colorScheme
-    return when (type) {
-        AlertType.Info -> colors.info
-        AlertType.Success -> colors.success
-        AlertType.Warning -> colors.warning
-        AlertType.Error -> colors.destructive
-    }
-}
-
-// ===========================================================================
-// AlertBanner (Inline)
-// ===========================================================================
-
-/**
- * An inline alert banner that displays a message with a type-specific accent.
+ * A macOS-style notification banner.
  *
- * The banner spans the full available width and features:
- * - A 4dp left accent border colored by [type]
- * - A tinted background (type color at 5% opacity)
- * - A type-specific icon
- * - Optional [title] displayed in bold above the [message]
- * - Optional dismiss "X" button when [onDismiss] is provided
+ * Renders as a floating dark glass pill with:
+ * - An optional [icon] on the left (typically a rounded app icon)
+ * - [title] and [message] text in the center
+ * - An optional [timestamp] in the top-right area
+ * - Optional [trailingContent] on the far right (e.g. an image or avatar)
  *
- * Usage:
- * ```
- * AlertBanner(
- *     message = "Your changes have been saved.",
- *     title = "Success",
- *     type = AlertType.Success,
- *     onDismiss = { /* handle dismiss */ },
- * )
- * ```
- *
- * @param message The main text content of the alert.
- * @param title Optional title displayed above the message in bold.
- * @param type The semantic type determining accent color and icon.
- * @param onDismiss Optional callback invoked when the close button is pressed.
- *                  When null, no close button is shown.
+ * @param title The notification title (bold).
+ * @param message The notification body text.
  * @param modifier Modifier applied to the banner container.
+ * @param timestamp Optional timestamp text displayed top-right (e.g. "now", "2m ago").
+ * @param icon Optional leading icon composable (e.g. an app icon).
+ * @param trailingContent Optional trailing composable (e.g. an image thumbnail).
+ * @param onDismiss Optional callback invoked when the banner is tapped to dismiss.
  */
 @Composable
 fun AlertBanner(
+    title: String,
     message: String,
-    title: String? = null,
-    type: AlertType = AlertType.Info,
-    onDismiss: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
+    timestamp: String? = null,
+    icon: (@Composable () -> Unit)? = null,
+    trailingContent: (@Composable () -> Unit)? = null,
+    onDismiss: (() -> Unit)? = null,
 ) {
     val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
-    val shapes = DarwinTheme.shapes
+    val isDark = colors.isDark
 
-    val accentColor = resolveAlertTypeColor(type)
-    val tintedBackground = accentColor.copy(alpha = 0.05f)
-    val borderColor = colors.border
+    val shape = RoundedCornerShape(14.dp)
 
-    val shape = shapes.large
+    val textColor = if (isDark) Color.White else Color.Black.copy(alpha = 0.85f)
+    val secondaryTextColor = if (isDark) Color.White.copy(alpha = 0.5f) else Color.Black.copy(alpha = 0.45f)
 
     Box(
         modifier = modifier
-            .fillMaxWidth()
-            .clip(shape)
-            .background(tintedBackground, shape)
-            .border(width = 1.dp, color = borderColor, shape = shape)
-            .drawBehind {
-                // Left accent border (4dp wide)
-                drawRect(
-                    color = accentColor,
-                    topLeft = Offset.Zero,
-                    size = Size(4.dp.toPx(), size.height),
-                )
-            }
-            .padding(start = 4.dp), // offset content past the accent border
+            .widthIn(max = 360.dp)
+            .darwinGlassMaterial(shape = shape, materialSize = GlassMaterialSize.Medium)
+            .then(
+                if (onDismiss != null) {
+                    Modifier.clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onDismiss,
+                    )
+                } else {
+                    Modifier
+                }
+            ),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.Top,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Type icon
-            Box(
-                modifier = Modifier
-                    .size(20.dp)
-                    .drawBehind { drawAlertTypeIcon(type, accentColor) },
-            )
-
-            Spacer(modifier = Modifier.width(12.dp))
+            // Leading icon
+            if (icon != null) {
+                Box(modifier = Modifier.size(36.dp)) {
+                    icon()
+                }
+                Spacer(modifier = Modifier.width(10.dp))
+            }
 
             // Title + Message
             Column(
                 modifier = Modifier.weight(1f),
             ) {
-                if (title != null) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = title,
-                        style = typography.subheadline,
-                        color = colors.textPrimary,
+                        style = typography.caption1,
+                        color = textColor,
                         fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false),
                     )
-                    Spacer(modifier = Modifier.height(2.dp))
+                    if (timestamp != null) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = timestamp,
+                            style = typography.caption2,
+                            color = secondaryTextColor,
+                            maxLines = 1,
+                        )
+                    }
                 }
                 Text(
                     text = message,
-                    style = typography.subheadline,
-                    color = colors.textSecondary,
+                    style = typography.caption2,
+                    color = secondaryTextColor,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
 
-            // Dismiss button
-            if (onDismiss != null) {
-                Spacer(modifier = Modifier.width(8.dp))
-                Box(
-                    modifier = Modifier
-                        .size(20.dp)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = onDismiss,
-                        )
-                        .drawBehind { drawAlertCloseIcon(colors.textTertiary) },
-                    contentAlignment = Alignment.Center,
-                ) {}
+            // Trailing content
+            if (trailingContent != null) {
+                Spacer(modifier = Modifier.width(10.dp))
+                Box(modifier = Modifier.size(36.dp)) {
+                    trailingContent()
+                }
             }
         }
     }
@@ -223,23 +193,6 @@ fun AlertBanner(
  * - Large rounded corners (26dp) with frosted-glass appearance
  * - Vertically stacked full-width pill buttons (accent, destructive, secondary)
  * - Centered title (bold) and message text
- *
- * Usage:
- * ```
- * var showDialog by remember { mutableStateOf(false) }
- *
- * AlertDialog(
- *     open = showDialog,
- *     onDismissRequest = { showDialog = false },
- *     title = "Save the document?",
- *     message = "Your changes will be lost if you don't save them.",
- *     confirmText = "Save",
- *     destructiveText = "Don't Save",
- *     cancelText = "Cancel",
- *     onConfirm = { /* save logic */ },
- *     onDestructive = { /* discard logic */ },
- * )
- * ```
  *
  * @param open Whether the dialog is visible.
  * @param onDismissRequest Callback invoked when the dialog should close.
@@ -390,7 +343,7 @@ private fun AlertDialogContent(
         modifier = Modifier
             .widthIn(max = 260.dp)
             .shadow(elevation = 25.dp, shape = shape, clip = false, ambientColor = Color.Black.copy(alpha = 0.5f))
-            .darwinGlass(shape = shape, fallbackColor = fallbackBg)
+            .darwinGlassMaterial(shape = shape, materialSize = GlassMaterialSize.Large)
             .border(width = 0.5.dp, color = borderColor, shape = shape)
             // Prevent click-through to scrim
             .clickable(
@@ -425,7 +378,6 @@ private fun AlertDialogContent(
 
         when (buttonLayout) {
             AlertDialogButtonLayout.Stacked -> {
-                // Vertically stacked full-width pill buttons (macOS native style)
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -453,12 +405,10 @@ private fun AlertDialogContent(
             }
 
             AlertDialogButtonLayout.SideBySide -> {
-                // Side-by-side pill buttons (macOS style for 2-button alerts)
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
-                    // Destructive action on its own row if present
                     if (destructiveText != null && onDestructive != null) {
                         AlertPillButton(
                             text = destructiveText,
@@ -466,7 +416,6 @@ private fun AlertDialogContent(
                             style = AlertPillButtonStyle.Destructive,
                         )
                     }
-                    // Cancel + Confirm side by side
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -494,10 +443,6 @@ private fun AlertDialogContent(
 
 // ===========================================================================
 // AlertPillButton — macOS-native full-width pill button for alert dialogs
-// ===========================================================================
-
-// ===========================================================================
-// AlertDialog Button Layout
 // ===========================================================================
 
 /**
@@ -575,148 +520,6 @@ private fun AlertPillButton(
 }
 
 // ===========================================================================
-// Canvas Icon Drawing
-// ===========================================================================
-
-/**
- * Draws the type-specific icon within a [DrawScope].
- *
- * - Info: Circle with "i" (vertical line with dot)
- * - Success: Circle with checkmark
- * - Warning: Triangle with "!" exclamation
- * - Error: Circle with "X"
- */
-private fun DrawScope.drawAlertTypeIcon(type: AlertType, color: Color) {
-    val cx = size.width / 2f
-    val cy = size.height / 2f
-    val radius = size.minDimension / 2f - 1f
-    val strokeWidth = size.minDimension * 0.09f
-
-    when (type) {
-        AlertType.Info -> {
-            // Circle outline
-            drawCircle(
-                color = color,
-                radius = radius,
-                center = Offset(cx, cy),
-                style = Stroke(width = strokeWidth),
-            )
-            // Dot at top
-            drawCircle(
-                color = color,
-                radius = strokeWidth * 0.8f,
-                center = Offset(cx, cy - radius * 0.35f),
-                style = Fill,
-            )
-            // Vertical line (info "i" body)
-            drawLine(
-                color = color,
-                start = Offset(cx, cy - radius * 0.05f),
-                end = Offset(cx, cy + radius * 0.45f),
-                strokeWidth = strokeWidth,
-            )
-        }
-
-        AlertType.Success -> {
-            // Circle outline
-            drawCircle(
-                color = color,
-                radius = radius,
-                center = Offset(cx, cy),
-                style = Stroke(width = strokeWidth),
-            )
-            // Checkmark
-            val path = Path().apply {
-                moveTo(cx - radius * 0.35f, cy + radius * 0.0f)
-                lineTo(cx - radius * 0.05f, cy + radius * 0.3f)
-                lineTo(cx + radius * 0.35f, cy - radius * 0.25f)
-            }
-            drawPath(
-                path = path,
-                color = color,
-                style = Stroke(width = strokeWidth),
-            )
-        }
-
-        AlertType.Warning -> {
-            // Triangle
-            val trianglePath = Path().apply {
-                moveTo(cx, cy - radius * 0.85f)
-                lineTo(cx + radius * 0.95f, cy + radius * 0.75f)
-                lineTo(cx - radius * 0.95f, cy + radius * 0.75f)
-                close()
-            }
-            drawPath(
-                path = trianglePath,
-                color = color,
-                style = Stroke(width = strokeWidth),
-            )
-            // Exclamation line
-            drawLine(
-                color = color,
-                start = Offset(cx, cy - radius * 0.3f),
-                end = Offset(cx, cy + radius * 0.2f),
-                strokeWidth = strokeWidth,
-            )
-            // Exclamation dot
-            drawCircle(
-                color = color,
-                radius = strokeWidth * 0.8f,
-                center = Offset(cx, cy + radius * 0.5f),
-                style = Fill,
-            )
-        }
-
-        AlertType.Error -> {
-            // Circle outline
-            drawCircle(
-                color = color,
-                radius = radius,
-                center = Offset(cx, cy),
-                style = Stroke(width = strokeWidth),
-            )
-            // X mark
-            val offset = radius * 0.3f
-            drawLine(
-                color = color,
-                start = Offset(cx - offset, cy - offset),
-                end = Offset(cx + offset, cy + offset),
-                strokeWidth = strokeWidth,
-            )
-            drawLine(
-                color = color,
-                start = Offset(cx + offset, cy - offset),
-                end = Offset(cx - offset, cy + offset),
-                strokeWidth = strokeWidth,
-            )
-        }
-    }
-}
-
-/**
- * Draws a small close "X" icon centered in the [DrawScope].
- */
-private fun DrawScope.drawAlertCloseIcon(color: Color) {
-    val cx = size.width / 2f
-    val cy = size.height / 2f
-    val half = size.minDimension * 0.25f
-    val strokeWidth = 1.5f
-
-    drawLine(
-        color = color,
-        start = Offset(cx - half, cy - half),
-        end = Offset(cx + half, cy + half),
-        strokeWidth = strokeWidth,
-    )
-    drawLine(
-        color = color,
-        start = Offset(cx + half, cy - half),
-        end = Offset(cx - half, cy + half),
-        strokeWidth = strokeWidth,
-    )
-}
-
-// ===========================================================================
 // AlertDialog — M3-compatible overload with composable slots
 // ===========================================================================
 
@@ -786,7 +589,7 @@ fun AlertDialog(
                 modifier = modifier
                     .widthIn(max = 260.dp)
                     .shadow(elevation = 25.dp, shape = shape, clip = false, ambientColor = Color.Black.copy(alpha = 0.5f))
-                    .darwinGlass(shape = shape, fallbackColor = fallbackBg)
+                    .darwinGlassMaterial(shape = shape, materialSize = GlassMaterialSize.Large)
                     .border(width = 0.5.dp, color = borderColor, shape = shape)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
@@ -844,9 +647,9 @@ fun AlertDialog(
 private fun AlertPreview() {
     DarwinTheme {
         AlertBanner(
-            message = "Your changes have been saved.",
-            title = "Success",
-            type = AlertType.Success,
+            title = "Calendar",
+            message = "You have a meeting in 15 minutes",
+            timestamp = "now",
         )
     }
 }

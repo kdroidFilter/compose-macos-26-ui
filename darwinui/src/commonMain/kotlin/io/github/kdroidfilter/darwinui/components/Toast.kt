@@ -4,10 +4,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -15,10 +13,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
@@ -26,43 +27,16 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Fill
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.GlassMaterialSize
+import io.github.kdroidfilter.darwinui.theme.darwinGlassMaterial
 import kotlinx.coroutines.delay
-
-// ===========================================================================
-// Toast Type
-// ===========================================================================
-
-/**
- * The semantic type of a toast notification, determining its accent color and icon.
- */
-enum class ToastType {
-    /** Informational toast with blue accent. */
-    Info,
-
-    /** Success toast with green accent. */
-    Success,
-
-    /** Warning toast with amber accent. */
-    Warning,
-
-    /** Error toast with red accent. */
-    Error,
-}
 
 // ===========================================================================
 // Toast Data
@@ -72,16 +46,20 @@ enum class ToastType {
  * Immutable data class representing a single toast notification.
  *
  * @param id Unique identifier for the toast. Auto-generated via an incrementing counter.
- * @param message The main text content of the toast.
- * @param title Optional title displayed above the message.
- * @param type The semantic type determining accent color and icon.
+ * @param title The notification title (bold).
+ * @param message The notification body text.
+ * @param timestamp Optional timestamp text (e.g. "now", "2m ago").
+ * @param icon Optional leading icon composable (e.g. an app icon).
+ * @param trailingContent Optional trailing composable (e.g. an image thumbnail).
  * @param duration How long (in milliseconds) the toast remains visible before auto-dismissing.
  */
 data class ToastData(
     val id: Long = nextToastId(),
+    val title: String,
     val message: String,
-    val title: String? = null,
-    val type: ToastType = ToastType.Info,
+    val timestamp: String? = null,
+    val icon: (@Composable () -> Unit)? = null,
+    val trailingContent: (@Composable () -> Unit)? = null,
     val duration: Long = 3000L,
 )
 
@@ -106,7 +84,7 @@ private fun nextToastId(): Long = ++toastIdCounter
  * ToastHost(state = toastState)
  *
  * // Show a toast
- * toastState.show("File saved successfully", type = ToastType.Success)
+ * toastState.show(title = "Calendar", message = "Meeting in 15 minutes")
  * ```
  */
 @Stable
@@ -120,22 +98,28 @@ class ToastState {
     /**
      * Shows a new toast notification.
      *
-     * @param message The main text content of the toast.
-     * @param title Optional title displayed above the message.
-     * @param type The semantic type determining accent color and icon.
+     * @param title The notification title (bold).
+     * @param message The notification body text.
+     * @param timestamp Optional timestamp text (e.g. "now").
+     * @param icon Optional leading icon composable.
+     * @param trailingContent Optional trailing composable.
      * @param duration How long (in milliseconds) the toast remains visible.
      */
     fun show(
+        title: String,
         message: String,
-        title: String? = null,
-        type: ToastType = ToastType.Info,
+        timestamp: String? = null,
+        icon: (@Composable () -> Unit)? = null,
+        trailingContent: (@Composable () -> Unit)? = null,
         duration: Long = 3000L,
     ) {
         _toasts.add(
             ToastData(
-                message = message,
                 title = title,
-                type = type,
+                message = message,
+                timestamp = timestamp,
+                icon = icon,
+                trailingContent = trailingContent,
                 duration = duration,
             )
         )
@@ -164,8 +148,10 @@ fun rememberToastState(): ToastState {
 /**
  * A container that displays toast notifications from the given [state].
  *
- * Place this composable at the root of your layout (typically inside a [Box] that fills
- * the screen). Toasts appear stacked in the top-right corner with slide and fade animations.
+ * Displays toast notifications from the given [state] using a [Popup] to ensure
+ * they render above all other content (including title bars).
+ *
+ * Toasts appear stacked in the top-end corner, matching macOS notification behavior.
  *
  * @param state The [ToastState] that holds the active toasts.
  * @param modifier Modifier applied to the outer container.
@@ -175,13 +161,16 @@ fun ToastHost(
     state: ToastState,
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.TopEnd,
+    if (state.toasts.isEmpty()) return
+
+    Popup(
+        alignment = Alignment.TopEnd,
+        properties = PopupProperties(focusable = false),
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = modifier.padding(top = 12.dp, end = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.End,
         ) {
             state.toasts.forEach { toast ->
                 ToastItem(
@@ -198,16 +187,7 @@ fun ToastHost(
 // ===========================================================================
 
 /**
- * A single toast notification card.
- *
- * Features:
- * - 360dp width
- * - Card background with border
- * - 4dp left accent border colored by [ToastData.type]
- * - Type-specific icon drawn via Canvas
- * - Close button in the top-right corner
- * - Auto-dismiss after [ToastData.duration] via [LaunchedEffect]
- * - Animated entry (slide from right + fade in) and exit (slide out + fade out)
+ * A single toast notification rendered as a macOS notification banner.
  */
 @Composable
 private fun ToastItem(
@@ -216,11 +196,12 @@ private fun ToastItem(
 ) {
     val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
-    val shapes = DarwinTheme.shapes
+    val isDark = colors.isDark
 
-    val accentColor = resolveTypeColor(toast.type)
-    val backgroundColor = colors.card
-    val borderColor = colors.border
+    val textColor = if (isDark) Color.White else Color.Black.copy(alpha = 0.85f)
+    val secondaryTextColor = if (isDark) Color.White.copy(alpha = 0.5f) else Color.Black.copy(alpha = 0.45f)
+
+    val shape = RoundedCornerShape(14.dp)
 
     // Auto-dismiss
     LaunchedEffect(toast.id) {
@@ -230,243 +211,80 @@ private fun ToastItem(
 
     AnimatedVisibility(
         visible = true,
-        enter = slideInHorizontally(
-            initialOffsetX = { fullWidth -> fullWidth },
+        enter = slideInVertically(
+            initialOffsetY = { fullHeight -> -fullHeight },
             animationSpec = tween(durationMillis = 300),
         ) + fadeIn(animationSpec = tween(durationMillis = 300)),
-        exit = slideOutHorizontally(
-            targetOffsetX = { fullWidth -> fullWidth },
+        exit = slideOutVertically(
+            targetOffsetY = { fullHeight -> -fullHeight },
             animationSpec = tween(durationMillis = 200),
         ) + fadeOut(animationSpec = tween(durationMillis = 200)),
     ) {
-        val shape = shapes.large
-
         Box(
             modifier = Modifier
-                .width(360.dp)
-                .shadow(elevation = 8.dp, shape = shape, clip = false)
-                .clip(shape)
-                .background(backgroundColor, shape)
-                .border(width = 1.dp, color = borderColor, shape = shape)
-                .drawBehind {
-                    // Left accent border (4dp wide)
-                    drawRect(
-                        color = accentColor,
-                        topLeft = Offset.Zero,
-                        size = Size(4.dp.toPx(), size.height),
-                    )
-                }
-                .padding(start = 4.dp), // offset content past the accent border
+                .widthIn(max = 360.dp)
+                .darwinGlassMaterial(shape = shape, materialSize = GlassMaterialSize.Medium)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onDismiss,
+                ),
         ) {
             Row(
-                modifier = Modifier.padding(12.dp),
-                verticalAlignment = Alignment.Top,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                // Type icon
-                Box(
-                    modifier = Modifier
-                        .size(20.dp)
-                        .drawBehind { drawTypeIcon(toast.type, accentColor) },
-                )
-
-                Spacer(modifier = Modifier.width(12.dp))
+                // Leading icon
+                if (toast.icon != null) {
+                    Box(modifier = Modifier.size(36.dp)) {
+                        toast.icon.invoke()
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                }
 
                 // Title + Message
                 Column(
                     modifier = Modifier.weight(1f),
                 ) {
-                    if (toast.title != null) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = toast.title,
-                            style = typography.subheadline,
-                            color = colors.textPrimary,
+                            style = typography.caption1,
+                            color = textColor,
                             fontWeight = FontWeight.SemiBold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false),
                         )
+                        if (toast.timestamp != null) {
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = toast.timestamp,
+                                style = typography.caption2,
+                                color = secondaryTextColor,
+                                maxLines = 1,
+                            )
+                        }
                     }
                     Text(
                         text = toast.message,
-                        style = typography.caption1,
-                        color = colors.textSecondary,
+                        style = typography.caption2,
+                        color = secondaryTextColor,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
-
-                // Close button
-                Box(
-                    modifier = Modifier
-                        .size(20.dp)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = onDismiss,
-                        )
-                        .drawBehind { drawCloseIcon(colors.textTertiary) },
-                    contentAlignment = Alignment.Center,
-                ) {}
+                // Trailing content
+                if (toast.trailingContent != null) {
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Box(modifier = Modifier.size(36.dp)) {
+                        toast.trailingContent.invoke()
+                    }
+                }
             }
         }
     }
-}
-
-// ===========================================================================
-// Type Color Resolution
-// ===========================================================================
-
-/**
- * Returns the accent [Color] for the given [ToastType].
- */
-@Composable
-private fun resolveTypeColor(type: ToastType): Color {
-    val colors = DarwinTheme.colorScheme
-    return when (type) {
-        ToastType.Info -> colors.info
-        ToastType.Success -> colors.success
-        ToastType.Warning -> colors.warning
-        ToastType.Error -> colors.destructive
-    }
-}
-
-// ===========================================================================
-// Canvas Icon Drawing
-// ===========================================================================
-
-/**
- * Draws the type-specific icon within a [DrawScope].
- *
- * - Info: Circle with "i" (vertical line with dot)
- * - Success: Circle with checkmark
- * - Warning: Triangle with "!" exclamation
- * - Error: Circle with "X"
- */
-private fun DrawScope.drawTypeIcon(type: ToastType, color: Color) {
-    val cx = size.width / 2f
-    val cy = size.height / 2f
-    val radius = size.minDimension / 2f - 1f
-    val strokeWidth = 1.8f
-
-    when (type) {
-        ToastType.Info -> {
-            // Circle outline
-            drawCircle(
-                color = color,
-                radius = radius,
-                center = Offset(cx, cy),
-                style = Stroke(width = strokeWidth),
-            )
-            // Dot at top
-            drawCircle(
-                color = color,
-                radius = 1.5f,
-                center = Offset(cx, cy - radius * 0.35f),
-                style = Fill,
-            )
-            // Vertical line (info "i" body)
-            drawLine(
-                color = color,
-                start = Offset(cx, cy - radius * 0.05f),
-                end = Offset(cx, cy + radius * 0.45f),
-                strokeWidth = strokeWidth,
-            )
-        }
-
-        ToastType.Success -> {
-            // Circle outline
-            drawCircle(
-                color = color,
-                radius = radius,
-                center = Offset(cx, cy),
-                style = Stroke(width = strokeWidth),
-            )
-            // Checkmark
-            val path = Path().apply {
-                moveTo(cx - radius * 0.35f, cy + radius * 0.0f)
-                lineTo(cx - radius * 0.05f, cy + radius * 0.3f)
-                lineTo(cx + radius * 0.35f, cy - radius * 0.25f)
-            }
-            drawPath(
-                path = path,
-                color = color,
-                style = Stroke(width = strokeWidth),
-            )
-        }
-
-        ToastType.Warning -> {
-            // Triangle
-            val trianglePath = Path().apply {
-                moveTo(cx, cy - radius * 0.85f)
-                lineTo(cx + radius * 0.95f, cy + radius * 0.75f)
-                lineTo(cx - radius * 0.95f, cy + radius * 0.75f)
-                close()
-            }
-            drawPath(
-                path = trianglePath,
-                color = color,
-                style = Stroke(width = strokeWidth),
-            )
-            // Exclamation line
-            drawLine(
-                color = color,
-                start = Offset(cx, cy - radius * 0.3f),
-                end = Offset(cx, cy + radius * 0.2f),
-                strokeWidth = strokeWidth,
-            )
-            // Exclamation dot
-            drawCircle(
-                color = color,
-                radius = 1.5f,
-                center = Offset(cx, cy + radius * 0.5f),
-                style = Fill,
-            )
-        }
-
-        ToastType.Error -> {
-            // Circle outline
-            drawCircle(
-                color = color,
-                radius = radius,
-                center = Offset(cx, cy),
-                style = Stroke(width = strokeWidth),
-            )
-            // X mark
-            val offset = radius * 0.3f
-            drawLine(
-                color = color,
-                start = Offset(cx - offset, cy - offset),
-                end = Offset(cx + offset, cy + offset),
-                strokeWidth = strokeWidth,
-            )
-            drawLine(
-                color = color,
-                start = Offset(cx + offset, cy - offset),
-                end = Offset(cx - offset, cy + offset),
-                strokeWidth = strokeWidth,
-            )
-        }
-    }
-}
-
-/**
- * Draws a small close "X" icon centered in the [DrawScope].
- */
-private fun DrawScope.drawCloseIcon(color: Color) {
-    val cx = size.width / 2f
-    val cy = size.height / 2f
-    val half = size.minDimension * 0.25f
-    val strokeWidth = 1.5f
-
-    drawLine(
-        color = color,
-        start = Offset(cx - half, cy - half),
-        end = Offset(cx + half, cy + half),
-        strokeWidth = strokeWidth,
-    )
-    drawLine(
-        color = color,
-        start = Offset(cx + half, cy - half),
-        end = Offset(cx - half, cy + half),
-        strokeWidth = strokeWidth,
-    )
 }
 
 @Preview

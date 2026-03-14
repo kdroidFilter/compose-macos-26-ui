@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.AlertBanner
-import io.github.kdroidfilter.darwinui.components.AlertType
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -16,63 +15,56 @@ import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 @Composable
 private fun AlertPreview() {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        AlertBanner(message = "This is an informational alert.", title = "Information", type = AlertType.Info)
-        AlertBanner(message = "Operation completed successfully!", title = "Success", type = AlertType.Success)
-        AlertBanner(message = "Please review before proceeding.", title = "Warning", type = AlertType.Warning)
-        AlertBanner(message = "An error occurred.", title = "Error", type = AlertType.Error)
+        AlertBanner(
+            title = "Calendar",
+            message = "You have a meeting in 15 minutes",
+            timestamp = "now",
+        )
+        AlertBanner(
+            title = "Messages",
+            message = "John: Hey, are you free for lunch today?",
+            timestamp = "2m ago",
+        )
     }
 }
 
-@GalleryExample("Alert", "Info")
+@GalleryExample("Alert", "Basic")
 @Composable
-fun AlertInfoExample() {
+fun AlertBasicExample() {
     AlertBanner(
-        message = "This is an informational alert.",
-        title = "Information",
-        type = AlertType.Info,
+        title = "Calendar",
+        message = "You have a meeting in 15 minutes",
+        timestamp = "now",
     )
 }
 
-@GalleryExample("Alert", "Success")
+@GalleryExample("Alert", "With Timestamp")
 @Composable
-fun AlertSuccessExample() {
+fun AlertWithTimestampExample() {
     AlertBanner(
-        message = "Operation completed successfully!",
-        title = "Success",
-        type = AlertType.Success,
+        title = "Messages",
+        message = "John: Hey, are you free for lunch today?",
+        timestamp = "2m ago",
     )
 }
 
-@GalleryExample("Alert", "Warning")
+@GalleryExample("Alert", "Minimal")
 @Composable
-fun AlertWarningExample() {
+fun AlertMinimalExample() {
     AlertBanner(
-        message = "Please review before proceeding.",
-        title = "Warning",
-        type = AlertType.Warning,
-    )
-}
-
-@GalleryExample("Alert", "Error")
-@Composable
-fun AlertErrorExample() {
-    AlertBanner(
-        message = "An error occurred while processing.",
-        title = "Error",
-        type = AlertType.Error,
-        onDismiss = {},
+        title = "Download Complete",
+        message = "Your file has been downloaded successfully.",
     )
 }
 
 @Composable
 internal fun AlertPage() {
-    GalleryPage("Alert", "Inline banners for user attention.") {
+    GalleryPage("Alert", "macOS-style notification banners.") {
         PreviewContainer { AlertPreview() }
 
         SectionHeader("Variants")
-        ExampleCard(title = "Info", sourceCode = GallerySources.AlertInfoExample) { AlertInfoExample() }
-        ExampleCard(title = "Success", sourceCode = GallerySources.AlertSuccessExample) { AlertSuccessExample() }
-        ExampleCard(title = "Warning", sourceCode = GallerySources.AlertWarningExample) { AlertWarningExample() }
-        ExampleCard(title = "Error", sourceCode = GallerySources.AlertErrorExample) { AlertErrorExample() }
+        ExampleCard(title = "Basic", sourceCode = GallerySources.AlertBasicExample) { AlertBasicExample() }
+        ExampleCard(title = "With Timestamp", sourceCode = GallerySources.AlertWithTimestampExample) { AlertWithTimestampExample() }
+        ExampleCard(title = "Minimal", sourceCode = GallerySources.AlertMinimalExample) { AlertMinimalExample() }
     }
 }
