@@ -199,38 +199,55 @@ data class RadioButtonStyle(
 ) {
     @Immutable
     data class Colors(
-        val selectedBackground: Color,
-        val unselectedBackground: Color,
-        val disabledSelectedBackground: Color,
-        val disabledUnselectedBackground: Color,
-        val selectedBorder: Color,
-        val unselectedBorder: Color,
-        val disabledBorder: Color,
+        // Active window fills
+        val checkedFill: Color,
+        val uncheckedFill: Color,
+        val pressedOverlay: Color,
+        val disabledCheckedFill: Color,
+
+        // Inactive window fills
+        val inactiveCheckedFill: Color,
+        val inactiveCheckedPressedFill: Color,
+        val inactiveDisabledFill: Color,
+
+        // Indicators
         val dot: Color,
-        val dotDisabled: Color,
+        val inactiveDot: Color,
+        val inactiveDisabledDot: Color,
+
+        // Disabled
+        val disabledAlpha: Float,
     )
 
     @Immutable
     data class Metrics(
         val size: Dp = 16.dp,
-        val dotSize: Dp = 6.dp,
+        val dotSize: Dp = 5.dp,
         val borderWidth: Dp = 1.dp,
-        val labelSpacing: Dp = 8.dp,
+        val labelSpacing: Dp = 3.dp,
     ) {
         fun sizeFor(controlSize: ControlSize): Dp = when (controlSize) {
             ControlSize.Mini -> 12.dp
             ControlSize.Small -> 14.dp
             ControlSize.Regular -> size
             ControlSize.Large -> 18.dp
-            ControlSize.ExtraLarge -> 22.dp
+            ControlSize.ExtraLarge -> 18.dp
         }
 
         fun dotSizeFor(controlSize: ControlSize): Dp = when (controlSize) {
             ControlSize.Mini -> 4.dp
             ControlSize.Small -> 5.dp
             ControlSize.Regular -> dotSize
-            ControlSize.Large -> 7.dp
-            ControlSize.ExtraLarge -> 9.dp
+            ControlSize.Large -> 5.dp
+            ControlSize.ExtraLarge -> 5.dp
+        }
+
+        fun labelSpacingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 3.dp
+            ControlSize.Small -> 3.dp
+            ControlSize.Regular -> labelSpacing
+            ControlSize.Large -> 5.dp
+            ControlSize.ExtraLarge -> 7.dp
         }
     }
 }

@@ -3,8 +3,8 @@ package io.github.kdroidfilter.darwinui.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +14,6 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -26,70 +25,17 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
+import io.github.kdroidfilter.darwinui.theme.DarwinSurface
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalControlSize
-import io.github.kdroidfilter.darwinui.theme.Zinc600
-import io.github.kdroidfilter.darwinui.theme.Zinc800
+import io.github.kdroidfilter.darwinui.theme.LocalDarwinSurface
+import io.github.kdroidfilter.darwinui.theme.LocalWindowActive
+import io.github.kdroidfilter.darwinui.theme.RadioButtonStyle
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 
 // ===========================================================================
-// RadioButtonColors — mirrors M3's RadioButtonColors
-// ===========================================================================
-
-@Immutable
-class RadioButtonColors(
-    val selectedColor: Color,
-    val unselectedColor: Color,
-    val dotColor: Color,
-    val disabledSelectedColor: Color,
-    val disabledUnselectedColor: Color,
-    val disabledDotColor: Color,
-    val unselectedBorderColor: Color,
-    val disabledBorderColor: Color,
-) {
-    fun copy(
-        selectedColor: Color = this.selectedColor,
-        unselectedColor: Color = this.unselectedColor,
-        dotColor: Color = this.dotColor,
-        disabledSelectedColor: Color = this.disabledSelectedColor,
-        disabledUnselectedColor: Color = this.disabledUnselectedColor,
-        disabledDotColor: Color = this.disabledDotColor,
-        unselectedBorderColor: Color = this.unselectedBorderColor,
-        disabledBorderColor: Color = this.disabledBorderColor,
-    ) = RadioButtonColors(
-        selectedColor, unselectedColor, dotColor,
-        disabledSelectedColor, disabledUnselectedColor, disabledDotColor,
-        unselectedBorderColor, disabledBorderColor
-    )
-}
-
-// ===========================================================================
-// RadioButtonDefaults — mirrors M3's RadioButtonDefaults
-// ===========================================================================
-
-object RadioButtonDefaults {
-    @Composable
-    fun colors(
-        selectedColor: Color = DarwinTheme.colorScheme.accent,
-        unselectedColor: Color = if (DarwinTheme.colorScheme.isDark) Zinc800 else Color.White,
-        dotColor: Color = Color.White,
-        disabledSelectedColor: Color = selectedColor.copy(alpha = 0.5f),
-        disabledUnselectedColor: Color = unselectedColor.copy(alpha = 0.5f),
-        disabledDotColor: Color = dotColor.copy(alpha = 0.5f),
-        unselectedBorderColor: Color = if (DarwinTheme.colorScheme.isDark) Zinc600 else Color.Black.copy(alpha = 0.20f),
-        disabledBorderColor: Color = unselectedBorderColor.copy(alpha = 0.5f),
-    ) = RadioButtonColors(
-        selectedColor, unselectedColor, dotColor,
-        disabledSelectedColor, disabledUnselectedColor, disabledDotColor,
-        unselectedBorderColor, disabledBorderColor
-    )
-}
-
-// ===========================================================================
-// RadioButton — M3-compatible
+// RadioButton — macOS 26 style (no borders, translucent fills)
 // ===========================================================================
 
 @Composable
@@ -98,38 +44,58 @@ fun RadioButton(
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    colors: RadioButtonColors = RadioButtonDefaults.colors(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val controlSize = LocalControlSize.current
-    val metrics = DarwinTheme.componentStyling.radioButton.metrics
+    val isWindowActive = LocalWindowActive.current
+    val surface = LocalDarwinSurface.current
+    val style = DarwinTheme.componentStyling.radioButton
+    val colors = style.colors
+    val metrics = style.metrics
 
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    // Resolve fill color based on state + surface
+    val fillTarget = resolveFillColor(selected, enabled, isPressed, isWindowActive, surface, colors)
+
+    val radioFill by animateColorAsState(
+        targetValue = fillTarget,
+        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+        label = "radioButtonFill",
+    )
+
+    // Pressed overlay for checked state (accent + darkening)
+    // Over-glass uses stronger darkening for depth
+    val pressedOverlayStrength = when (surface) {
+        DarwinSurface.ContentArea -> 0.15f
+        DarwinSurface.OverGlass -> 0.17f
+    }
+    val pressedOverlayAlpha by animateFloatAsState(
+        targetValue = if (isPressed && selected && enabled && isWindowActive) pressedOverlayStrength else 0f,
+        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+        label = "radioButtonPressedOverlay",
+    )
+
+    // Dot animation
     val dotAnimationProgress by animateFloatAsState(
         targetValue = if (selected) 1f else 0f,
         animationSpec = darwinSpring(preset = DarwinSpringPreset.Snappy),
-        label = "radioButtonAnimation",
+        label = "radioButtonDotAnimation",
     )
 
-    val radioBackground by animateColorAsState(
-        targetValue = when {
-            !enabled && selected -> colors.disabledSelectedColor
-            !enabled -> colors.disabledUnselectedColor
-            selected -> colors.selectedColor
-            else -> colors.unselectedColor
-        },
-        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
-        label = "radioButtonBackgroundColor",
-    )
+    // Dot color
+    val dotColor = when {
+        !isWindowActive && !enabled -> colors.inactiveDisabledDot
+        !isWindowActive -> colors.inactiveDot
+        else -> colors.dot
+    }
 
-    val borderColor by animateColorAsState(
-        targetValue = when {
-            !enabled -> colors.disabledBorderColor
-            selected -> colors.selectedColor
-            else -> colors.unselectedBorderColor
-        },
-        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
-        label = "radioButtonBorderColor",
-    )
+    // Disabled alpha
+    val contentAlpha = when {
+        !enabled && selected -> colors.disabledAlpha
+        !enabled -> 1f
+        else -> 1f
+    }
 
     val selectableModifier = if (onClick != null) {
         modifier.selectable(
@@ -145,12 +111,21 @@ fun RadioButton(
     Box(
         contentAlignment = Alignment.Center,
         modifier = selectableModifier
-            .alpha(if (enabled) 1f else 0.5f)
+            .alpha(contentAlpha)
             .size(metrics.sizeFor(controlSize))
             .clip(CircleShape)
-            .background(radioBackground, CircleShape)
-            .border(width = 1.dp, color = borderColor, shape = CircleShape),
+            .background(radioFill, CircleShape),
     ) {
+        // Pressed darkening overlay (only for active-window checked state)
+        if (pressedOverlayAlpha > 0f) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(Color.Black.copy(alpha = pressedOverlayAlpha), CircleShape),
+            )
+        }
+
+        // Dot indicator
         if (dotAnimationProgress > 0f) {
             Box(
                 modifier = Modifier
@@ -160,10 +135,41 @@ fun RadioButton(
                         scaleY = dotAnimationProgress
                         alpha = dotAnimationProgress
                     }
-                    .background(if (enabled) colors.dotColor else colors.disabledDotColor, CircleShape)
+                    .background(dotColor, CircleShape),
             )
         }
     }
+}
+
+private fun resolveFillColor(
+    selected: Boolean,
+    enabled: Boolean,
+    isPressed: Boolean,
+    isWindowActive: Boolean,
+    surface: DarwinSurface,
+    colors: RadioButtonStyle.Colors,
+): Color = when {
+    // Disabled states
+    !enabled && selected && isWindowActive -> colors.disabledCheckedFill
+    !enabled && selected -> colors.inactiveDisabledFill
+    !enabled -> colors.uncheckedFill
+
+    // Active window
+    isWindowActive && selected -> colors.checkedFill
+    isWindowActive && isPressed -> colors.pressedOverlay
+    isWindowActive -> colors.uncheckedFill
+
+    // Inactive window — Over-glass uses slightly lighter fills
+    selected && isPressed -> when (surface) {
+        DarwinSurface.ContentArea -> colors.inactiveCheckedPressedFill
+        DarwinSurface.OverGlass -> colors.inactiveCheckedPressedFill.copy(alpha = 0.17f)
+    }
+    selected -> when (surface) {
+        DarwinSurface.ContentArea -> colors.inactiveCheckedFill
+        DarwinSurface.OverGlass -> colors.inactiveCheckedFill.copy(alpha = 0.10f)
+    }
+    isPressed -> colors.pressedOverlay
+    else -> colors.uncheckedFill
 }
 
 // ===========================================================================
@@ -188,20 +194,20 @@ fun RadioButton(
                 enabled = enabled,
                 role = Role.RadioButton,
                 interactionSource = interactionSource,
-                indication = null
+                indication = null,
             ),
         ) {
             RadioButton(
                 selected = selected,
                 onClick = null,
                 enabled = enabled,
-                interactionSource = interactionSource
+                interactionSource = interactionSource,
             )
-            Spacer(modifier = Modifier.width(DarwinTheme.componentStyling.radioButton.metrics.labelSpacing))
+            Spacer(modifier = Modifier.width(DarwinTheme.componentStyling.radioButton.metrics.labelSpacingFor(LocalControlSize.current)))
             BasicText(
                 text = label,
                 style = DarwinTheme.typography.subheadline.merge(
-                    TextStyle(color = DarwinTheme.colorScheme.textPrimary, fontSize = 13.sp)
+                    TextStyle(color = DarwinTheme.colorScheme.textPrimary),
                 ),
             )
         }
@@ -211,7 +217,6 @@ fun RadioButton(
             onClick = onClick,
             modifier = modifier,
             enabled = enabled,
-            colors = RadioButtonDefaults.colors(),
         )
     }
 }

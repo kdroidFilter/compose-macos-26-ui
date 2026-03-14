@@ -169,19 +169,33 @@ private fun defaultCheckboxStyle(cs: ColorScheme) = CheckboxStyle(
     ),
 )
 
-private fun defaultRadioButtonStyle(cs: ColorScheme) = RadioButtonStyle(
-    colors = RadioButtonStyle.Colors(
-        selectedBackground = cs.accent,
-        unselectedBackground = if (cs.isDark) Color(0xFF27272A) else Color.White,
-        disabledSelectedBackground = cs.accent.copy(alpha = 0.5f),
-        disabledUnselectedBackground = (if (cs.isDark) Color(0xFF27272A) else Color.White).copy(alpha = 0.5f),
-        selectedBorder = cs.accent,
-        unselectedBorder = if (cs.isDark) Color(0xFF52525B) else Color.Black.copy(alpha = 0.20f),
-        disabledBorder = Color.Black.copy(alpha = 0.10f),
-        dot = Color.White,
-        dotDisabled = Color.White.copy(alpha = 0.7f),
-    ),
-)
+private fun defaultRadioButtonStyle(cs: ColorScheme): RadioButtonStyle {
+    // Light mode uses translucent black fills; dark mode uses translucent white
+    val fillBase = if (cs.isDark) Color.White else Color.Black
+
+    return RadioButtonStyle(
+        colors = RadioButtonStyle.Colors(
+            // Active window fills
+            checkedFill = cs.accent,
+            uncheckedFill = fillBase.copy(alpha = if (cs.isDark) 0.10f else 0.05f),
+            pressedOverlay = fillBase.copy(alpha = 0.15f),
+            disabledCheckedFill = cs.accent.copy(alpha = 0.5f),
+
+            // Inactive window fills
+            inactiveCheckedFill = fillBase.copy(alpha = 0.13f),
+            inactiveCheckedPressedFill = fillBase.copy(alpha = 0.20f),
+            inactiveDisabledFill = fillBase.copy(alpha = if (cs.isDark) 0.10f else 0.05f),
+
+            // Indicators
+            dot = Color.White,
+            inactiveDot = if (cs.isDark) Color(0xFFAEAEB2) else Color(0xFF4C4C4C),
+            inactiveDisabledDot = if (cs.isDark) Color(0xFF636366) else Color(0xFFC6C6C6),
+
+            // Disabled
+            disabledAlpha = 0.5f,
+        ),
+    )
+}
 
 private fun defaultSwitchStyle(cs: ColorScheme): SwitchStyle {
     val offTrack = if (cs.isDark) Color(0xFF3A3A3C) else Color(0xFFD1D1D6)

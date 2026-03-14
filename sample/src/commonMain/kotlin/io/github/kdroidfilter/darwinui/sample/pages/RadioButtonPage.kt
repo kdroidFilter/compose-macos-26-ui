@@ -2,19 +2,21 @@ package io.github.kdroidfilter.darwinui.sample.pages
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.RadioButton
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.theme.ControlSize
+import io.github.kdroidfilter.darwinui.theme.DarwinSurface
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
@@ -69,6 +71,55 @@ fun RadioButtonBasicExample() {
     }
 }
 
+@GalleryExample("RadioButton", "Surface")
+@Composable
+fun RadioButtonSurfaceExample() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = "Content Area",
+                style = DarwinTheme.typography.caption1,
+                color = DarwinTheme.colorScheme.textSecondary,
+            )
+            DarwinSurface(DarwinSurface.ContentArea) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    var s by remember { mutableStateOf(1) }
+                    RadioButton(selected = s == 1, onClick = { s = 1 }, label = "Selected")
+                    RadioButton(selected = s == 2, onClick = { s = 2 }, label = "Unselected")
+                    RadioButton(selected = false, onClick = {}, label = "Disabled", enabled = false)
+                }
+            }
+        }
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = "Over Glass",
+                style = DarwinTheme.typography.caption1,
+                color = DarwinTheme.colorScheme.textSecondary,
+            )
+            DarwinSurface(DarwinSurface.OverGlass) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    var s by remember { mutableStateOf(1) }
+                    RadioButton(selected = s == 1, onClick = { s = 1 }, label = "Selected")
+                    RadioButton(selected = s == 2, onClick = { s = 2 }, label = "Unselected")
+                    RadioButton(selected = false, onClick = {}, label = "Disabled", enabled = false)
+                }
+            }
+        }
+    }
+}
+
 @Composable
 internal fun RadioButtonPage() {
     GalleryPage("RadioButton", "A control that allows the user to select a single option from a set.") {
@@ -80,6 +131,9 @@ internal fun RadioButtonPage() {
             description = "RadioButton at each ControlSize level",
             sourceCode = GallerySources.RadioButtonSizesExample,
         ) { RadioButtonSizesExample() }
+
+        SectionHeader("Surface Appearance")
+        ExampleCard(title = "Content Area vs Over Glass", sourceCode = GallerySources.RadioButtonSurfaceExample) { RadioButtonSurfaceExample() }
 
         SectionHeader("Examples")
         ExampleCard(
