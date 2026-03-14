@@ -752,6 +752,63 @@ data class SidebarStyle(
 
 
 // ---------------------------------------------------------------------------
+// StepperStyle
+// ---------------------------------------------------------------------------
+
+@Immutable
+data class StepperStyle(
+    val colors: Colors,
+    val metrics: Metrics = Metrics(),
+) {
+    @Immutable
+    data class Colors(
+        // Content Area — button half backgrounds
+        val background: Color,
+        val backgroundPressed: Color,
+        val backgroundDisabled: Color,
+        // Over-glass — button half backgrounds
+        val overGlassBackground: Color,
+        val overGlassBackgroundPressed: Color,
+        val overGlassBackgroundDisabled: Color,
+        // Arrow / chevron
+        val arrow: Color,
+        val arrowDisabled: Color,
+        // Separator
+        val separator: Color,
+    )
+
+    @Immutable
+    data class Metrics(
+        val disabledAlpha: Float = 0.5f,
+    ) {
+        fun widthFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 13.dp
+            ControlSize.Small -> 17.dp
+            ControlSize.Regular -> 20.dp
+            ControlSize.Large -> 23.dp
+            ControlSize.ExtraLarge -> 30.dp
+        }
+
+        fun heightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 16.dp
+            ControlSize.Small -> 20.dp
+            ControlSize.Regular -> 24.dp
+            ControlSize.Large -> 28.dp
+            ControlSize.ExtraLarge -> 36.dp
+        }
+
+        fun cornerRadiusFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 4.dp
+            ControlSize.Small -> 5.dp
+            ControlSize.Regular -> 6.dp
+            ControlSize.Large -> 7.dp
+            ControlSize.ExtraLarge -> 9.dp
+        }
+    }
+}
+
+
+// ---------------------------------------------------------------------------
 // TooltipStyle
 // ---------------------------------------------------------------------------
 

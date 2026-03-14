@@ -119,6 +119,7 @@ import io.github.kdroidfilter.darwinui.sample.pages.SegmentedControlPage
 import io.github.kdroidfilter.darwinui.sample.pages.SidebarPage
 import io.github.kdroidfilter.darwinui.sample.pages.SkeletonPage
 import io.github.kdroidfilter.darwinui.sample.pages.SliderPage
+import io.github.kdroidfilter.darwinui.sample.pages.StepperPage
 import io.github.kdroidfilter.darwinui.sample.pages.SwitchPage
 import io.github.kdroidfilter.darwinui.sample.pages.TablePage
 import io.github.kdroidfilter.darwinui.sample.pages.TabsPage
@@ -148,6 +149,7 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("searchinput", "Search Input", "FORM CONTROLS", Lucide.Search),
     SidebarEntryDef("slider", "Slider", "FORM CONTROLS", Lucide.SlidersHorizontal),
     SidebarEntryDef("circularslider", "Circular Slider", "FORM CONTROLS", Lucide.Loader),
+    SidebarEntryDef("stepper", "Stepper", "FORM CONTROLS", Lucide.ChevronsUpDown),
     SidebarEntryDef("colorwell", "Color Well", "FORM CONTROLS", Lucide.Scan),
     SidebarEntryDef("scrollbar", "Scrollbar", "DATA DISPLAY", Lucide.GripVertical),
     SidebarEntryDef("groupbox", "Group Box", "DATA DISPLAY", Lucide.SquareDashed),
@@ -417,6 +419,7 @@ fun App() {
                         "multiselect" -> MultiSelectPage()
                         "slider" -> SliderPage()
                         "circularslider" -> CircularSliderPage()
+                        "stepper" -> StepperPage()
                         "scrollbar" -> ScrollbarPage()
                         "groupbox" -> GroupBoxPage()
                         "groupedlist" -> GroupedListPage()

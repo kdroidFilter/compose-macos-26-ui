@@ -43,6 +43,7 @@ data class ComponentStyling(
     val segmentedControl: SegmentedControlStyle,
     val tooltip: TooltipStyle,
     val card: CardStyle,
+    val stepper: StepperStyle,
     val progress: ProgressStyle = ProgressStyle(),
     val sidebar: SidebarStyle = SidebarStyle(),
 )
@@ -73,6 +74,7 @@ fun defaultComponentStyling(colorScheme: ColorScheme): ComponentStyling {
         tab = defaultTabStyle(colorScheme),
         comboBox = defaultComboBoxStyle(colorScheme),
         segmentedControl = defaultSegmentedControlStyle(colorScheme),
+        stepper = defaultStepperStyle(colorScheme),
         tooltip = defaultTooltipStyle(colorScheme),
         card = defaultCardStyle(colorScheme),
     )
@@ -304,6 +306,32 @@ private fun defaultSegmentedControlStyle(cs: ColorScheme) = SegmentedControlStyl
         disabledContent = cs.textTertiary,
     ),
 )
+
+private fun defaultStepperStyle(cs: ColorScheme): StepperStyle {
+    val fillBase = if (cs.isDark) Color.White else Color.Black
+    return StepperStyle(
+        colors = StepperStyle.Colors(
+            // Sketch: Content Area/01 - Bordered Neutral/Off, 01 - Idle = #0000000d
+            background = fillBase.copy(alpha = if (cs.isDark) 0.08f else 0.05f),
+            // Sketch: Content Area/01 - Bordered Neutral/Off, 03 - Clicked = #00000026
+            backgroundPressed = fillBase.copy(alpha = 0.15f),
+            // Sketch: Content Area/01 - Bordered Neutral/Off, 04 - Disabled = #0000000a
+            backgroundDisabled = fillBase.copy(alpha = if (cs.isDark) 0.06f else 0.04f),
+            // Sketch: Over-Glass/01 - Bordered Neutral/Off, 01 - Idle = #0000000d
+            overGlassBackground = fillBase.copy(alpha = if (cs.isDark) 0.08f else 0.05f),
+            // Sketch: Over-Glass/01 - Bordered Neutral/Off, 03 - Clicked = #00000026
+            overGlassBackgroundPressed = fillBase.copy(alpha = 0.15f),
+            // Sketch: Over-Glass/01 - Bordered Neutral/Off, 04 - Disabled = #00000008
+            overGlassBackgroundDisabled = fillBase.copy(alpha = if (cs.isDark) 0.05f else 0.03f),
+            // Sketch: Label Colors/Light/1 Primary = #000000d9
+            arrow = cs.textPrimary,
+            // Sketch: Label Colors/Light/3 Tertiary = #00000040
+            arrowDisabled = cs.textTertiary,
+            // Sketch: Label Colors/Light Vibrant/3 Tertiary = #bfbfbfff
+            separator = if (cs.isDark) Color(0xFF636366) else Color(0xFFBFBFBF),
+        ),
+    )
+}
 
 private fun defaultTooltipStyle(cs: ColorScheme) = TooltipStyle(
     colors = TooltipStyle.Colors(
