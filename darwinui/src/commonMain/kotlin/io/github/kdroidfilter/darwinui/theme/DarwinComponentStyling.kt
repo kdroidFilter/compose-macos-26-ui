@@ -130,30 +130,34 @@ private fun textButtonStyle(cs: ColorScheme) = ButtonStyle(
     ),
 )
 
-private fun defaultTextFieldStyle(cs: ColorScheme) = TextFieldStyle(
-    colors = TextFieldStyle.Colors(
-        background = cs.inputBackground,
-        backgroundFocused = cs.inputFocusBackground,
-        backgroundDisabled = cs.inputBackground.copy(alpha = 0.5f),
-        backgroundError = cs.inputBackground,
-        content = cs.textPrimary,
-        contentDisabled = cs.textTertiary,
-        placeholder = cs.textTertiary,
-        placeholderDisabled = cs.textTertiary.copy(alpha = 0.5f),
-        border = cs.inputBorder,
-        borderFocused = cs.inputFocusBorder,
-        borderDisabled = cs.inputBorder.copy(alpha = 0.5f),
-        borderError = cs.destructive,
-        cursor = cs.inputFocusBorder,
-        cursorError = cs.destructive,
-        label = cs.textPrimary,
-        labelDisabled = cs.textTertiary,
-        labelError = cs.destructive,
-        icon = cs.textTertiary,
-        iconDisabled = cs.textTertiary.copy(alpha = 0.5f),
-        iconError = cs.destructive,
-    ),
-)
+private fun defaultTextFieldStyle(cs: ColorScheme): TextFieldStyle {
+    val isDark = cs.isDark
+    return TextFieldStyle(
+        colors = TextFieldStyle.Colors(
+            // Content Area — Sketch: "Content Area/Input Fields"
+            background = if (isDark) Color(0xFF2C2C2E) else Color.White,
+            backgroundDisabled = if (isDark) Color(0xFF2C2C2E).copy(alpha = 0.5f) else Color.White.copy(alpha = 0.5f),
+            border = Color.Black.copy(alpha = if (isDark) 0.30f else 0.08f),
+            borderDisabled = Color.Black.copy(alpha = if (isDark) 0.15f else 0.04f),
+            // Over-glass — Sketch: "Over-Glass/Input Fields"
+            overGlassBackground = Color.White.copy(alpha = if (isDark) 0.08f else 0.10f),
+            overGlassFocusedBackground = if (isDark) Color(0xFF3A3A3C) else Color(0xFFD9D9D9),
+            overGlassDisabledBackground = Color.White.copy(alpha = if (isDark) 0.04f else 0.05f),
+            // Content
+            text = cs.textPrimary,
+            textDisabled = cs.textTertiary,
+            placeholder = cs.textTertiary,
+            cursor = cs.accent,
+            // Label & error
+            label = cs.textPrimary,
+            labelDisabled = cs.textTertiary,
+            errorBorder = cs.destructive,
+            // Icon
+            icon = cs.textTertiary,
+            iconDisabled = cs.textTertiary.copy(alpha = 0.5f),
+        ),
+    )
+}
 
 private fun defaultCheckboxStyle(cs: ColorScheme): CheckboxStyle {
     val fillBase = if (cs.isDark) Color.White else Color.Black

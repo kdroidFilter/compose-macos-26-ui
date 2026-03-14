@@ -95,46 +95,69 @@ data class TextFieldStyle(
 ) {
     @Immutable
     data class Colors(
+        // Content Area
         val background: Color,
-        val backgroundFocused: Color,
         val backgroundDisabled: Color,
-        val backgroundError: Color,
-        val content: Color,
-        val contentDisabled: Color,
-        val placeholder: Color,
-        val placeholderDisabled: Color,
         val border: Color,
-        val borderFocused: Color,
         val borderDisabled: Color,
-        val borderError: Color,
+        // Over-glass
+        val overGlassBackground: Color,
+        val overGlassFocusedBackground: Color,
+        val overGlassDisabledBackground: Color,
+        // Content
+        val text: Color,
+        val textDisabled: Color,
+        val placeholder: Color,
         val cursor: Color,
-        val cursorError: Color,
+        // Label & error
         val label: Color,
         val labelDisabled: Color,
-        val labelError: Color,
+        val errorBorder: Color,
+        // Icon
         val icon: Color,
         val iconDisabled: Color,
-        val iconError: Color,
     )
 
+    /** Sketch: Text Field / Content Area & Over-glass — all 5 sizes */
     @Immutable
     data class Metrics(
-        val minHeightSm: Dp = 26.dp,
-        val minHeightMd: Dp = 32.dp,
-        val minHeightLg: Dp = 40.dp,
-        val horizontalPadding: Dp = 12.dp,
-        val cornerSize: Dp = 6.dp,
-        val borderWidth: Dp = 1.dp,
-        val focusedBorderWidth: Dp = 2.dp,
         val labelBottomPadding: Dp = 6.dp,
         val supportingTextTopPadding: Dp = 4.dp,
     ) {
-        fun minHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
-            ControlSize.Mini -> 22.dp
-            ControlSize.Small -> minHeightSm
-            ControlSize.Regular -> minHeightMd
-            ControlSize.Large -> minHeightLg
-            ControlSize.ExtraLarge -> 48.dp
+        /** Sketch heights: Mn=16, Sm=20, Md=24, Lg=28, XL=36 */
+        fun heightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 16.dp
+            ControlSize.Small -> 20.dp
+            ControlSize.Regular -> 24.dp
+            ControlSize.Large -> 28.dp
+            ControlSize.ExtraLarge -> 36.dp
+        }
+
+        /** Sketch corner radii: Mn=4, Sm=5, Md=6, Lg=7, XL=9 */
+        fun cornerRadiusFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 4.dp
+            ControlSize.Small -> 5.dp
+            ControlSize.Regular -> 6.dp
+            ControlSize.Large -> 7.dp
+            ControlSize.ExtraLarge -> 9.dp
+        }
+
+        /** Sketch left padding: Mn=6, Sm=6, Md=8, Lg=8, XL=10 */
+        fun startPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 6.dp
+            ControlSize.Small -> 6.dp
+            ControlSize.Regular -> 8.dp
+            ControlSize.Large -> 8.dp
+            ControlSize.ExtraLarge -> 10.dp
+        }
+
+        /** Sketch right padding: Mn=2, Sm=2.5, Md=4, Lg=6, XL=8 */
+        fun endPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 2.dp
+            ControlSize.Small -> 2.5.dp
+            ControlSize.Regular -> 4.dp
+            ControlSize.Large -> 6.dp
+            ControlSize.ExtraLarge -> 8.dp
         }
     }
 }

@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.components.TextField
 import io.github.kdroidfilter.darwinui.theme.ControlSize
+import io.github.kdroidfilter.darwinui.theme.DarwinSurface
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.CodeBlock
@@ -122,6 +123,83 @@ fun InputPasswordExample() {
     )
 }
 
+@GalleryExample("Input", "Disabled")
+@Composable
+fun InputDisabledExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+        TextField(
+            value = "",
+            onValueChange = {},
+            placeholder = { Text("Empty disabled") },
+            enabled = false,
+        )
+        TextField(
+            value = "Disabled with value",
+            onValueChange = {},
+            enabled = false,
+        )
+    }
+}
+
+@GalleryExample("Input", "Surface Variants")
+@Composable
+fun InputSurfaceVariantsExample() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        // Content Area (default)
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = "Content Area",
+                style = DarwinTheme.typography.caption1,
+                color = DarwinTheme.colorScheme.textSecondary,
+            )
+            DarwinSurface(DarwinSurface.ContentArea) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    var text by remember { mutableStateOf("") }
+                    TextField(
+                        value = text,
+                        onValueChange = { text = it },
+                        placeholder = { Text("Placeholder") },
+                    )
+                    TextField(value = "With value", onValueChange = {})
+                    TextField(value = "", onValueChange = {}, placeholder = { Text("Disabled") }, enabled = false)
+                }
+            }
+        }
+
+        // Over Glass
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = "Over Glass",
+                style = DarwinTheme.typography.caption1,
+                color = DarwinTheme.colorScheme.textSecondary,
+            )
+            DarwinSurface(DarwinSurface.OverGlass) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    var text by remember { mutableStateOf("") }
+                    TextField(
+                        value = text,
+                        onValueChange = { text = it },
+                        placeholder = { Text("Placeholder") },
+                    )
+                    TextField(value = "With value", onValueChange = {})
+                    TextField(value = "", onValueChange = {}, placeholder = { Text("Disabled") }, enabled = false)
+                }
+            }
+        }
+    }
+}
+
 @Composable
 internal fun InputPage() {
     GalleryPage("Input", "A text input field with label, validation states, and password support.") {
@@ -163,5 +241,17 @@ TextField(
             description = "Password input with visibility toggle",
             sourceCode = GallerySources.InputPasswordExample,
         ) { InputPasswordExample() }
+        ExampleCard(
+            title = "Disabled",
+            description = "Disabled text fields with and without value",
+            sourceCode = GallerySources.InputDisabledExample,
+        ) { InputDisabledExample() }
+
+        SectionHeader("Surface Variants")
+        ExampleCard(
+            title = "Content Area vs Over Glass",
+            description = "Side-by-side comparison of surface variants",
+            sourceCode = GallerySources.InputSurfaceVariantsExample,
+        ) { InputSurfaceVariantsExample() }
     }
 }

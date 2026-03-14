@@ -119,7 +119,7 @@ fun SearchField(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(tfMetrics.minHeightFor(controlSize))
+                    .height(tfMetrics.heightFor(controlSize))
                     .shadow(
                         elevation = if (isFocused) 4.dp else 0.dp,
                         shape = shape,
