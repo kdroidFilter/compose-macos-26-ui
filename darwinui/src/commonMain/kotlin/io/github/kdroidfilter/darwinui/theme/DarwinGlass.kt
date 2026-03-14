@@ -224,8 +224,10 @@ fun Modifier.darwinGlass(
  * Applies a macOS 26 Liquid Glass material effect with the correct
  * blur radius, tint, and shadow for the given [materialSize].
  *
- * When liquid glass is available, renders with backdrop blur + tint.
- * Otherwise falls back to the material's opaque [GlassMaterialSpec.baseColor].
+ * Renders with the material's tint color, base color, and shadow parameters.
+ * Unlike [darwinGlass] (which uses backdrop blur for overlays like title bars),
+ * material panels are content elements and use opaque rendering to avoid
+ * recursive capture issues with the root [liquefiable] tree.
  *
  * @param shape The clipping shape for the material.
  * @param materialSize The material size tier (Small, Medium, Large).
@@ -237,36 +239,21 @@ fun Modifier.darwinGlassMaterial(
     materialSize: GlassMaterialSize,
     tintColor: Color? = null,
 ): Modifier {
-    val liquidState = LocalDarwinLiquidState.current
     val isDark = LocalDarwinColors.current.isDark
     val spec = resolveGlassMaterial(materialSize, isDark)
 
-    val withShadow = this
+    var result = this
         .shadow(
             elevation = spec.shadowBlur / 2,
             shape = shape,
             ambientColor = spec.edgeShadowColor,
             spotColor = spec.shadowColor,
         )
-
-    return if (liquidState != null) {
-        var result = withShadow.liquid(liquidState) {
-            frost = spec.blurRadius
-            this.shape = shape
-            tint = spec.tint
-            saturation = 1.15f
-        }
-        if (tintColor != null) {
-            result = result.background(tintColor.copy(alpha = 0.15f), shape)
-        }
-        result
-    } else {
-        var result = withShadow
-            .clip(shape)
-            .background(spec.baseColor, shape)
-        if (tintColor != null) {
-            result = result.background(tintColor.copy(alpha = 0.15f), shape)
-        }
-        result
+        .clip(shape)
+        .background(spec.tint, shape)
+        .background(spec.baseColor.copy(alpha = 0.6f), shape)
+    if (tintColor != null) {
+        result = result.background(tintColor.copy(alpha = 0.15f), shape)
     }
+    return result
 }
