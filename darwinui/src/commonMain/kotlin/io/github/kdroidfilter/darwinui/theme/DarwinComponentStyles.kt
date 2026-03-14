@@ -569,54 +569,60 @@ data class ComboBoxStyle(
 // SegmentedControlStyle
 // ---------------------------------------------------------------------------
 
+enum class SegmentedControlVariant {
+    ContentArea,
+    OverGlass,
+}
+
 @Immutable
 data class SegmentedControlStyle(
-    val colors: Colors,
+    val contentArea: Colors,
+    val overGlass: Colors,
     val metrics: Metrics = Metrics(),
 ) {
+    fun colorsFor(variant: SegmentedControlVariant): Colors = when (variant) {
+        SegmentedControlVariant.ContentArea -> contentArea
+        SegmentedControlVariant.OverGlass -> overGlass
+    }
+
     @Immutable
     data class Colors(
         val track: Color,
-        val trackBorder: Color,
         val selectedSegment: Color,
-        val selectedSegmentBorder: Color,
         val selectedContent: Color,
         val unselectedContent: Color,
-        val disabledSelectedSegment: Color,
+        val pressedOverlay: Color,
         val disabledContent: Color,
+        val separatorColor: Color,
+        val inactiveSelectedSegment: Color,
+        val inactiveSelectedContent: Color,
     )
 
     @Immutable
     data class Metrics(
-        val containerHeightSm: Dp = 22.dp,
-        val containerHeightMd: Dp = 28.dp,
-        val containerHeightLg: Dp = 34.dp,
-        val horizontalPadding: Dp = 10.dp,
-        val cornerSize: Dp = 6.dp,
-        val trackPadding: Dp = 2.dp,
-        val segmentSpacing: Dp = 2.dp,
+        val separatorWidth: Dp = 1.dp,
     ) {
         fun containerHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
-            ControlSize.Mini -> 18.dp
-            ControlSize.Small -> containerHeightSm
-            ControlSize.Regular -> containerHeightMd
-            ControlSize.Large -> containerHeightLg
-            ControlSize.ExtraLarge -> 40.dp
+            ControlSize.Mini -> 16.dp
+            ControlSize.Small -> 20.dp
+            ControlSize.Regular -> 24.dp
+            ControlSize.Large -> 28.dp
+            ControlSize.ExtraLarge -> 36.dp
         }
 
-        fun segmentHorizontalPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
-            ControlSize.Mini -> 6.dp
-            ControlSize.Small -> 10.dp
-            ControlSize.Regular -> 14.dp
-            ControlSize.Large -> 16.dp
-            ControlSize.ExtraLarge -> 20.dp
+        fun cornerRadiusFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 4.dp
+            ControlSize.Small -> 5.dp
+            ControlSize.Regular -> 6.dp
+            ControlSize.Large -> 14.dp
+            ControlSize.ExtraLarge -> 18.dp
         }
 
-        fun segmentVerticalPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
-            ControlSize.Mini -> 1.dp
-            ControlSize.Small -> 2.dp
-            ControlSize.Regular -> 4.dp
-            ControlSize.Large -> 6.dp
+        fun separatorVerticalPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 3.dp
+            ControlSize.Small -> 4.dp
+            ControlSize.Regular -> 5.dp
+            ControlSize.Large -> 5.dp
             ControlSize.ExtraLarge -> 8.dp
         }
     }

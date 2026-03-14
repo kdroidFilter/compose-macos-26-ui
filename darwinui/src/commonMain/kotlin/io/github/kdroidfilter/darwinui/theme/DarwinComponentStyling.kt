@@ -294,18 +294,31 @@ private fun defaultComboBoxStyle(cs: ColorScheme) = ComboBoxStyle(
     ),
 )
 
-private fun defaultSegmentedControlStyle(cs: ColorScheme) = SegmentedControlStyle(
-    colors = SegmentedControlStyle.Colors(
-        track = if (cs.isDark) Color(0xFF2C2C2E) else Color.Black.copy(alpha = 0.06f),
-        trackBorder = cs.border,
-        selectedSegment = if (cs.isDark) Color(0xFF636366) else Color.White,
-        selectedSegmentBorder = cs.border,
-        selectedContent = cs.textPrimary,
-        unselectedContent = cs.textSecondary,
-        disabledSelectedSegment = (if (cs.isDark) Color(0xFF636366) else Color.White).copy(alpha = 0.5f),
+private fun defaultSegmentedControlStyle(cs: ColorScheme): SegmentedControlStyle {
+    val fillBase = if (cs.isDark) Color.White else Color.Black
+    val track = fillBase.copy(alpha = if (cs.isDark) 0.10f else 0.05f)
+    // Inactive selected: light = black 13%, dark = white 20%
+    val inactiveContentArea = fillBase.copy(alpha = if (cs.isDark) 0.20f else 0.13f)
+    // Over-glass inactive: light = black 10%, dark = white 15%
+    val inactiveOverGlass = fillBase.copy(alpha = if (cs.isDark) 0.15f else 0.10f)
+    val shared = SegmentedControlStyle.Colors(
+        track = track,
+        selectedSegment = cs.accent,
+        selectedContent = Color.White,
+        unselectedContent = cs.textPrimary,
+        pressedOverlay = fillBase.copy(alpha = 0.15f),
         disabledContent = cs.textTertiary,
-    ),
-)
+        separatorColor = cs.textQuaternary,
+        inactiveSelectedSegment = inactiveContentArea,
+        inactiveSelectedContent = cs.textPrimary,
+    )
+    return SegmentedControlStyle(
+        contentArea = shared,
+        overGlass = shared.copy(
+            inactiveSelectedSegment = inactiveOverGlass,
+        ),
+    )
+}
 
 private fun defaultStepperStyle(cs: ColorScheme): StepperStyle {
     val fillBase = if (cs.isDark) Color.White else Color.Black

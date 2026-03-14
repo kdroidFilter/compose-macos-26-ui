@@ -1,5 +1,6 @@
 package io.github.kdroidfilter.darwinui.components
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -14,13 +15,11 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
@@ -42,87 +40,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalControlSize
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
-import io.github.kdroidfilter.darwinui.theme.Zinc300
-import io.github.kdroidfilter.darwinui.theme.Zinc600
+import io.github.kdroidfilter.darwinui.theme.LocalWindowActive
+import io.github.kdroidfilter.darwinui.theme.SegmentedControlStyle
+import io.github.kdroidfilter.darwinui.theme.SegmentedControlVariant
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 // =============================================================================
-// SegmentedControlColors
-// =============================================================================
-
-@Immutable
-class SegmentedControlColors(
-    val trackColor: Color,
-    val indicatorColor: Color,
-    val indicatorShadowElevation: Dp,
-    val dividerColor: Color,
-    val contentColor: Color,
-    val selectedContentColor: Color,
-    val disabledTrackColor: Color,
-    val disabledIndicatorColor: Color,
-    val disabledContentColor: Color,
-)
-
-// =============================================================================
-// SegmentedControlDefaults
-// =============================================================================
-
-object SegmentedControlDefaults {
-
-    @Composable
-    fun colors(
-        trackColor: Color = if (DarwinTheme.colorScheme.isDark)
-            Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.06f),
-        indicatorColor: Color = if (DarwinTheme.colorScheme.isDark)
-            Color.White.copy(alpha = 0.25f) else Color.White,
-        indicatorShadowElevation: Dp = if (DarwinTheme.colorScheme.isDark) 0.dp else 1.dp,
-        dividerColor: Color = if (DarwinTheme.colorScheme.isDark)
-            Zinc600 else Zinc300,
-        contentColor: Color = DarwinTheme.colorScheme.onSurface,
-        selectedContentColor: Color = DarwinTheme.colorScheme.onSurface,
-        disabledTrackColor: Color = trackColor.copy(alpha = trackColor.alpha * 0.5f),
-        disabledIndicatorColor: Color = indicatorColor.copy(alpha = indicatorColor.alpha * 0.5f),
-        disabledContentColor: Color = contentColor.copy(alpha = 0.5f),
-    ) = SegmentedControlColors(
-        trackColor = trackColor,
-        indicatorColor = indicatorColor,
-        indicatorShadowElevation = indicatorShadowElevation,
-        dividerColor = dividerColor,
-        contentColor = contentColor,
-        selectedContentColor = selectedContentColor,
-        disabledTrackColor = disabledTrackColor,
-        disabledIndicatorColor = disabledIndicatorColor,
-        disabledContentColor = disabledContentColor,
-    )
-}
-
-// =============================================================================
 // SegmentedControl — slot-based API
 // =============================================================================
 
-/**
- * macOS-style segmented control with a sliding pill indicator.
- *
- * A single capsule track with equal-width segments. The selected segment
- * is indicated by an elevated white pill that slides between positions
- * with a spring animation.
- *
- * @param segmentCount Total number of segments.
- * @param selectedIndex Index of the currently selected segment.
- * @param onSelectedIndexChange Callback when a segment is tapped.
- * @param modifier Modifier for the outer track.
- * @param enabled Whether the control accepts interaction.
- * @param colors Color configuration.
- * @param segment Content composable for each segment by index.
- */
 @Composable
 fun SegmentedControl(
     segmentCount: Int,
@@ -130,26 +65,33 @@ fun SegmentedControl(
     onSelectedIndexChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    colors: SegmentedControlColors = SegmentedControlDefaults.colors(),
+    variant: SegmentedControlVariant = SegmentedControlVariant.ContentArea,
     segment: @Composable (index: Int) -> Unit,
 ) {
     require(segmentCount > 0) { "segmentCount must be > 0" }
 
     val controlSize = LocalControlSize.current
-    val metrics = DarwinTheme.componentStyling.segmentedControl.metrics
+    val isWindowActive = LocalWindowActive.current
+    val style = DarwinTheme.componentStyling.segmentedControl
+    val metrics = style.metrics
+    val colors = style.colorsFor(variant)
     val density = LocalDensity.current
-    val isDark = DarwinTheme.colorScheme.isDark
-    val trackShape = RoundedCornerShape(50)
-    val pillShape = RoundedCornerShape(50)
 
-    val trackColor = if (enabled) colors.trackColor else colors.disabledTrackColor
-    val indicatorColor = if (enabled) colors.indicatorColor else colors.disabledIndicatorColor
-    val textColor = if (enabled) colors.contentColor else colors.disabledContentColor
-    val selectedTextColor = if (enabled) colors.selectedContentColor else colors.disabledContentColor
+    val trackHeight = metrics.containerHeightFor(controlSize)
+    val cornerRadius = metrics.cornerRadiusFor(controlSize)
+    val trackShape = RoundedCornerShape(cornerRadius)
+    val pillShape = RoundedCornerShape(cornerRadius)
+
+    // Resolve pill color based on active/inactive window state
+    val pillColor by animateColorAsState(
+        targetValue = resolveSelectedSegmentColor(colors, enabled, isWindowActive),
+        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+        label = "pillColor",
+    )
 
     // Segment measurements
-    val segmentOffsets = remember { FloatArray(segmentCount) }
-    val segmentWidths = remember { FloatArray(segmentCount) }
+    val segmentOffsets = remember(segmentCount) { FloatArray(segmentCount) }
+    val segmentWidths = remember(segmentCount) { FloatArray(segmentCount) }
     var measurementReady by remember { mutableStateOf(false) }
 
     // Animated indicator
@@ -174,18 +116,14 @@ fun SegmentedControl(
         }
     }
 
-    val trackHeight = metrics.containerHeightFor(controlSize)
-    val trackPadding = metrics.trackPadding
-    val indicatorHeight = trackHeight - trackPadding * 2
+    val selectedContentColor = if (isWindowActive) colors.selectedContent else colors.inactiveSelectedContent
 
     // Track
     Box(
         modifier = modifier
             .height(trackHeight)
-            .alpha(if (enabled) 1f else 0.6f)
             .clip(trackShape)
-            .background(trackColor, trackShape)
-            .padding(trackPadding),
+            .background(colors.track, trackShape),
         contentAlignment = Alignment.CenterStart,
     ) {
         // Sliding pill indicator
@@ -200,10 +138,9 @@ fun SegmentedControl(
                     }
                     .size(
                         width = with(density) { indicatorWidthAnim.value.toDp() },
-                        height = indicatorHeight,
+                        height = trackHeight,
                     )
-                    .shadow(colors.indicatorShadowElevation, pillShape, clip = false)
-                    .background(indicatorColor, pillShape),
+                    .background(pillColor, pillShape),
             )
         }
 
@@ -212,12 +149,12 @@ fun SegmentedControl(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             for (index in 0 until segmentCount) {
-                // Divider before this segment (not before first)
                 if (index > 0) {
                     SegmentDivider(
                         visible = index != selectedIndex && index - 1 != selectedIndex,
-                        color = colors.dividerColor,
-                        height = indicatorHeight * 0.5f,
+                        color = colors.separatorColor,
+                        controlSize = controlSize,
+                        trackHeight = trackHeight,
                     )
                 }
 
@@ -225,9 +162,11 @@ fun SegmentedControl(
                     index = index,
                     isSelected = index == selectedIndex,
                     enabled = enabled,
-                    isDark = isDark,
-                    textColor = if (index == selectedIndex) selectedTextColor else textColor,
                     controlSize = controlSize,
+                    cornerRadius = cornerRadius,
+                    selectedTextColor = selectedContentColor,
+                    unselectedTextColor = if (enabled) colors.unselectedContent else colors.disabledContent,
+                    pressedOverlay = colors.pressedOverlay,
                     onMeasured = { idx, offset, width ->
                         segmentOffsets[idx] = offset
                         segmentWidths[idx] = width
@@ -243,22 +182,20 @@ fun SegmentedControl(
     }
 }
 
+private fun resolveSelectedSegmentColor(
+    colors: SegmentedControlStyle.Colors,
+    enabled: Boolean,
+    isWindowActive: Boolean,
+): Color = when {
+    !enabled -> colors.selectedSegment.copy(alpha = colors.selectedSegment.alpha * 0.5f)
+    isWindowActive -> colors.selectedSegment
+    else -> colors.inactiveSelectedSegment
+}
+
 // =============================================================================
 // SegmentedControl — convenience text-only API
 // =============================================================================
 
-/**
- * macOS-style segmented control with string labels.
- *
- * Convenience overload that accepts a list of text labels.
- *
- * @param options List of segment label strings.
- * @param selectedIndex Index of the currently selected segment.
- * @param onSelectedIndexChange Callback when a segment is tapped.
- * @param modifier Modifier for the outer track.
- * @param enabled Whether the control accepts interaction.
- * @param colors Color configuration.
- */
 @Composable
 fun SegmentedControl(
     options: List<String>,
@@ -266,7 +203,7 @@ fun SegmentedControl(
     onSelectedIndexChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    colors: SegmentedControlColors = SegmentedControlDefaults.colors(),
+    variant: SegmentedControlVariant = SegmentedControlVariant.ContentArea,
 ) {
     SegmentedControl(
         segmentCount = options.size,
@@ -274,7 +211,7 @@ fun SegmentedControl(
         onSelectedIndexChange = onSelectedIndexChange,
         modifier = modifier,
         enabled = enabled,
-        colors = colors,
+        variant = variant,
     ) { index ->
         Text(options[index])
     }
@@ -284,47 +221,55 @@ fun SegmentedControl(
 // Internal: Segment
 // =============================================================================
 
+private fun fontSizeFor(controlSize: ControlSize) = when (controlSize) {
+    ControlSize.Mini -> 10.sp
+    ControlSize.Small -> 11.sp
+    ControlSize.Regular -> 13.sp
+    ControlSize.Large -> 13.sp
+    ControlSize.ExtraLarge -> 13.sp
+}
+
 @Composable
 private fun RowScope.Segment(
     index: Int,
     isSelected: Boolean,
     enabled: Boolean,
-    isDark: Boolean,
-    textColor: Color,
     controlSize: ControlSize,
+    cornerRadius: Dp,
+    selectedTextColor: Color,
+    unselectedTextColor: Color,
+    pressedOverlay: Color,
     onMeasured: (index: Int, offset: Float, width: Float) -> Unit,
     onClick: () -> Unit,
     content: @Composable () -> Unit,
 ) {
-    val metrics = DarwinTheme.componentStyling.segmentedControl.metrics
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    // Subtle hover overlay on unselected segments only
+    val pressAlpha by animateFloatAsState(
+        targetValue = if (isPressed && enabled) 1f else 0f,
+        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+        label = "segmentPress",
+    )
+
     val hoverAlpha by animateFloatAsState(
         targetValue = when {
             !enabled || isSelected || !isHovered -> 0f
-            isDark -> 0.04f
             else -> 0.03f
         },
         animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
         label = "segmentHover",
     )
 
-    // Subtle press scale on unselected segments
-    val pressAlpha by animateFloatAsState(
-        targetValue = when {
-            !enabled || isSelected || !isPressed -> 0f
-            isDark -> 0.06f
-            else -> 0.04f
-        },
-        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
-        label = "segmentPress",
+    val textColor = if (isSelected && enabled) selectedTextColor else unselectedTextColor
+    val textStyle = TextStyle(
+        color = textColor,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = fontSizeFor(controlSize),
     )
 
-    val textStyle = DarwinTheme.typography.caption1
-        .merge(TextStyle(color = textColor, fontWeight = FontWeight.Medium))
+    val segmentShape = RoundedCornerShape(cornerRadius)
 
     Box(
         modifier = Modifier
@@ -337,16 +282,15 @@ private fun RowScope.Segment(
                     coordinates.size.width.toFloat(),
                 )
             }
-            .clip(RoundedCornerShape(50))
+            .clip(segmentShape)
             .then(
-                if (hoverAlpha > 0f || pressAlpha > 0f) {
-                    val overlayColor = if (isDark) Color.White else Color.Black
-                    Modifier
-                        .background(overlayColor.copy(alpha = hoverAlpha))
-                        .background(overlayColor.copy(alpha = pressAlpha))
+                if (pressAlpha > 0f) {
+                    Modifier.background(pressedOverlay.copy(alpha = pressedOverlay.alpha * pressAlpha))
+                } else if (hoverAlpha > 0f) {
+                    Modifier.background(Color.Black.copy(alpha = hoverAlpha))
                 } else {
                     Modifier
-                }
+                },
             )
             .hoverable(interactionSource, enabled)
             .clickable(
@@ -355,10 +299,6 @@ private fun RowScope.Segment(
                 enabled = enabled,
                 role = Role.Tab,
                 onClick = onClick,
-            )
-            .padding(
-                horizontal = metrics.segmentHorizontalPaddingFor(controlSize),
-                vertical = metrics.segmentVerticalPaddingFor(controlSize),
             ),
         contentAlignment = Alignment.Center,
     ) {
@@ -379,8 +319,13 @@ private fun RowScope.Segment(
 private fun SegmentDivider(
     visible: Boolean,
     color: Color,
-    height: Dp,
+    controlSize: ControlSize,
+    trackHeight: Dp,
 ) {
+    val metrics = DarwinTheme.componentStyling.segmentedControl.metrics
+    val verticalPadding = metrics.separatorVerticalPaddingFor(controlSize)
+    val separatorHeight = trackHeight - verticalPadding * 2
+
     val alpha by animateFloatAsState(
         targetValue = if (visible) 1f else 0f,
         animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
@@ -389,9 +334,9 @@ private fun SegmentDivider(
     Box(
         modifier = Modifier
             .width(1.dp)
-            .height(height)
+            .height(separatorHeight)
             .alpha(alpha)
-            .background(color),
+            .background(color, RoundedCornerShape(0.5.dp)),
     )
 }
 

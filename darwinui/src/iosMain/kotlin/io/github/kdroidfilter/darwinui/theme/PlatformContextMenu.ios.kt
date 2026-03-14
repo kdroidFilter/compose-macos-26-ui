@@ -1,6 +1,15 @@
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
 package io.github.kdroidfilter.darwinui.theme
 
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.text.contextmenu.data.TextContextMenuComponent
+import androidx.compose.foundation.text.contextmenu.data.TextContextMenuItemWithComposableLeadingIcon
 
-@Composable
-internal actual fun PlatformContextMenuOverride(content: @Composable () -> Unit) = content()
+internal actual fun TextContextMenuComponent.toItemInfo(): ContextMenuItemInfo? {
+    if (this !is TextContextMenuItemWithComposableLeadingIcon) return null
+    return ContextMenuItemInfo(
+        label = label,
+        enabled = enabled,
+        onClick = onClick,
+    )
+}

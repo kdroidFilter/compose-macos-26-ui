@@ -171,7 +171,7 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("tabs", "Tabs", "NAVIGATION", Lucide.Columns3),
     SidebarEntryDef("accordion", "Accordion", "NAVIGATION", Lucide.ChevronsUpDown),
     SidebarEntryDef("sidebar", "Sidebar", "NAVIGATION", LucidePanelLeft),
-    SidebarEntryDef("segmentedcontrol", "Segmented Control", "NAVIGATION", Lucide.Columns3),
+    SidebarEntryDef("segmentedcontrol", "Segmented Control", "FORM CONTROLS", Lucide.Columns3),
     SidebarEntryDef("titlebar", "Title Bar", "NAVIGATION", Lucide.PanelTopOpen),
     SidebarEntryDef("addressbar", "Address Bar", "NAVIGATION", Lucide.Search),
     SidebarEntryDef("scaffold", "Scaffold", "NAVIGATION", LucidePanelLeft),
