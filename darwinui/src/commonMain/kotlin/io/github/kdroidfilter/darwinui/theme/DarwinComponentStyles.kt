@@ -56,7 +56,31 @@ data class ButtonStyle(
         val horizontalPadding: Dp = 12.dp,
         val cornerSize: Dp = 5.dp,
         val borderWidth: Dp = 1.dp,
-    )
+    ) {
+        fun minHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 16.dp
+            ControlSize.Small -> minHeightSmall
+            ControlSize.Regular -> minHeight
+            ControlSize.Large -> minHeightLarge
+            ControlSize.ExtraLarge -> 34.dp
+        }
+
+        fun horizontalPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 6.dp
+            ControlSize.Small -> 8.dp
+            ControlSize.Regular -> horizontalPadding
+            ControlSize.Large -> 14.dp
+            ControlSize.ExtraLarge -> 16.dp
+        }
+
+        fun cornerSizeFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 3.dp
+            ControlSize.Small -> 4.dp
+            ControlSize.Regular -> cornerSize
+            ControlSize.Large -> 7.dp
+            ControlSize.ExtraLarge -> 9.dp
+        }
+    }
 }
 
 
@@ -104,7 +128,15 @@ data class TextFieldStyle(
         val focusedBorderWidth: Dp = 2.dp,
         val labelBottomPadding: Dp = 6.dp,
         val supportingTextTopPadding: Dp = 4.dp,
-    )
+    ) {
+        fun minHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 22.dp
+            ControlSize.Small -> minHeightSm
+            ControlSize.Regular -> minHeightMd
+            ControlSize.Large -> minHeightLg
+            ControlSize.ExtraLarge -> 48.dp
+        }
+    }
 }
 
 
@@ -136,7 +168,23 @@ data class CheckboxStyle(
         val cornerSize: Dp = 4.dp,
         val borderWidth: Dp = 1.dp,
         val labelSpacing: Dp = 8.dp,
-    )
+    ) {
+        fun sizeFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 12.dp
+            ControlSize.Small -> 14.dp
+            ControlSize.Regular -> size
+            ControlSize.Large -> 18.dp
+            ControlSize.ExtraLarge -> 22.dp
+        }
+
+        fun cornerSizeFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 2.dp
+            ControlSize.Small -> 3.dp
+            ControlSize.Regular -> cornerSize
+            ControlSize.Large -> 5.dp
+            ControlSize.ExtraLarge -> 6.dp
+        }
+    }
 }
 
 
@@ -168,7 +216,23 @@ data class RadioButtonStyle(
         val dotSize: Dp = 6.dp,
         val borderWidth: Dp = 1.dp,
         val labelSpacing: Dp = 8.dp,
-    )
+    ) {
+        fun sizeFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 12.dp
+            ControlSize.Small -> 14.dp
+            ControlSize.Regular -> size
+            ControlSize.Large -> 18.dp
+            ControlSize.ExtraLarge -> 22.dp
+        }
+
+        fun dotSizeFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 4.dp
+            ControlSize.Small -> 5.dp
+            ControlSize.Regular -> dotSize
+            ControlSize.Large -> 7.dp
+            ControlSize.ExtraLarge -> 9.dp
+        }
+    }
 }
 
 
@@ -198,7 +262,31 @@ data class SwitchStyle(
         val trackHeight: Dp = 22.dp,
         val thumbSize: Dp = 18.dp,
         val thumbPadding: Dp = 2.dp,
-    )
+    ) {
+        fun trackWidthFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 28.dp
+            ControlSize.Small -> 32.dp
+            ControlSize.Regular -> trackWidth
+            ControlSize.Large -> 42.dp
+            ControlSize.ExtraLarge -> 50.dp
+        }
+
+        fun trackHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 16.dp
+            ControlSize.Small -> 18.dp
+            ControlSize.Regular -> trackHeight
+            ControlSize.Large -> 26.dp
+            ControlSize.ExtraLarge -> 30.dp
+        }
+
+        fun thumbSizeFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 12.dp
+            ControlSize.Small -> 14.dp
+            ControlSize.Regular -> thumbSize
+            ControlSize.Large -> 22.dp
+            ControlSize.ExtraLarge -> 26.dp
+        }
+    }
 }
 
 
@@ -239,7 +327,31 @@ data class SliderStyle(
         /** Thumb diameter for the large size. */
         val thumbSizeLg: Dp = 22.dp,
         val thumbBorderWidth: Dp = 1.dp,
-    )
+    ) {
+        fun trackHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 1.dp
+            ControlSize.Small -> trackHeightSm
+            ControlSize.Regular -> trackHeightMd
+            ControlSize.Large -> trackHeightLg
+            ControlSize.ExtraLarge -> 8.dp
+        }
+
+        fun thumbWidthFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 12.dp
+            ControlSize.Small -> 16.dp
+            ControlSize.Regular -> 20.dp
+            ControlSize.Large -> 24.dp
+            ControlSize.ExtraLarge -> 28.dp
+        }
+
+        fun thumbHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 10.dp
+            ControlSize.Small -> 12.dp
+            ControlSize.Regular -> 16.dp
+            ControlSize.Large -> 20.dp
+            ControlSize.ExtraLarge -> 24.dp
+        }
+    }
 }
 
 
@@ -274,7 +386,39 @@ data class TabStyle(
         val horizontalPadding: Dp = 12.dp,
         val tabSpacing: Dp = 2.dp,
         val cornerSize: Dp = 6.dp,
-    )
+    ) {
+        fun containerHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 24.dp
+            ControlSize.Small -> containerHeightSm
+            ControlSize.Regular -> containerHeightMd
+            ControlSize.Large -> containerHeightLg
+            ControlSize.ExtraLarge -> 48.dp
+        }
+
+        fun triggerHPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 6.dp
+            ControlSize.Small -> 10.dp
+            ControlSize.Regular -> 12.dp
+            ControlSize.Large -> 16.dp
+            ControlSize.ExtraLarge -> 20.dp
+        }
+
+        fun triggerVPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 2.dp
+            ControlSize.Small -> 4.dp
+            ControlSize.Regular -> 6.dp
+            ControlSize.Large -> 8.dp
+            ControlSize.ExtraLarge -> 10.dp
+        }
+
+        fun iconSizeFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 12.dp
+            ControlSize.Small -> 14.dp
+            ControlSize.Regular -> 16.dp
+            ControlSize.Large -> 18.dp
+            ControlSize.ExtraLarge -> 20.dp
+        }
+    }
 }
 
 
@@ -314,7 +458,15 @@ data class ComboBoxStyle(
         val borderWidth: Dp = 1.dp,
         val chevronSize: Dp = 16.dp,
         val dropdownMaxHeight: Dp = 300.dp,
-    )
+    ) {
+        fun minHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 16.dp
+            ControlSize.Small -> 18.dp
+            ControlSize.Regular -> minHeight
+            ControlSize.Large -> 28.dp
+            ControlSize.ExtraLarge -> 34.dp
+        }
+    }
 }
 
 
@@ -348,7 +500,135 @@ data class SegmentedControlStyle(
         val cornerSize: Dp = 6.dp,
         val trackPadding: Dp = 2.dp,
         val segmentSpacing: Dp = 2.dp,
-    )
+    ) {
+        fun containerHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 18.dp
+            ControlSize.Small -> containerHeightSm
+            ControlSize.Regular -> containerHeightMd
+            ControlSize.Large -> containerHeightLg
+            ControlSize.ExtraLarge -> 40.dp
+        }
+
+        fun segmentHorizontalPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 6.dp
+            ControlSize.Small -> 10.dp
+            ControlSize.Regular -> 14.dp
+            ControlSize.Large -> 16.dp
+            ControlSize.ExtraLarge -> 20.dp
+        }
+
+        fun segmentVerticalPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 1.dp
+            ControlSize.Small -> 2.dp
+            ControlSize.Regular -> 4.dp
+            ControlSize.Large -> 6.dp
+            ControlSize.ExtraLarge -> 8.dp
+        }
+    }
+}
+
+
+// ---------------------------------------------------------------------------
+// ProgressStyle
+// ---------------------------------------------------------------------------
+
+@Immutable
+data class ProgressStyle(
+    val metrics: Metrics = Metrics(),
+) {
+    @Immutable
+    data class Metrics(
+        val heightSm: Dp = 4.dp,
+        val heightMd: Dp = 8.dp,
+        val heightLg: Dp = 12.dp,
+        val ringSizeSm: Dp = 16.dp,
+        val ringSizeMd: Dp = 32.dp,
+        val ringSizeLg: Dp = 64.dp,
+    ) {
+        fun heightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 2.dp
+            ControlSize.Small -> heightSm
+            ControlSize.Regular -> heightMd
+            ControlSize.Large -> heightLg
+            ControlSize.ExtraLarge -> 16.dp
+        }
+
+        fun ringSizeFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 12.dp
+            ControlSize.Small -> ringSizeSm
+            ControlSize.Regular -> ringSizeMd
+            ControlSize.Large -> ringSizeLg
+            ControlSize.ExtraLarge -> 96.dp
+        }
+    }
+}
+
+
+// ---------------------------------------------------------------------------
+// SidebarStyle
+// ---------------------------------------------------------------------------
+
+@Immutable
+data class SidebarStyle(
+    val metrics: Metrics = Metrics(),
+) {
+    @Immutable
+    data class Metrics(
+        val iconDpSm: Dp = 14.dp,
+        val iconDpMd: Dp = 16.dp,
+        val iconDpLg: Dp = 22.dp,
+        val itemHeightSm: Dp = 26.dp,
+        val itemHeightMd: Dp = 30.dp,
+        val itemHeightLg: Dp = 36.dp,
+    ) {
+        fun iconDpFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 12.dp
+            ControlSize.Small -> iconDpSm
+            ControlSize.Regular -> iconDpMd
+            ControlSize.Large -> iconDpLg
+            ControlSize.ExtraLarge -> 26.dp
+        }
+
+        fun itemHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 22.dp
+            ControlSize.Small -> itemHeightSm
+            ControlSize.Regular -> itemHeightMd
+            ControlSize.Large -> itemHeightLg
+            ControlSize.ExtraLarge -> 42.dp
+        }
+
+        fun hPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 4.dp
+            ControlSize.Small -> 6.dp
+            ControlSize.Regular -> 8.dp
+            ControlSize.Large -> 10.dp
+            ControlSize.ExtraLarge -> 12.dp
+        }
+
+        fun iconGapFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 4.dp
+            ControlSize.Small -> 5.dp
+            ControlSize.Regular -> 6.dp
+            ControlSize.Large -> 8.dp
+            ControlSize.ExtraLarge -> 10.dp
+        }
+
+        fun itemSpacingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 0.dp
+            ControlSize.Small -> 0.dp
+            ControlSize.Regular -> 1.dp
+            ControlSize.Large -> 2.dp
+            ControlSize.ExtraLarge -> 3.dp
+        }
+
+        fun groupHeaderMaxHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 24.dp
+            ControlSize.Small -> 30.dp
+            ControlSize.Regular -> 32.dp
+            ControlSize.Large -> 30.dp
+            ControlSize.ExtraLarge -> 34.dp
+        }
+    }
 }
 
 

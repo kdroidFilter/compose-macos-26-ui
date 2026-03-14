@@ -9,8 +9,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.SegmentedControl
-import io.github.kdroidfilter.darwinui.components.SegmentedControlSize
 import io.github.kdroidfilter.darwinui.components.Text
+import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
@@ -44,26 +44,28 @@ internal fun SegmentedControlPage() {
         SectionHeader("Sizes")
         ExampleCard(
             title = "Sizes",
-            description = "Small, Regular, and Large variants",
+            description = "All ControlSize variants",
             sourceCode = """
-                SegmentedControl(
-                    options = options,
-                    selectedIndex = selected,
-                    onSelectedIndexChange = { selected = it },
-                    size = SegmentedControlSize.Small, // Regular, Large
-                )
-            """.trimIndent(),
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                for (size in SegmentedControlSize.entries) {
-                    var selected by remember { mutableStateOf(0) }
-                    Text(size.name)
+                ControlSize(ControlSize.Small) {
                     SegmentedControl(
                         options = options,
                         selectedIndex = selected,
                         onSelectedIndexChange = { selected = it },
-                        size = size,
                     )
+                }
+            """.trimIndent(),
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                for (size in ControlSize.entries) {
+                    var selected by remember { mutableStateOf(0) }
+                    Text(size.name)
+                    ControlSize(size) {
+                        SegmentedControl(
+                            options = options,
+                            selectedIndex = selected,
+                            onSelectedIndexChange = { selected = it },
+                        )
+                    }
                 }
             }
         }

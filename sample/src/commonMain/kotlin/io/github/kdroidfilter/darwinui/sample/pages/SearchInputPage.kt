@@ -1,9 +1,11 @@
 package io.github.kdroidfilter.darwinui.sample.pages
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,12 +22,44 @@ import io.github.kdroidfilter.darwinui.components.SearchSuggestionSeparator
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.components.ToolbarSearchField
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
+import io.github.kdroidfilter.darwinui.theme.ControlSize
+import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideSearch
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
+
+@GalleryExample("SearchInput", "Sizes")
+@Composable
+fun SearchInputSizesExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        for (size in ControlSize.entries) {
+            ControlSize(size) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(0.6f),
+                ) {
+                    Text(
+                        text = size.name,
+                        style = DarwinTheme.typography.caption1,
+                        color = DarwinTheme.colorScheme.textSecondary,
+                        modifier = Modifier.widthIn(min = 72.dp),
+                    )
+                    var query by remember { mutableStateOf("") }
+                    SearchField(
+                        value = query,
+                        onValueChange = { query = it },
+                        placeholder = "Search...",
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+        }
+    }
+}
 
 @GalleryExample("SearchInput", "Default")
 @Composable
@@ -92,6 +126,13 @@ fun SearchInputToolbarSearchExample() {
 @Composable
 internal fun SearchInputPage() {
     GalleryPage("Search Input", "Text inputs designed for search and URL navigation.") {
+        SectionHeader("Sizes")
+        ExampleCard(
+            title = "All Sizes",
+            description = "SearchField at each ControlSize level",
+            sourceCode = GallerySources.SearchInputSizesExample,
+        ) { SearchInputSizesExample() }
+
         SectionHeader("Search Field")
         ExampleCard(
             title = "Default",

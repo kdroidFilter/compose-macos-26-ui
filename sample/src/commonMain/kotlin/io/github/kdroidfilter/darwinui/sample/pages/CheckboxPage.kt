@@ -2,7 +2,9 @@ package io.github.kdroidfilter.darwinui.sample.pages
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,7 +13,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.CheckBox
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
+import io.github.kdroidfilter.darwinui.theme.ControlSize
+import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.PreviewContainer
@@ -27,6 +32,30 @@ private fun CheckboxPreview() {
         CheckBox(checked = c1, onCheckedChange = { c1 = it }, label = "Unchecked option")
         CheckBox(checked = c2, onCheckedChange = { c2 = it }, label = "Checked option")
         CheckBox(checked = c3, onCheckedChange = { c3 = it }, indeterminate = !c3, label = "Indeterminate")
+    }
+}
+
+@GalleryExample("Checkbox", "Sizes")
+@Composable
+fun CheckboxSizesExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        for (size in ControlSize.entries) {
+            ControlSize(size) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = size.name,
+                        style = DarwinTheme.typography.caption1,
+                        color = DarwinTheme.colorScheme.textSecondary,
+                        modifier = Modifier.widthIn(min = 72.dp),
+                    )
+                    var c by remember { mutableStateOf(true) }
+                    CheckBox(checked = c, onCheckedChange = { c = it }, label = "Checked")
+                }
+            }
+        }
     }
 }
 
@@ -78,6 +107,13 @@ fun CheckboxSelectAllExample() {
 internal fun CheckboxPage() {
     GalleryPage("Checkbox", "A control that allows the user to toggle between checked and unchecked.") {
         PreviewContainer { CheckboxPreview() }
+
+        SectionHeader("Sizes")
+        ExampleCard(
+            title = "All Sizes",
+            description = "Checkbox at each ControlSize level",
+            sourceCode = GallerySources.CheckboxSizesExample,
+        ) { CheckboxSizesExample() }
 
         SectionHeader("Examples")
         ExampleCard(

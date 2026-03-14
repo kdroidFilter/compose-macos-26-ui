@@ -101,4 +101,10 @@ object DarwinTheme {
         @Composable
         @ReadOnlyComposable
         get() = LocalDarwinComponentStyling.current
+
+    /** Current control size propagated via [ControlSize] wrapper. */
+    val controlSize: ControlSize
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalControlSize.current
 }

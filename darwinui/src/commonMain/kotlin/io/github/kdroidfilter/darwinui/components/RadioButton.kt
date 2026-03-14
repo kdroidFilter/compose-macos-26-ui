@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.LocalControlSize
 import io.github.kdroidfilter.darwinui.theme.Zinc600
 import io.github.kdroidfilter.darwinui.theme.Zinc800
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
@@ -100,6 +101,9 @@ fun RadioButton(
     colors: RadioButtonColors = RadioButtonDefaults.colors(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.radioButton.metrics
+
     val dotAnimationProgress by animateFloatAsState(
         targetValue = if (selected) 1f else 0f,
         animationSpec = darwinSpring(preset = DarwinSpringPreset.Snappy),
@@ -142,7 +146,7 @@ fun RadioButton(
         contentAlignment = Alignment.Center,
         modifier = selectableModifier
             .alpha(if (enabled) 1f else 0.5f)
-            .size(16.dp)
+            .size(metrics.sizeFor(controlSize))
             .clip(CircleShape)
             .background(radioBackground, CircleShape)
             .border(width = 1.dp, color = borderColor, shape = CircleShape),
@@ -150,7 +154,7 @@ fun RadioButton(
         if (dotAnimationProgress > 0f) {
             Box(
                 modifier = Modifier
-                    .size(6.dp)
+                    .size(metrics.dotSizeFor(controlSize))
                     .graphicsLayer {
                         scaleX = dotAnimationProgress
                         scaleY = dotAnimationProgress
@@ -193,7 +197,7 @@ fun RadioButton(
                 enabled = enabled,
                 interactionSource = interactionSource
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(DarwinTheme.componentStyling.radioButton.metrics.labelSpacing))
             BasicText(
                 text = label,
                 style = DarwinTheme.typography.subheadline.merge(

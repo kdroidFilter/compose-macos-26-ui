@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.LocalControlSize
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 
 // ===========================================================================
@@ -105,12 +106,15 @@ fun Switch(
     colors: SwitchColors = SwitchDefaults.colors(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    val trackWidth = (54f / 1.3f).dp
-    val trackHeight = (24f / 1.3f).dp
-    val thumbWidth = (32f / 1.3f).dp
-    val thumbHeight = (20f / 1.3f).dp
-    val thumbPadding = (2f / 1.3f).dp
-    val thumbShape = RoundedCornerShape((10f / 1.3f).dp)
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.switch.metrics
+
+    val trackWidth = metrics.trackWidthFor(controlSize)
+    val trackHeight = metrics.trackHeightFor(controlSize)
+    val thumbWidth = metrics.thumbSizeFor(controlSize)
+    val thumbHeight = metrics.thumbSizeFor(controlSize)
+    val thumbPadding = metrics.thumbPadding
+    val thumbShape = RoundedCornerShape(50)
     val trackShape = RoundedCornerShape(50)
 
     // Thumb translates between left and right positions

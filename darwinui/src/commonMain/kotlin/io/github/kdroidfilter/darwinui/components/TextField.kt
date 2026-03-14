@@ -30,17 +30,10 @@ import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.FocusableComponentState
+import io.github.kdroidfilter.darwinui.theme.LocalControlSize
 import io.github.kdroidfilter.darwinui.theme.Outline
 import io.github.kdroidfilter.darwinui.theme.darwinTween
 import io.github.kdroidfilter.darwinui.theme.focusOrValidationOutline
-
-// ===========================================================================
-// InputSize — Darwin extension
-// ===========================================================================
-
-enum class InputSize(val height: Dp) {
-    Sm(26.dp), Md(32.dp), Lg(40.dp),
-}
 
 // ===========================================================================
 // TextFieldState — implements FocusableComponentState (Phase 1.2)
@@ -242,12 +235,14 @@ private fun TextFieldImpl(
     interactionSource: MutableInteractionSource,
     shape: Shape,
     colors: TextFieldColors,
-    size: InputSize,
     focusRequester: FocusRequester,
     outline: Outline,
 ) {
     val typography = DarwinTheme.typography
     val outlines = DarwinTheme.globalColors.outlines
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.textField.metrics
+    val resolvedHeight = metrics.minHeightFor(controlSize)
 
     var isFocused by remember { mutableStateOf(false) }
 
@@ -333,7 +328,7 @@ private fun TextFieldImpl(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(size.height)
+                        .height(resolvedHeight)
                         .focusOrValidationOutline(isFocused, outline, shape, outlines),
                 ) {
                     // Inner clipped box handles background, border, and disabled opacity
@@ -448,8 +443,6 @@ fun TextField(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = DarwinTheme.shapes.small,
     colors: TextFieldColors = TextFieldDefaults.colors(),
-    // Darwin extensions
-    size: InputSize = InputSize.Md,
     focusRequester: FocusRequester = remember { FocusRequester() },
     outline: Outline = Outline.None,
 ) {
@@ -457,7 +450,7 @@ fun TextField(
         value, onValueChange, modifier, enabled, readOnly, textStyle,
         label, placeholder, leadingIcon, trailingIcon, prefix, suffix, supportingText,
         isError, visualTransformation, keyboardOptions, keyboardActions,
-        singleLine, maxLines, minLines, interactionSource, shape, colors, size, focusRequester,
+        singleLine, maxLines, minLines, interactionSource, shape, colors, focusRequester,
         outline,
     )
 }
@@ -491,8 +484,6 @@ fun OutlinedTextField(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = DarwinTheme.shapes.small,
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors(),
-    // Darwin extensions
-    size: InputSize = InputSize.Md,
     focusRequester: FocusRequester = remember { FocusRequester() },
     outline: Outline = Outline.None,
 ) {
@@ -500,7 +491,7 @@ fun OutlinedTextField(
         value, onValueChange, modifier, enabled, readOnly, textStyle,
         label, placeholder, leadingIcon, trailingIcon, prefix, suffix, supportingText,
         isError, visualTransformation, keyboardOptions, keyboardActions,
-        singleLine, maxLines, minLines, interactionSource, shape, colors, size, focusRequester,
+        singleLine, maxLines, minLines, interactionSource, shape, colors, focusRequester,
         outline,
     )
 }

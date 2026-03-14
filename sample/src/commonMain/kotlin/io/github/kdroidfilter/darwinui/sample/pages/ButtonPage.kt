@@ -31,7 +31,32 @@ import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
+import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+
+@GalleryExample("Button", "Sizes")
+@Composable
+fun ButtonSizesExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        for (size in ControlSize.entries) {
+            ControlSize(size) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = size.name,
+                        style = DarwinTheme.typography.caption1,
+                        color = DarwinTheme.colorScheme.textSecondary,
+                        modifier = Modifier.widthIn(min = 72.dp),
+                    )
+                    PushButton(text = "Label", onClick = {})
+                    PushButton(text = "Disabled", onClick = {}, enabled = false)
+                }
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalLayoutApi::class)
 @GalleryExample("Button", "Pulldown")
@@ -152,6 +177,13 @@ fun ButtonPanelFooterExample() {
 @Composable
 internal fun ButtonPage() {
     GalleryPage("Button", "Native macOS button controls with idiomatic Compose APIs.") {
+        SectionHeader("Sizes")
+        ExampleCard(
+            title = "All Sizes",
+            description = "PushButton at each ControlSize level",
+            sourceCode = GallerySources.ButtonSizesExample,
+        ) { ButtonSizesExample() }
+
         SectionHeader("Examples")
         ExampleCard(
             title = "Pulldown",

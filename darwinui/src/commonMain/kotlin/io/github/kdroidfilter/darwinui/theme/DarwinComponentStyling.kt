@@ -43,6 +43,8 @@ data class ComponentStyling(
     val segmentedControl: SegmentedControlStyle,
     val tooltip: TooltipStyle,
     val card: CardStyle,
+    val progress: ProgressStyle = ProgressStyle(),
+    val sidebar: SidebarStyle = SidebarStyle(),
 )
 
 // ---------------------------------------------------------------------------

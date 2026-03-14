@@ -98,6 +98,38 @@ data class GlobalMetrics(
 
     /** Icon size used inside controls (leading/trailing icons in text fields). */
     val inlineIconSize: Dp = 16.dp,
-)
+) {
+    fun componentHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+        ControlSize.Mini -> miniComponentHeight
+        ControlSize.Small -> smallComponentHeight
+        ControlSize.Regular -> defaultComponentHeight
+        ControlSize.Large -> largeComponentHeight
+        ControlSize.ExtraLarge -> 32.dp
+    }
+
+    fun cornerRadiusFor(controlSize: ControlSize): Dp = when (controlSize) {
+        ControlSize.Mini -> cornerRadiusMini
+        ControlSize.Small -> cornerRadiusSmall
+        ControlSize.Regular -> cornerRadiusMedium
+        ControlSize.Large -> cornerRadiusLarge
+        ControlSize.ExtraLarge -> cornerRadiusExtraLarge
+    }
+
+    fun horizontalPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
+        ControlSize.Mini -> 4.dp
+        ControlSize.Small -> horizontalPaddingSmall
+        ControlSize.Regular -> horizontalPaddingMedium
+        ControlSize.Large -> horizontalPaddingLarge
+        ControlSize.ExtraLarge -> 20.dp
+    }
+
+    fun inlineIconSizeFor(controlSize: ControlSize): Dp = when (controlSize) {
+        ControlSize.Mini -> 12.dp
+        ControlSize.Small -> 14.dp
+        ControlSize.Regular -> inlineIconSize
+        ControlSize.Large -> 18.dp
+        ControlSize.ExtraLarge -> 20.dp
+    }
+}
 
 val LocalDarwinGlobalMetrics = staticCompositionLocalOf { GlobalMetrics() }

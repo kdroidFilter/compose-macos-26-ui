@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.LocalControlSize
 import io.github.kdroidfilter.darwinui.theme.ToggleableComponentState
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 
@@ -133,6 +134,9 @@ fun Checkbox(
     colors: CheckboxColors = CheckboxDefaults.colors(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.checkbox.metrics
+
     val animationProgress by animateFloatAsState(
         targetValue = if (checked) 1f else 0f,
         animationSpec = darwinSpring(preset = DarwinSpringPreset.Snappy),
@@ -170,12 +174,12 @@ fun Checkbox(
         )
     } else modifier
 
-    val checkboxShape = RoundedCornerShape(4.dp)
+    val checkboxShape = RoundedCornerShape(metrics.cornerSizeFor(controlSize))
     Box(
         contentAlignment = Alignment.Center,
         modifier = toggleModifier
             .alpha(if (enabled) 1f else 0.5f)
-            .size(16.dp)
+            .size(metrics.sizeFor(controlSize))
             .clip(checkboxShape)
             .background(boxBackground, checkboxShape)
             .border(width = 1.dp, color = borderColor, shape = checkboxShape),
@@ -209,6 +213,9 @@ fun TriStateCheckbox(
     colors: CheckboxColors = CheckboxDefaults.colors(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.checkbox.metrics
+
     val isIndeterminate = state == androidx.compose.ui.state.ToggleableState.Indeterminate
     val isChecked = state == androidx.compose.ui.state.ToggleableState.On
     val isActive = isChecked || isIndeterminate
@@ -251,12 +258,12 @@ fun TriStateCheckbox(
         )
     } else modifier
 
-    val checkboxShape = RoundedCornerShape(4.dp)
+    val checkboxShape = RoundedCornerShape(metrics.cornerSizeFor(controlSize))
     Box(
         contentAlignment = Alignment.Center,
         modifier = clickModifier
             .alpha(if (enabled) 1f else 0.5f)
-            .size(16.dp)
+            .size(metrics.sizeFor(controlSize))
             .clip(checkboxShape)
             .background(boxBackground, checkboxShape)
             .border(width = 1.dp, color = borderColor, shape = checkboxShape),
@@ -308,7 +315,7 @@ fun CheckBox(
                 Checkbox(checked = checked, onCheckedChange = onCheckedChange, enabled = enabled)
             }
             if (label != null) {
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(DarwinTheme.componentStyling.checkbox.metrics.labelSpacing))
                 BasicText(
                     text = label,
                     style = DarwinTheme.typography.subheadline.merge(

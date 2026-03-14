@@ -7,8 +7,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.RadioButton
+import io.github.kdroidfilter.darwinui.components.Text
+import io.github.kdroidfilter.darwinui.theme.ControlSize
+import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -23,6 +30,30 @@ private fun RadioButtonPreview() {
         RadioButton(selected = selected == "Option 1", onClick = { selected = "Option 1" }, label = "Option 1")
         RadioButton(selected = selected == "Option 2", onClick = { selected = "Option 2" }, label = "Option 2")
         RadioButton(selected = selected == "Option 3", onClick = { selected = "Option 3" }, label = "Option 3")
+    }
+}
+
+@GalleryExample("RadioButton", "Sizes")
+@Composable
+fun RadioButtonSizesExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        for (size in ControlSize.entries) {
+            ControlSize(size) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = size.name,
+                        style = DarwinTheme.typography.caption1,
+                        color = DarwinTheme.colorScheme.textSecondary,
+                        modifier = Modifier.widthIn(min = 72.dp),
+                    )
+                    RadioButton(selected = true, onClick = {}, label = "Selected")
+                    RadioButton(selected = false, onClick = {}, label = "Unselected")
+                }
+            }
+        }
     }
 }
 
@@ -42,6 +73,13 @@ fun RadioButtonBasicExample() {
 internal fun RadioButtonPage() {
     GalleryPage("RadioButton", "A control that allows the user to select a single option from a set.") {
         PreviewContainer { RadioButtonPreview() }
+
+        SectionHeader("Sizes")
+        ExampleCard(
+            title = "All Sizes",
+            description = "RadioButton at each ControlSize level",
+            sourceCode = GallerySources.RadioButtonSizesExample,
+        ) { RadioButtonSizesExample() }
 
         SectionHeader("Examples")
         ExampleCard(

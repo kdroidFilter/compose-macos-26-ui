@@ -32,7 +32,6 @@ import io.github.kdroidfilter.darwinui.components.ComboBox
 import io.github.kdroidfilter.darwinui.components.GroupedList
 import io.github.kdroidfilter.darwinui.components.GroupedListItem
 import io.github.kdroidfilter.darwinui.components.IconButton
-import io.github.kdroidfilter.darwinui.components.InputSize
 import io.github.kdroidfilter.darwinui.components.PulldownButton
 import io.github.kdroidfilter.darwinui.components.PushButton
 import io.github.kdroidfilter.darwinui.components.RadioButton
@@ -47,6 +46,7 @@ import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
+import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
 // =====================================================================
@@ -290,13 +290,14 @@ fun FormTrailingAccessoryExample() {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    TextField(
-                        value = stepperText,
-                        onValueChange = {},
-                        singleLine = true,
-                        size = InputSize.Sm,
-                        modifier = Modifier.width(64.dp),
-                    )
+                    ControlSize(ControlSize.Small) {
+                        TextField(
+                            value = stepperText,
+                            onValueChange = {},
+                            singleLine = true,
+                            modifier = Modifier.width(64.dp),
+                        )
+                    }
                     ArrowButton(
                         onIncrement = { stepperValue++ },
                         onDecrement = { if (stepperValue > 0) stepperValue-- },
@@ -314,13 +315,14 @@ fun FormTrailingAccessoryExample() {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    TextField(
-                        value = stepperText,
-                        onValueChange = {},
-                        singleLine = true,
-                        size = InputSize.Sm,
-                        modifier = Modifier.width(64.dp),
-                    )
+                    ControlSize(ControlSize.Small) {
+                        TextField(
+                            value = stepperText,
+                            onValueChange = {},
+                            singleLine = true,
+                            modifier = Modifier.width(64.dp),
+                        )
+                    }
                     ArrowButton(
                         onIncrement = { stepperValue++ },
                         onDecrement = { if (stepperValue > 0) stepperValue-- },
@@ -335,13 +337,14 @@ fun FormTrailingAccessoryExample() {
         // Text Field
         GroupedListItem(
             trailing = {
-                TextField(
-                    value = textFieldValue,
-                    onValueChange = { textFieldValue = it },
-                    singleLine = true,
-                    size = InputSize.Sm,
-                    modifier = Modifier.width(100.dp),
-                )
+                ControlSize(ControlSize.Small) {
+                    TextField(
+                        value = textFieldValue,
+                        onValueChange = { textFieldValue = it },
+                        singleLine = true,
+                        modifier = Modifier.width(100.dp),
+                    )
+                }
             },
         ) {
             Text("Text Field", style = typography.subheadline, color = colors.textPrimary)

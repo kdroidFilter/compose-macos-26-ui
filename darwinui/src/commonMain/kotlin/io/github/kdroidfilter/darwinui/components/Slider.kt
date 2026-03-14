@@ -35,11 +35,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.LocalControlSize
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import kotlin.math.round
 import kotlin.math.roundToInt
@@ -95,16 +95,6 @@ object SliderDefaults {
     ) = SliderColors(thumbColor, activeTrackColor, activeTickColor, inactiveTrackColor, inactiveTickColor, disabledThumbColor, disabledActiveTrackColor, disabledActiveTickColor, disabledInactiveTrackColor, disabledInactiveTickColor)
 }
 
-// ===========================================================================
-// SliderSize — Darwin extension (not in M3)
-// ===========================================================================
-
-enum class SliderSize(val trackHeight: Dp, val thumbWidth: Dp, val thumbHeight: Dp) {
-    Sm(trackHeight = 2.dp, thumbWidth = 16.dp, thumbHeight = 12.dp),
-    Md(trackHeight = 4.dp, thumbWidth = 20.dp, thumbHeight = 16.dp),
-    Lg(trackHeight = 6.dp, thumbWidth = 24.dp, thumbHeight = 20.dp),
-}
-
 private val ThumbShape = RoundedCornerShape(50)
 
 // ===========================================================================
@@ -125,9 +115,11 @@ fun Slider(
     thumb: @Composable ((Float) -> Unit)? = null,
     track: @Composable ((Float) -> Unit)? = null,
     // Darwin extensions
-    sliderSize: SliderSize = SliderSize.Md,
     showValue: Boolean = false,
 ) {
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.slider.metrics
+
     val min = valueRange.start
     val max = valueRange.endInclusive
 
@@ -149,7 +141,7 @@ fun Slider(
 
     val density = LocalDensity.current
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
-    val thumbWidthPx = with(density) { sliderSize.thumbWidth.toPx() }
+    val thumbWidthPx = with(density) { metrics.thumbWidthFor(controlSize).toPx() }
 
     val isHovered by interactionSource.collectIsHoveredAsState()
     val thumbScale by animateFloatAsState(
@@ -170,7 +162,7 @@ fun Slider(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(sliderSize.thumbHeight)
+                .height(metrics.thumbHeightFor(controlSize))
                 .onSizeChanged { containerSize = it }
                 .then(if (enabled) Modifier
                     .pointerInput(min, max, steps) {
@@ -195,7 +187,7 @@ fun Slider(
             if (track != null) {
                 track(animatedFraction)
             } else {
-                Canvas(modifier = Modifier.fillMaxWidth().height(sliderSize.trackHeight).align(Alignment.Center)) {
+                Canvas(modifier = Modifier.fillMaxWidth().height(metrics.trackHeightFor(controlSize)).align(Alignment.Center)) {
                     val cornerRadius = CornerRadius(this.size.height / 2f)
                     drawRoundRect(color = trackColor, cornerRadius = cornerRadius, size = this.size)
                     val fillWidth = animatedFraction * this.size.width
@@ -215,7 +207,7 @@ fun Slider(
                 Box(
                     modifier = Modifier
                         .offset(x = thumbOffsetDp)
-                        .size(width = sliderSize.thumbWidth, height = sliderSize.thumbHeight)
+                        .size(width = metrics.thumbWidthFor(controlSize), height = metrics.thumbHeightFor(controlSize))
                         .graphicsLayer { scaleX = thumbScale; scaleY = thumbScale }
                         .hoverable(interactionSource)
                         .shadow(2.dp, ThumbShape, clip = false)
@@ -256,9 +248,10 @@ fun RangeSlider(
     startThumb: @Composable ((ClosedFloatingPointRange<Float>) -> Unit)? = null,
     endThumb: @Composable ((ClosedFloatingPointRange<Float>) -> Unit)? = null,
     track: @Composable ((ClosedFloatingPointRange<Float>) -> Unit)? = null,
-    // Darwin extension
-    sliderSize: SliderSize = SliderSize.Md,
 ) {
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.slider.metrics
+
     val min = valueRange.start
     val max = valueRange.endInclusive
 
@@ -270,7 +263,7 @@ fun RangeSlider(
 
     val density = LocalDensity.current
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
-    val thumbWidthPx = with(density) { sliderSize.thumbWidth.toPx() }
+    val thumbWidthPx = with(density) { metrics.thumbWidthFor(controlSize).toPx() }
 
     fun valueFromFraction(f: Float): Float = (min + f * (max - min)).coerceIn(min, max)
     fun fractionFromX(x: Float) = (x / containerSize.width.toFloat()).coerceIn(0f, 1f)
@@ -282,7 +275,7 @@ fun RangeSlider(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(sliderSize.thumbHeight)
+            .height(metrics.thumbHeightFor(controlSize))
             .onSizeChanged { containerSize = it }
             .then(if (!enabled) Modifier.graphicsLayer { alpha = 0.5f } else Modifier),
         contentAlignment = Alignment.CenterStart,
@@ -290,7 +283,7 @@ fun RangeSlider(
         if (track != null) {
             track(value)
         } else {
-            Canvas(modifier = Modifier.fillMaxWidth().height(sliderSize.trackHeight).align(Alignment.Center)) {
+            Canvas(modifier = Modifier.fillMaxWidth().height(metrics.trackHeightFor(controlSize)).align(Alignment.Center)) {
                 val cornerRadius = CornerRadius(this.size.height / 2f)
                 drawRoundRect(color = trackColor, cornerRadius = cornerRadius, size = this.size)
                 val startX = startFraction * this.size.width
@@ -328,7 +321,7 @@ fun RangeSlider(
             Box(
                 modifier = Modifier
                     .offset(x = startOffsetDp)
-                    .size(width = sliderSize.thumbWidth, height = sliderSize.thumbHeight)
+                    .size(width = metrics.thumbWidthFor(controlSize), height = metrics.thumbHeightFor(controlSize))
                     .shadow(2.dp, ThumbShape, clip = false)
                     .clip(ThumbShape)
                     .background(thumbColor),
@@ -343,7 +336,7 @@ fun RangeSlider(
             Box(
                 modifier = Modifier
                     .offset(x = endOffsetDp)
-                    .size(width = sliderSize.thumbWidth, height = sliderSize.thumbHeight)
+                    .size(width = metrics.thumbWidthFor(controlSize), height = metrics.thumbHeightFor(controlSize))
                     .shadow(2.dp, ThumbShape, clip = false)
                     .clip(ThumbShape)
                     .background(thumbColor),

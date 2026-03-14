@@ -42,6 +42,7 @@ import io.github.kdroidfilter.darwinui.icons.LucideSearch
 import io.github.kdroidfilter.darwinui.icons.LucideX
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.LocalControlSize
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
 import io.github.kdroidfilter.darwinui.theme.Outline
@@ -63,10 +64,11 @@ fun SearchField(
     label: String? = null,
     supportingText: String? = null,
     isError: Boolean = false,
-    size: InputSize = InputSize.Md,
     trailingIcon: @Composable (() -> Unit)? = null,
     outline: Outline = Outline.None,
 ) {
+    val controlSize = LocalControlSize.current
+    val tfMetrics = DarwinTheme.componentStyling.textField.metrics
     val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
     val isDark = colors.isDark
@@ -117,7 +119,7 @@ fun SearchField(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(28.dp)
+                    .height(tfMetrics.minHeightFor(controlSize))
                     .shadow(
                         elevation = if (isFocused) 4.dp else 0.dp,
                         shape = shape,

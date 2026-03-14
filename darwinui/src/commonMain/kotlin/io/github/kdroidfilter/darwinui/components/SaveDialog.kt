@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.darwinGlass
@@ -252,25 +253,27 @@ private fun SaveDialogContent(
         Column(verticalArrangement = Arrangement.spacedBy(13.dp)) {
             // Save As row
             SaveDialogRow(label = "Save As:") {
-                TextField(
-                    value = fileName,
-                    onValueChange = onFileNameChange,
-                    singleLine = true,
-                    size = InputSize.Sm,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                ControlSize(ControlSize.Small) {
+                    TextField(
+                        value = fileName,
+                        onValueChange = onFileNameChange,
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
 
             // Tags row
             if (onTagsChange != null) {
                 SaveDialogRow(label = "Tags:") {
-                    TextField(
-                        value = tags,
-                        onValueChange = onTagsChange,
-                        singleLine = true,
-                        size = InputSize.Sm,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    ControlSize(ControlSize.Small) {
+                        TextField(
+                            value = tags,
+                            onValueChange = onTagsChange,
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
             }
 

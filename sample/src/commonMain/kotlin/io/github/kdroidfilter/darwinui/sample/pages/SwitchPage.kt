@@ -9,15 +9,21 @@ import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.Switcher
+import io.github.kdroidfilter.darwinui.components.Text
+import io.github.kdroidfilter.darwinui.theme.ControlSize
+import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -54,6 +60,30 @@ internal fun HoverOffsetItem(content: @Composable () -> Unit) {
     }
 }
 
+@GalleryExample("Switch", "Sizes")
+@Composable
+fun SwitchSizesExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        for (size in ControlSize.entries) {
+            ControlSize(size) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = size.name,
+                        style = DarwinTheme.typography.caption1,
+                        color = DarwinTheme.colorScheme.textSecondary,
+                        modifier = Modifier.widthIn(min = 72.dp),
+                    )
+                    var s by remember { mutableStateOf(true) }
+                    Switcher(checked = s, onCheckedChange = { s = it }, label = "Toggle")
+                }
+            }
+        }
+    }
+}
+
 @GalleryExample("Switch", "States")
 @Composable
 fun SwitchStatesExample() {
@@ -70,6 +100,9 @@ fun SwitchStatesExample() {
 internal fun SwitchPage() {
     GalleryPage("Switch", "A control that toggles between on and off states.") {
         PreviewContainer { SwitchPreview() }
+
+        SectionHeader("Sizes")
+        ExampleCard(title = "All Sizes", sourceCode = GallerySources.SwitchSizesExample) { SwitchSizesExample() }
 
         SectionHeader("Examples")
         ExampleCard(title = "States", sourceCode = GallerySources.SwitchStatesExample) { SwitchStatesExample() }

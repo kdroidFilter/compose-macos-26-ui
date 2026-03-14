@@ -19,14 +19,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.theme.*
+import io.github.kdroidfilter.darwinui.theme.LocalControlSize
 
 // ==================== Enums ====================
-
-enum class ProgressSize(val height: Dp) {
-    Sm(4.dp),
-    Md(8.dp),
-    Lg(12.dp),
-}
 
 enum class ProgressVariant {
     Default,
@@ -34,14 +29,6 @@ enum class ProgressVariant {
     Warning,
     Danger,
     Gradient,
-}
-
-// ==================== ProgressRing sizes ====================
-
-object ProgressRingSize {
-    val Large = 64.dp
-    val Medium = 32.dp
-    val Small = 16.dp
 }
 
 // ==================== Color Helpers ====================
@@ -67,12 +54,13 @@ private fun gradientBrush(width: Float): Brush = Brush.linearGradient(
 fun LinearProgress(
     value: Float = 0f,
     max: Float = 100f,
-    size: ProgressSize = ProgressSize.Md,
     variant: ProgressVariant = ProgressVariant.Default,
     indeterminate: Boolean = false,
     showValue: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.progress.metrics
     val isDark = DarwinTheme.colorScheme.isDark
 
     val trackColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
@@ -109,7 +97,7 @@ fun LinearProgress(
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(size.height),
+                .height(metrics.heightFor(controlSize)),
         ) {
             val cornerRadius = CornerRadius(this.size.height / 2f)
 
@@ -191,7 +179,7 @@ fun LinearProgress(
 fun ProgressRing(
     progress: Float,
     modifier: Modifier = Modifier,
-    size: Dp = ProgressRingSize.Medium,
+    size: Dp = DarwinTheme.componentStyling.progress.metrics.ringSizeFor(LocalControlSize.current),
     width: Dp = size * 3 / 32,
     color: Color = DarwinTheme.colorScheme.accent,
 ) {
@@ -256,7 +244,7 @@ fun ProgressRing(
 @Composable
 fun ProgressRing(
     modifier: Modifier = Modifier,
-    size: Dp = ProgressRingSize.Medium,
+    size: Dp = DarwinTheme.componentStyling.progress.metrics.ringSizeFor(LocalControlSize.current),
     width: Dp = size * 3 / 32,
     color: Color = DarwinTheme.colorScheme.accent,
 ) {

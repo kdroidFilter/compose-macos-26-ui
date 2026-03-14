@@ -43,11 +43,13 @@ import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.LocalControlSize
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import io.github.kdroidfilter.darwinui.theme.darwinGlass
 import io.github.kdroidfilter.darwinui.theme.darwinTween
+import io.github.kdroidfilter.darwinui.theme.labelStyle
 
 // ===========================================================================
 // PulldownButton — macOS-native pulldown/popup button (flat bezel style)
@@ -65,6 +67,8 @@ fun PulldownButton(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit,
 ) {
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.defaultButton.metrics
     val isDark = DarwinTheme.colorScheme.isDark
     val isPressed by interactionSource.collectIsPressedAsState()
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -91,17 +95,17 @@ fun PulldownButton(
 
     val bgColor = if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.05f)
     val contentColor = if (isDark) Color.White else Color(0xFF1A1A1A)
-    val shape = RoundedCornerShape(9.6.dp)
+    val shape = RoundedCornerShape(metrics.cornerSizeFor(controlSize))
 
     CompositionLocalProvider(
         LocalDarwinContentColor provides contentColor,
-        LocalDarwinTextStyle provides DarwinTheme.typography.caption1,
+        LocalDarwinTextStyle provides controlSize.labelStyle(),
     ) {
         Box(
             modifier = modifier
                 .scale(scale)
                 .alpha(alpha)
-                .height(24.dp)
+                .height(metrics.minHeightFor(controlSize))
                 .clip(shape)
                 .background(bgColor, shape)
                 .background(hoverOverlay, shape)
@@ -113,7 +117,7 @@ fun PulldownButton(
                     role = Role.Button,
                     onClick = onClick,
                 )
-                .padding(horizontal = 12.dp),
+                .padding(horizontal = metrics.horizontalPaddingFor(controlSize)),
             contentAlignment = Alignment.Center,
         ) {
             Row(
@@ -146,7 +150,7 @@ fun PulldownButton(
 // ===========================================================================
 
 /**
- * macOS-native pulldown button with frosted glass background: 36dp tall, capsule shape,
+ * macOS-native pulldown button with frosted glass background, capsule shape,
  * drop shadow. Displays content + up/down chevron arrows.
  */
 @Composable
@@ -157,6 +161,8 @@ fun GlassPulldownButton(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit,
 ) {
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.defaultButton.metrics
     val isDark = DarwinTheme.colorScheme.isDark
     val isPressed by interactionSource.collectIsPressedAsState()
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -188,7 +194,7 @@ fun GlassPulldownButton(
 
     CompositionLocalProvider(
         LocalDarwinContentColor provides contentColor,
-        LocalDarwinTextStyle provides DarwinTheme.typography.caption1,
+        LocalDarwinTextStyle provides controlSize.labelStyle(),
     ) {
         Box(
             modifier = modifier
@@ -214,8 +220,8 @@ fun GlassPulldownButton(
                     role = Role.Button,
                     onClick = onClick,
                 )
-                .defaultMinSize(minHeight = 36.dp)
-                .padding(horizontal = 16.dp),
+                .defaultMinSize(minHeight = metrics.minHeightFor(controlSize) + 12.dp)
+                .padding(horizontal = metrics.horizontalPaddingFor(controlSize) + 4.dp),
             contentAlignment = Alignment.Center,
         ) {
             Row(
@@ -347,6 +353,8 @@ fun PushButton(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit,
 ) {
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.defaultButton.metrics
     val isDark = DarwinTheme.colorScheme.isDark
     val isPressed by interactionSource.collectIsPressedAsState()
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -373,17 +381,17 @@ fun PushButton(
 
     val bgColor = if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.05f)
     val contentColor = if (isDark) Color.White else Color(0xFF1A1A1A)
-    val shape = RoundedCornerShape(9.6.dp)
+    val shape = RoundedCornerShape(metrics.cornerSizeFor(controlSize))
 
     CompositionLocalProvider(
         LocalDarwinContentColor provides contentColor,
-        LocalDarwinTextStyle provides DarwinTheme.typography.caption1,
+        LocalDarwinTextStyle provides controlSize.labelStyle(),
     ) {
         Box(
             modifier = modifier
                 .scale(scale)
                 .alpha(alpha)
-                .height(24.dp)
+                .height(metrics.minHeightFor(controlSize))
                 .clip(shape)
                 .background(bgColor, shape)
                 .background(hoverOverlay, shape)
@@ -395,7 +403,7 @@ fun PushButton(
                     role = Role.Button,
                     onClick = onClick,
                 )
-                .padding(horizontal = 12.dp),
+                .padding(horizontal = metrics.horizontalPaddingFor(controlSize)),
             contentAlignment = Alignment.Center,
         ) {
             Row(
@@ -528,6 +536,8 @@ fun PanelAccentButton(
     enabled: Boolean = true,
     fillWidth: Boolean = false,
 ) {
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.defaultButton.metrics
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -547,13 +557,13 @@ fun PanelAccentButton(
         label = "panel_accent_hover",
     )
 
-    val shape = RoundedCornerShape(7.69.dp)
+    val shape = RoundedCornerShape(metrics.cornerSizeFor(controlSize))
 
     Box(
         modifier = modifier
             .scale(scale)
             .then(if (fillWidth) Modifier.fillMaxWidth() else Modifier.defaultMinSize(minWidth = 76.dp))
-            .height(24.dp)
+            .height(metrics.minHeightFor(controlSize))
             .clip(shape)
             .background(Color(0xFF0088FF), shape)
             .background(hoverOverlay, shape)
@@ -569,9 +579,8 @@ fun PanelAccentButton(
     ) {
         CompositionLocalProvider(
             LocalDarwinContentColor provides Color.White,
-            LocalDarwinTextStyle provides DarwinTheme.typography.caption1.copy(
+            LocalDarwinTextStyle provides controlSize.labelStyle().copy(
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
-                fontSize = 13.sp,
             ),
         ) {
             Text(text)
@@ -581,7 +590,7 @@ fun PanelAccentButton(
 
 /**
  * macOS-native destructive panel button for save dialogs and sheet footers.
- * 24dp tall, squarish rounded corners (rx≈7.69dp), red tinted background (#FF383C at 25%).
+ * Squarish rounded corners, red tinted background (#FF383C at 25%).
  */
 @Composable
 fun PanelDestructiveButton(
@@ -591,6 +600,8 @@ fun PanelDestructiveButton(
     enabled: Boolean = true,
     fillWidth: Boolean = false,
 ) {
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.defaultButton.metrics
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -611,13 +622,13 @@ fun PanelDestructiveButton(
         label = "panel_dest_hover",
     )
 
-    val shape = RoundedCornerShape(7.69.dp)
+    val shape = RoundedCornerShape(metrics.cornerSizeFor(controlSize))
 
     Box(
         modifier = modifier
             .scale(scale)
             .then(if (fillWidth) Modifier.fillMaxWidth() else Modifier.defaultMinSize(minWidth = 76.dp))
-            .height(24.dp)
+            .height(metrics.minHeightFor(controlSize))
             .clip(shape)
             .background(Color(0xFFFF383C).copy(alpha = 0.25f), shape)
             .background(hoverOverlay, shape)
@@ -633,9 +644,8 @@ fun PanelDestructiveButton(
     ) {
         CompositionLocalProvider(
             LocalDarwinContentColor provides Color(0xFFFF383C),
-            LocalDarwinTextStyle provides DarwinTheme.typography.caption1.copy(
+            LocalDarwinTextStyle provides controlSize.labelStyle().copy(
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
-                fontSize = 13.sp,
             ),
         ) {
             Text(text)
@@ -645,7 +655,7 @@ fun PanelDestructiveButton(
 
 /**
  * macOS-native secondary panel button for save dialogs and sheet footers.
- * 24dp tall, squarish rounded corners (rx≈7.69dp), subtle 5% black background.
+ * Squarish rounded corners, subtle 5% black background.
  */
 @Composable
 fun PanelSecondaryButton(
@@ -655,6 +665,8 @@ fun PanelSecondaryButton(
     enabled: Boolean = true,
     fillWidth: Boolean = false,
 ) {
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.defaultButton.metrics
     val isDark = DarwinTheme.colorScheme.isDark
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -678,13 +690,13 @@ fun PanelSecondaryButton(
         label = "panel_sec_hover",
     )
 
-    val shape = RoundedCornerShape(7.69.dp)
+    val shape = RoundedCornerShape(metrics.cornerSizeFor(controlSize))
 
     Box(
         modifier = modifier
             .scale(scale)
             .then(if (fillWidth) Modifier.fillMaxWidth() else Modifier.defaultMinSize(minWidth = 76.dp))
-            .height(24.dp)
+            .height(metrics.minHeightFor(controlSize))
             .clip(shape)
             .background(backgroundColor, shape)
             .background(hoverOverlay, shape)
@@ -700,9 +712,8 @@ fun PanelSecondaryButton(
     ) {
         CompositionLocalProvider(
             LocalDarwinContentColor provides textColor,
-            LocalDarwinTextStyle provides DarwinTheme.typography.caption1.copy(
+            LocalDarwinTextStyle provides controlSize.labelStyle().copy(
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
-                fontSize = 13.sp,
             ),
         ) {
             Text(text)
@@ -726,6 +737,8 @@ fun MacNativeAccentButton(
     enabled: Boolean = true,
     fillWidth: Boolean = true,
 ) {
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.defaultButton.metrics
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
@@ -735,13 +748,14 @@ fun MacNativeAccentButton(
         label = "mac_btn_scale",
     )
 
-    val pillShape = RoundedCornerShape(14.dp)
+    val pillShape = RoundedCornerShape(50)
+    val btnHeight = metrics.minHeightFor(controlSize) + 6.dp
 
     Box(
         modifier = modifier
             .scale(scale)
             .then(if (fillWidth) Modifier.fillMaxWidth() else Modifier.defaultMinSize(minWidth = 72.dp))
-            .height(28.dp)
+            .height(btnHeight)
             .clip(pillShape)
             .background(Color(0xFF0088FF), pillShape)
             .hoverable(interactionSource = interactionSource, enabled = enabled)
@@ -756,9 +770,8 @@ fun MacNativeAccentButton(
     ) {
         CompositionLocalProvider(
             LocalDarwinContentColor provides Color.White,
-            LocalDarwinTextStyle provides DarwinTheme.typography.caption1.copy(
+            LocalDarwinTextStyle provides controlSize.labelStyle().copy(
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
-                fontSize = 13.sp,
             ),
         ) {
             Text(text)
@@ -768,7 +781,7 @@ fun MacNativeAccentButton(
 
 /**
  * macOS-native destructive pill button for alert dialogs.
- * Full-width, 28dp tall, pill-shaped with red tinted background (#FF383C at 23%).
+ * Full-width, pill-shaped with red tinted background (#FF383C at 23%).
  */
 @Composable
 fun MacNativeDestructiveButton(
@@ -778,6 +791,8 @@ fun MacNativeDestructiveButton(
     enabled: Boolean = true,
     fillWidth: Boolean = true,
 ) {
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.defaultButton.metrics
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
@@ -787,13 +802,14 @@ fun MacNativeDestructiveButton(
         label = "mac_dest_btn_scale",
     )
 
-    val pillShape = RoundedCornerShape(14.dp)
+    val pillShape = RoundedCornerShape(50)
+    val btnHeight = metrics.minHeightFor(controlSize) + 6.dp
 
     Box(
         modifier = modifier
             .scale(scale)
             .then(if (fillWidth) Modifier.fillMaxWidth() else Modifier.defaultMinSize(minWidth = 72.dp))
-            .height(28.dp)
+            .height(btnHeight)
             .clip(pillShape)
             .background(Color(0xFFFF383C).copy(alpha = 0.23f), pillShape)
             .hoverable(interactionSource = interactionSource, enabled = enabled)
@@ -808,9 +824,8 @@ fun MacNativeDestructiveButton(
     ) {
         CompositionLocalProvider(
             LocalDarwinContentColor provides Color(0xFFFF383C),
-            LocalDarwinTextStyle provides DarwinTheme.typography.caption1.copy(
+            LocalDarwinTextStyle provides controlSize.labelStyle().copy(
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
-                fontSize = 13.sp,
             ),
         ) {
             Text(text)
@@ -820,7 +835,7 @@ fun MacNativeDestructiveButton(
 
 /**
  * macOS-native secondary/cancel pill button for alert dialogs.
- * Full-width, 28dp tall, pill-shaped with neutral gray background (#E6E6E6 light / white 12% dark).
+ * Full-width, pill-shaped with neutral gray background (#E6E6E6 light / white 12% dark).
  */
 @Composable
 fun MacNativeSecondaryButton(
@@ -830,6 +845,8 @@ fun MacNativeSecondaryButton(
     enabled: Boolean = true,
     fillWidth: Boolean = true,
 ) {
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.defaultButton.metrics
     val isDark = DarwinTheme.colorScheme.isDark
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -843,13 +860,14 @@ fun MacNativeSecondaryButton(
         label = "mac_sec_btn_scale",
     )
 
-    val pillShape = RoundedCornerShape(14.dp)
+    val pillShape = RoundedCornerShape(50)
+    val btnHeight = metrics.minHeightFor(controlSize) + 6.dp
 
     Box(
         modifier = modifier
             .scale(scale)
             .then(if (fillWidth) Modifier.fillMaxWidth() else Modifier.defaultMinSize(minWidth = 72.dp))
-            .height(28.dp)
+            .height(btnHeight)
             .clip(pillShape)
             .background(backgroundColor, pillShape)
             .hoverable(interactionSource = interactionSource, enabled = enabled)
@@ -864,9 +882,8 @@ fun MacNativeSecondaryButton(
     ) {
         CompositionLocalProvider(
             LocalDarwinContentColor provides textColor,
-            LocalDarwinTextStyle provides DarwinTheme.typography.caption1.copy(
+            LocalDarwinTextStyle provides controlSize.labelStyle().copy(
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
-                fontSize = 13.sp,
             ),
         ) {
             Text(text)

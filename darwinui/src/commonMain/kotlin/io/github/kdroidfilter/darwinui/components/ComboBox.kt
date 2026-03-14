@@ -50,6 +50,7 @@ import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.LocalControlSize
 import io.github.kdroidfilter.darwinui.theme.Outline
 import io.github.kdroidfilter.darwinui.theme.darwinGlass
 import io.github.kdroidfilter.darwinui.theme.focusOrValidationOutline
@@ -76,6 +77,8 @@ fun ComboBox(
     disabled: Boolean = false,
     outline: Outline = Outline.None,
 ) {
+    val controlSize = LocalControlSize.current
+    val comboMetrics = DarwinTheme.componentStyling.comboBox.metrics
     val colors = DarwinTheme.colorScheme
     val shapes = DarwinTheme.shapes
     val typography = DarwinTheme.typography
@@ -124,7 +127,7 @@ fun ComboBox(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(24.dp)
+                    .height(comboMetrics.minHeightFor(controlSize))
                     .focusOrValidationOutline(isFocused || expanded, outline, shapes.small, outlines),
             ) {
             Row(
@@ -267,7 +270,7 @@ fun ComboBox(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(24.dp)
+                                .height(comboMetrics.minHeightFor(controlSize))
                                 .hoverable(itemInteractionSource)
                                 .clickable(
                                     interactionSource = itemInteractionSource,

@@ -42,8 +42,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.LocalControlSize
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
 import io.github.kdroidfilter.darwinui.theme.Zinc300
@@ -51,21 +53,6 @@ import io.github.kdroidfilter.darwinui.theme.Zinc600
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
-
-// =============================================================================
-// SegmentedControlSize
-// =============================================================================
-
-enum class SegmentedControlSize(
-    val trackHeight: Dp,
-    val trackPadding: Dp,
-    val segmentHorizontalPadding: Dp,
-    val segmentVerticalPadding: Dp,
-) {
-    Small(trackHeight = 24.dp, trackPadding = 2.dp, segmentHorizontalPadding = 10.dp, segmentVerticalPadding = 2.dp),
-    Regular(trackHeight = 28.dp, trackPadding = 2.dp, segmentHorizontalPadding = 14.dp, segmentVerticalPadding = 4.dp),
-    Large(trackHeight = 32.dp, trackPadding = 2.dp, segmentHorizontalPadding = 16.dp, segmentVerticalPadding = 6.dp),
-}
 
 // =============================================================================
 // SegmentedControlColors
@@ -133,7 +120,6 @@ object SegmentedControlDefaults {
  * @param onSelectedIndexChange Callback when a segment is tapped.
  * @param modifier Modifier for the outer track.
  * @param enabled Whether the control accepts interaction.
- * @param size Size preset for the control.
  * @param colors Color configuration.
  * @param segment Content composable for each segment by index.
  */
@@ -144,12 +130,13 @@ fun SegmentedControl(
     onSelectedIndexChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    size: SegmentedControlSize = SegmentedControlSize.Regular,
     colors: SegmentedControlColors = SegmentedControlDefaults.colors(),
     segment: @Composable (index: Int) -> Unit,
 ) {
     require(segmentCount > 0) { "segmentCount must be > 0" }
 
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.segmentedControl.metrics
     val density = LocalDensity.current
     val isDark = DarwinTheme.colorScheme.isDark
     val trackShape = RoundedCornerShape(50)
@@ -187,16 +174,18 @@ fun SegmentedControl(
         }
     }
 
-    val indicatorHeight = size.trackHeight - size.trackPadding * 2
+    val trackHeight = metrics.containerHeightFor(controlSize)
+    val trackPadding = metrics.trackPadding
+    val indicatorHeight = trackHeight - trackPadding * 2
 
     // Track
     Box(
         modifier = modifier
-            .height(size.trackHeight)
+            .height(trackHeight)
             .alpha(if (enabled) 1f else 0.6f)
             .clip(trackShape)
             .background(trackColor, trackShape)
-            .padding(size.trackPadding),
+            .padding(trackPadding),
         contentAlignment = Alignment.CenterStart,
     ) {
         // Sliding pill indicator
@@ -238,7 +227,7 @@ fun SegmentedControl(
                     enabled = enabled,
                     isDark = isDark,
                     textColor = if (index == selectedIndex) selectedTextColor else textColor,
-                    size = size,
+                    controlSize = controlSize,
                     onMeasured = { idx, offset, width ->
                         segmentOffsets[idx] = offset
                         segmentWidths[idx] = width
@@ -268,7 +257,6 @@ fun SegmentedControl(
  * @param onSelectedIndexChange Callback when a segment is tapped.
  * @param modifier Modifier for the outer track.
  * @param enabled Whether the control accepts interaction.
- * @param size Size preset for the control.
  * @param colors Color configuration.
  */
 @Composable
@@ -278,7 +266,6 @@ fun SegmentedControl(
     onSelectedIndexChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    size: SegmentedControlSize = SegmentedControlSize.Regular,
     colors: SegmentedControlColors = SegmentedControlDefaults.colors(),
 ) {
     SegmentedControl(
@@ -287,7 +274,6 @@ fun SegmentedControl(
         onSelectedIndexChange = onSelectedIndexChange,
         modifier = modifier,
         enabled = enabled,
-        size = size,
         colors = colors,
     ) { index ->
         Text(options[index])
@@ -305,11 +291,12 @@ private fun RowScope.Segment(
     enabled: Boolean,
     isDark: Boolean,
     textColor: Color,
-    size: SegmentedControlSize,
+    controlSize: ControlSize,
     onMeasured: (index: Int, offset: Float, width: Float) -> Unit,
     onClick: () -> Unit,
     content: @Composable () -> Unit,
 ) {
+    val metrics = DarwinTheme.componentStyling.segmentedControl.metrics
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -370,8 +357,8 @@ private fun RowScope.Segment(
                 onClick = onClick,
             )
             .padding(
-                horizontal = size.segmentHorizontalPadding,
-                vertical = size.segmentVerticalPadding,
+                horizontal = metrics.segmentHorizontalPaddingFor(controlSize),
+                vertical = metrics.segmentVerticalPaddingFor(controlSize),
             ),
         contentAlignment = Alignment.Center,
     ) {
