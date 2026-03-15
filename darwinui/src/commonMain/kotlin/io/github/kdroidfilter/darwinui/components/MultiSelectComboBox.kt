@@ -87,6 +87,7 @@ fun MultiSelectComboBox(
     disabled: Boolean = false,
     outline: Outline = Outline.None,
     showTags: Boolean = true,
+    placement: MenuPlacement = MenuPlacement.Below,
 ) {
     val controlSize = LocalControlSize.current
     val comboMetrics = DarwinTheme.componentStyling.comboBox.metrics
@@ -273,6 +274,7 @@ fun MultiSelectComboBox(
                 anchorWidthPx = triggerWidthPx,
                 anchorHeightPx = triggerHeightPx,
                 matchAnchorWidth = false,
+                placement = placement,
                 modifier = Modifier
                     .darwinGlass(
                         shape = shapes.large,

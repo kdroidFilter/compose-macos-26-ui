@@ -1,11 +1,19 @@
 package io.github.kdroidfilter.darwinui.sample.pages
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.darwinui.components.MenuPlacement
 import io.github.kdroidfilter.darwinui.components.PushButton
 import io.github.kdroidfilter.darwinui.components.DropdownMenu
 import io.github.kdroidfilter.darwinui.components.DropdownMenuCheckboxItem
@@ -20,6 +28,7 @@ import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
+import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
 @GalleryExample("DropdownMenu", "Default")
 @Composable
@@ -116,6 +125,42 @@ fun DropdownMenuSubMenuExample() {
     }
 }
 
+@GalleryExample("DropdownMenu", "Placement")
+@Composable
+fun DropdownMenuPlacementExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        for (placement in MenuPlacement.entries) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = placement.name,
+                    style = DarwinTheme.typography.caption1,
+                    color = DarwinTheme.colorScheme.textSecondary,
+                    modifier = Modifier.widthIn(min = 100.dp),
+                )
+                var expanded by remember { mutableStateOf(false) }
+                Box {
+                    PushButton(
+                        text = "Open",
+                        onClick = { expanded = !expanded },
+                    )
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        placement = placement,
+                    ) {
+                        DropdownMenuItem(onClick = { expanded = false }) { Text("Item 1") }
+                        DropdownMenuItem(onClick = { expanded = false }) { Text("Item 2") }
+                        DropdownMenuItem(onClick = { expanded = false }) { Text("Item 3") }
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Composable
 internal fun DropdownMenuPage() {
     GalleryPage("Dropdown Menu", "Displays a menu to the user with a list of actions.") {
@@ -130,5 +175,11 @@ internal fun DropdownMenuPage() {
             description = "Nested submenus with hover-to-open behavior",
             sourceCode = GallerySources.DropdownMenuSubMenuExample,
         ) { DropdownMenuSubMenuExample() }
+        SectionHeader("Placement")
+        ExampleCard(
+            title = "Menu Placement",
+            description = "Control where the menu appears relative to the trigger",
+            sourceCode = GallerySources.DropdownMenuPlacementExample,
+        ) { DropdownMenuPlacementExample() }
     }
 }

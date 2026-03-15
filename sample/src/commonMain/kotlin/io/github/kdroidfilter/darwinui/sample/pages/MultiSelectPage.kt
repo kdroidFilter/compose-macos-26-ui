@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.darwinui.components.MenuPlacement
 import io.github.kdroidfilter.darwinui.components.MultiSelectComboBox
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
@@ -92,6 +93,35 @@ fun MultiSelectDisabledExample() {
     )
 }
 
+@GalleryExample("MultiSelect", "Placement")
+@Composable
+fun MultiSelectPlacementExample() {
+    val items = listOf("React", "Vue", "Angular", "Svelte")
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        for (placement in MenuPlacement.entries) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = placement.name,
+                    style = DarwinTheme.typography.caption1,
+                    color = DarwinTheme.colorScheme.textSecondary,
+                    modifier = Modifier.widthIn(min = 100.dp),
+                )
+                var selected by remember { mutableStateOf(listOf(0)) }
+                MultiSelectComboBox(
+                    items = items,
+                    selectedIndices = selected,
+                    onSelectionChange = { selected = it },
+                    placement = placement,
+                    showTags = false,
+                )
+            }
+        }
+    }
+}
+
 @Composable
 internal fun MultiSelectPage() {
     GalleryPage("Multi Select", "Allows selecting multiple options from a list.") {
@@ -105,5 +135,11 @@ internal fun MultiSelectPage() {
         ExampleCard(title = "Default", sourceCode = GallerySources.MultiSelectDefaultExample) { MultiSelectDefaultExample() }
         ExampleCard(title = "Pre-selected", sourceCode = GallerySources.MultiSelectPreselectedExample) { MultiSelectPreselectedExample() }
         ExampleCard(title = "Disabled", sourceCode = GallerySources.MultiSelectDisabledExample) { MultiSelectDisabledExample() }
+        SectionHeader("Placement")
+        ExampleCard(
+            title = "Menu Placement",
+            description = "Control where the dropdown appears relative to the trigger",
+            sourceCode = GallerySources.MultiSelectPlacementExample,
+        ) { MultiSelectPlacementExample() }
     }
 }

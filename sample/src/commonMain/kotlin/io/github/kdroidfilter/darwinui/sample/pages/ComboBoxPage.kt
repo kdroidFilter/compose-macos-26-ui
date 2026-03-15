@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.ComboBox
+import io.github.kdroidfilter.darwinui.components.MenuPlacement
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
@@ -97,6 +98,34 @@ fun ComboBoxDisabledExample() {
     )
 }
 
+@GalleryExample("ComboBox", "Placement")
+@Composable
+fun ComboBoxPlacementExample() {
+    val items = listOf("Light", "Dark", "Auto")
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        for (placement in MenuPlacement.entries) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = placement.name,
+                    style = DarwinTheme.typography.caption1,
+                    color = DarwinTheme.colorScheme.textSecondary,
+                    modifier = Modifier.widthIn(min = 100.dp),
+                )
+                var selected by remember { mutableStateOf(0) }
+                ComboBox(
+                    items = items,
+                    selected = selected,
+                    onSelectionChange = { index, _ -> selected = index },
+                    placement = placement,
+                )
+            }
+        }
+    }
+}
+
 @Composable
 internal fun ComboBoxPage() {
     GalleryPage("Combo Box", "A dropdown combo box for selecting from a list of options.") {
@@ -122,5 +151,11 @@ internal fun ComboBoxPage() {
             description = "Combo box in disabled state",
             sourceCode = GallerySources.ComboBoxDisabledExample,
         ) { ComboBoxDisabledExample() }
+        SectionHeader("Placement")
+        ExampleCard(
+            title = "Menu Placement",
+            description = "Control where the dropdown appears relative to the trigger",
+            sourceCode = GallerySources.ComboBoxPlacementExample,
+        ) { ComboBoxPlacementExample() }
     }
 }

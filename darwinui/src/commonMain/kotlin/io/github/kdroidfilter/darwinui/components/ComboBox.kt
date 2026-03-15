@@ -79,6 +79,7 @@ fun ComboBox(
     placeholder: String? = null,
     disabled: Boolean = false,
     outline: Outline = Outline.None,
+    placement: MenuPlacement = MenuPlacement.Below,
 ) {
     val controlSize = LocalControlSize.current
     val comboMetrics = DarwinTheme.componentStyling.comboBox.metrics
@@ -261,6 +262,7 @@ fun ComboBox(
                 anchorWidthPx = triggerWidthPx,
                 anchorHeightPx = triggerHeightPx,
                 matchAnchorWidth = false,
+                placement = placement,
                 modifier = Modifier
                     .darwinGlass(
                         shape = shapes.large,

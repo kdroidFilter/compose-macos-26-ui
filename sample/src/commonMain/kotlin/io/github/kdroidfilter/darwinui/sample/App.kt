@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.composables.icons.lucide.Calendar
 import com.composables.icons.lucide.Bell
 import com.composables.icons.lucide.ChevronsUpDown
 import com.composables.icons.lucide.CircleDot
@@ -99,6 +100,7 @@ import io.github.kdroidfilter.darwinui.sample.pages.CheckboxPage
 import io.github.kdroidfilter.darwinui.sample.pages.CircularSliderPage
 import io.github.kdroidfilter.darwinui.sample.pages.ComboBoxPage
 import io.github.kdroidfilter.darwinui.sample.pages.ColorWellPage
+import io.github.kdroidfilter.darwinui.sample.pages.DatePickerPage
 import io.github.kdroidfilter.darwinui.sample.pages.ControlSizePage
 import io.github.kdroidfilter.darwinui.sample.pages.ContextMenuPage
 import io.github.kdroidfilter.darwinui.sample.pages.DialogPage
@@ -110,6 +112,7 @@ import io.github.kdroidfilter.darwinui.sample.pages.GroupedListPage
 import io.github.kdroidfilter.darwinui.sample.pages.InputPage
 import io.github.kdroidfilter.darwinui.sample.pages.MultiSelectPage
 import io.github.kdroidfilter.darwinui.sample.pages.PopoverPage
+import io.github.kdroidfilter.darwinui.sample.pages.PopupButtonPage
 import io.github.kdroidfilter.darwinui.sample.pages.ProgressPage
 import io.github.kdroidfilter.darwinui.sample.pages.RadioButtonPage
 import io.github.kdroidfilter.darwinui.sample.pages.ScaffoldPage
@@ -151,6 +154,8 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("slider", "Slider", "FORM CONTROLS", Lucide.SlidersHorizontal),
     SidebarEntryDef("circularslider", "Circular Slider", "FORM CONTROLS", Lucide.Loader),
     SidebarEntryDef("stepper", "Stepper", "FORM CONTROLS", Lucide.ChevronsUpDown),
+    SidebarEntryDef("popupbutton", "Pop-up Button", "FORM CONTROLS", Lucide.ChevronsUpDown),
+    SidebarEntryDef("datepicker", "Date Picker", "FORM CONTROLS", Lucide.Calendar),
     SidebarEntryDef("colorwell", "Color Well", "FORM CONTROLS", Lucide.Scan),
     SidebarEntryDef("scrollbar", "Scrollbar", "DATA DISPLAY", Lucide.GripVertical),
     SidebarEntryDef("groupbox", "Group Box", "DATA DISPLAY", Lucide.SquareDashed),
@@ -459,6 +464,8 @@ fun App() {
                         "titlebar" -> TitleBarPage()
                         "addressbar" -> AddressBarPage()
                         "scaffold" -> ScaffoldPage()
+                        "popupbutton" -> PopupButtonPage()
+                        "datepicker" -> DatePickerPage()
                         "colorwell" -> ColorWellPage()
                         "material" -> MaterialPage()
                         "controlsize" -> ControlSizePage()

@@ -57,6 +57,7 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -144,6 +145,7 @@ fun DropdownMenu(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     offset: IntOffset = IntOffset(0, 0),
+    placement: MenuPlacement = MenuPlacement.Below,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = DarwinTheme.colorScheme
@@ -155,14 +157,20 @@ fun DropdownMenu(
 
     // Capture the anchor's window position for full-screen popup positioning
     var anchorPosition by remember { mutableStateOf(IntOffset.Zero) }
+    var anchorSize by remember { mutableStateOf(IntSize.Zero) }
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
     var menuSize by remember { mutableStateOf(IntSize.Zero) }
     Spacer(
         modifier = Modifier.onGloballyPositioned { coordinates ->
             val windowPos = coordinates.localToWindow(Offset.Zero)
             anchorPosition = IntOffset(windowPos.x.toInt(), windowPos.y.toInt())
+            anchorSize = coordinates.size
         },
     )
+
+    val density = LocalDensity.current
+    val gapPx = with(density) { 4.dp.roundToPx() }
+    val origin = placement.transformOrigin(centerX = true)
 
     if (expanded) {
         val keyboardState = remember { DropdownMenuKeyboardState() }
@@ -180,10 +188,16 @@ fun DropdownMenu(
                         onClick = onDismissRequest,
                     ),
             ) {
-                val rawOffset = anchorPosition + offset
+                val rawY = calculateMenuY(
+                    placement = placement,
+                    anchorY = anchorPosition.y,
+                    anchorHeight = anchorSize.height,
+                    menuHeight = menuSize.height,
+                    gapPx = gapPx,
+                ) + offset.y
                 val clampedOffset = IntOffset(
-                    x = rawOffset.x.coerceIn(0, (containerSize.width - menuSize.width).coerceAtLeast(0)),
-                    y = rawOffset.y.coerceIn(0, (containerSize.height - menuSize.height).coerceAtLeast(0)),
+                    x = (anchorPosition.x + offset.x).coerceIn(0, (containerSize.width - menuSize.width).coerceAtLeast(0)),
+                    y = rawY.coerceIn(0, (containerSize.height - menuSize.height).coerceAtLeast(0)),
                 )
                 AnimatedVisibility(
                     visible = expanded,
@@ -193,13 +207,13 @@ fun DropdownMenu(
                     enter = fadeIn(tween(150)) +
                             scaleIn(
                                 initialScale = 0.95f,
-                                transformOrigin = TransformOrigin(0.5f, 0f),
+                                transformOrigin = origin,
                                 animationSpec = tween(150),
                             ),
                     exit = fadeOut(tween(100)) +
                             scaleOut(
                                 targetScale = 0.95f,
-                                transformOrigin = TransformOrigin(0.5f, 0f),
+                                transformOrigin = origin,
                                 animationSpec = tween(100),
                             ),
                 ) {
