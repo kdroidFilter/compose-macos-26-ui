@@ -358,26 +358,32 @@ fun lightColorScheme(accentColor: AccentColor = AccentColor.Blue): ColorScheme {
 }
 
 /**
- * Applies vibrant (opaque) label and fill overrides to the given [ColorScheme].
+ * Applies vibrant system color overrides to the given [ColorScheme].
  *
- * On macOS, vibrant colors are used on vibrancy surfaces with "plus lighter"
- * (dark) or "plus darker" (light) blend modes. When true blend modes aren't
- * available (Compose), these opaque values still provide a distinct visual style
- * that approximates the vibrant appearance.
+ * On macOS, vibrant colors are opaque equivalents used on vibrancy surfaces
+ * with blend modes ("plus lighter" / "plus darker"). Since Compose doesn't
+ * support these blend modes, only the system colors (accent, destructive, etc.)
+ * are swapped — label and fill overrides are skipped as they appear incorrect
+ * without the native blend modes.
+ *
+ * @param vibrantColors Vibrant system color definitions.
+ * @param accentColor The current accent color, used to resolve its vibrant variant.
  */
-fun ColorScheme.vibrant(vibrantColors: VibrantColors): ColorScheme = copy(
-    // Labels → vibrant opaque equivalents
-    textPrimary = vibrantColors.labels.primary,
-    textSecondary = vibrantColors.labels.secondary,
-    textTertiary = vibrantColors.labels.tertiary,
-    textQuaternary = vibrantColors.labels.quaternary,
-    // Fills → vibrant opaque equivalents
-    inputBackground = vibrantColors.fills.primary,
-    inputBorder = vibrantColors.fills.secondary,
-    // Surface variant uses a vibrant fill for subtle backgrounds
-    onSurfaceVariant = vibrantColors.labels.secondary,
-    outlineVariant = vibrantColors.fills.secondary,
-    mutedForeground = vibrantColors.labels.secondary,
-)
+fun ColorScheme.vibrant(vibrantColors: VibrantColors, accentColor: AccentColor = AccentColor.Blue): ColorScheme {
+    val vibrantAccent = if (isDark) accentColor.vibrantDark else accentColor.vibrantLight
+    return copy(
+        // System colors → vibrant opaque equivalents
+        accent = vibrantAccent,
+        info = vibrantAccent,
+        ring = vibrantAccent,
+        inputFocusBorder = vibrantAccent,
+        surfaceTint = vibrantAccent,
+        tertiary = vibrantAccent,
+        destructive = vibrantColors.systemColors.red,
+        error = vibrantColors.systemColors.red,
+        success = vibrantColors.systemColors.green,
+        warning = vibrantColors.systemColors.yellow,
+    )
+}
 
 val LocalDarwinColors = staticCompositionLocalOf { darkColorScheme() }

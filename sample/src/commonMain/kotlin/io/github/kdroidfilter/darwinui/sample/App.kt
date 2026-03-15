@@ -196,7 +196,7 @@ fun App() {
     }
     val colorScheme = if (isVibrant) {
         val vibrant = if (isDark) VibrantColors.dark() else VibrantColors.light()
-        baseColorScheme.vibrant(vibrant)
+        baseColorScheme.vibrant(vibrant, accentColor)
     } else {
         baseColorScheme
     }
