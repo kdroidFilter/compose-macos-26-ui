@@ -23,6 +23,7 @@ kotlin = "2.3.10"
 kotlinx-coroutines = "1.10.2"
 kotlinx-datetime = "0.7.1"
 ksp = "2.3.1"
+multiplatformMarkdownRenderer = "0.39.2"
 
 [libraries]
 kotlin-math = { module = "dev.romainguy:kotlin-math", version.ref = "kotlinMath" }
@@ -50,6 +51,7 @@ kotlinx-coroutinesSwing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-s
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 detekt-compose-rules = { module = "io.nlopez.compose.rules:detekt", version.ref = "compose-rules" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
+multiplatform-markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "multiplatformMarkdownRenderer" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

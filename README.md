@@ -110,7 +110,7 @@ Compose Macos UI is available under a **dual license**:
 
 Free for open-source projects. If your project is distributed under a GPL-compatible license, you can use Compose Macos UI at no cost under the terms of the [GNU General Public License v3.0](LICENSE).
 
-### Commercial License — $20
+### Commercial License — $50
 
 For proprietary/closed-source projects, a commercial license is available for **$50** (one-time payment). This license covers usage in **up to 3 commercial projects**.
 

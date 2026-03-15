@@ -62,6 +62,7 @@ kotlin {
             implementation(libs.highlights)
             implementation(libs.icons.lucide.cmp)
             implementation(libs.kotlin.math)
+            implementation(project(":macos-markdown"))
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

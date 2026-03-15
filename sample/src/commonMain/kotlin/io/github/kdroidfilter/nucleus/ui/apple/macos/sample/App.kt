@@ -100,6 +100,8 @@ import androidx.compose.ui.platform.LocalUriHandler
 import com.composables.icons.lucide.Github
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AddressBarPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.HomePage
+import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.GettingStartedPage
+import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.LicensePage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AccordionPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AlertPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AvatarPage
@@ -156,6 +158,8 @@ internal data class SidebarEntryDef(val id: String, val label: String, val group
 
 internal val sidebarEntryDefs = listOf(
     SidebarEntryDef("home", "Home", "GENERAL", LucideHome),
+    SidebarEntryDef("getting-started", "Getting Started", "GENERAL", Lucide.LayoutList),
+    SidebarEntryDef("license", "License", "GENERAL", Lucide.Tag),
     SidebarEntryDef("button", "Button", "FORM CONTROLS", Lucide.MousePointerClick),
     SidebarEntryDef("iconbutton", "Icon Button", "FORM CONTROLS", Lucide.CircleDot),
     SidebarEntryDef("input", "Input", "FORM CONTROLS", Lucide.TextCursorInput),
@@ -456,6 +460,8 @@ fun App(deeplinkService: DeeplinkService = DeeplinkService()) {
                 ) {
                     when (selectedPage) {
                         "home" -> HomePage(onNavigate = { selectedPage = it })
+                        "getting-started" -> GettingStartedPage()
+                        "license" -> LicensePage()
                         "button" -> ButtonPage()
                         "iconbutton" -> IconButtonPage()
                         "input" -> InputPage()
