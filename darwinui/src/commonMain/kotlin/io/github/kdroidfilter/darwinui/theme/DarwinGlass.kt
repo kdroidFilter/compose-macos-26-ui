@@ -52,6 +52,23 @@ class SidebarResizeCallbacks(
 val LocalSidebarResize = compositionLocalOf<SidebarResizeCallbacks?> { null }
 
 /**
+ * The two glass appearance variants matching macOS 26.
+ *
+ * - [Regular] — neutral translucent glass with a lighter tint.
+ * - [Tinted] — darker, more opaque glass with a stronger tint overlay.
+ */
+enum class GlassType {
+    Regular,
+    Tinted,
+}
+
+/**
+ * Provides the current [GlassType] for all descendant glass components.
+ * Defaults to [GlassType.Regular].
+ */
+val LocalDarwinGlassType = compositionLocalOf { GlassType.Regular }
+
+/**
  * Provides a [LiquidState] for backdrop glass effects via [Modifier.darwinGlass].
  * Null when liquid glass is disabled in [DarwinTheme].
  */
@@ -70,7 +87,7 @@ val LocalToolbarGlassState = compositionLocalOf<LiquidState?> { null }
 //
 // Apple defines three material sizes (Small, Medium, Large) with different
 // blur radii, tint opacities, and shadow styles.  Each has a light and dark
-// variant, plus optional "Tinted" versions that overlay the accent color.
+// variant, plus "Tinted" versions with a stronger, more opaque tint.
 //
 // Values extracted from Apple macOS 26 UI Kit (Sketch shared layer styles
 // named "Liquid Glass/{Light,Dark}/Regular - {Small,Medium,Large}").
@@ -116,34 +133,37 @@ data class GlassMaterialSpec(
 
 /**
  * Resolves a [GlassMaterialSpec] for the given [size] and dark/light mode.
+ *
+ * Values extracted from Apple macOS 26 UI Kit Sketch shared layer styles
+ * named "Liquid Glass/{Light,Dark}/Regular - {Small,Medium,Large}".
  */
 fun resolveGlassMaterial(size: GlassMaterialSize, isDark: Boolean): GlassMaterialSpec = when {
     isDark -> when (size) {
         GlassMaterialSize.Small -> GlassMaterialSpec(
-            tint = Color.Black.copy(alpha = 0.40f),
+            tint = Color.Black.copy(alpha = 0.40f),           // #00000066
             baseColor = Color(0xFF1A1A1A),
             blurRadius = 6.dp,
-            shadowColor = Color.Black.copy(alpha = 0.16f),
+            shadowColor = Color.Black.copy(alpha = 0.16f),    // #00000029
             shadowY = 2.dp,
             shadowBlur = 25.dp,
-            edgeShadowColor = Color.Black.copy(alpha = 0.10f),
+            edgeShadowColor = Color.Black.copy(alpha = 0.10f), // #0000001a
             edgeShadowBlur = 2.dp,
         )
         GlassMaterialSize.Medium -> GlassMaterialSpec(
-            tint = Color.Black.copy(alpha = 0.40f),
+            tint = Color.Black.copy(alpha = 0.40f),           // #00000066
             baseColor = Color(0xFF121212),
             blurRadius = 8.dp,
-            shadowColor = Color.Black.copy(alpha = 0.12f),
+            shadowColor = Color.Black.copy(alpha = 0.12f),    // #0000001f
             shadowY = 8.dp,
             shadowBlur = 40.dp,
             edgeShadowColor = Color.Black.copy(alpha = 0.10f),
             edgeShadowBlur = 2.dp,
         )
         GlassMaterialSize.Large -> GlassMaterialSpec(
-            tint = Color.Black.copy(alpha = 0.40f),
+            tint = Color.Black.copy(alpha = 0.40f),           // #00000066
             baseColor = Color(0xFF1A1A1A),
             blurRadius = 16.dp,
-            shadowColor = Color.Black.copy(alpha = 0.12f),
+            shadowColor = Color.Black.copy(alpha = 0.12f),    // #0000001f
             shadowY = 8.dp,
             shadowBlur = 40.dp,
             edgeShadowColor = Color.Black.copy(alpha = 0.10f),
@@ -152,30 +172,30 @@ fun resolveGlassMaterial(size: GlassMaterialSize, isDark: Boolean): GlassMateria
     }
     else -> when (size) {
         GlassMaterialSize.Small -> GlassMaterialSpec(
-            tint = Color.White.copy(alpha = 0.40f),
+            tint = Color.White.copy(alpha = 0.40f),           // #ffffff66
             baseColor = Color(0xFFFAFAFA),
             blurRadius = 6.dp,
-            shadowColor = Color.Black.copy(alpha = 0.12f),
+            shadowColor = Color.Black.copy(alpha = 0.12f),    // #0000001f
             shadowY = 8.dp,
             shadowBlur = 40.dp,
-            edgeShadowColor = Color.Black.copy(alpha = 0.10f),
-            edgeShadowBlur = 2.dp,
+            edgeShadowColor = Color.Transparent,
+            edgeShadowBlur = 0.dp,
         )
         GlassMaterialSize.Medium -> GlassMaterialSpec(
-            tint = Color.White.copy(alpha = 0.70f),
+            tint = Color.White.copy(alpha = 0.70f),           // #ffffffb3
             baseColor = Color(0xFFFAFAFA),
             blurRadius = 10.dp,
-            shadowColor = Color.Black.copy(alpha = 0.12f),
+            shadowColor = Color.Black.copy(alpha = 0.12f),    // #0000001f
             shadowY = 8.dp,
             shadowBlur = 40.dp,
             edgeShadowColor = Color.Black.copy(alpha = 0.10f),
             edgeShadowBlur = 2.dp,
         )
         GlassMaterialSize.Large -> GlassMaterialSpec(
-            tint = Color.White.copy(alpha = 0.70f),
+            tint = Color.White.copy(alpha = 0.70f),           // #ffffffb3
             baseColor = Color(0xFFFAFAFA),
             blurRadius = 15.dp,
-            shadowColor = Color.Black.copy(alpha = 0.12f),
+            shadowColor = Color.Black.copy(alpha = 0.12f),    // #0000001f
             shadowY = 8.dp,
             shadowBlur = 40.dp,
             edgeShadowColor = Color.Black.copy(alpha = 0.10f),
@@ -204,9 +224,15 @@ fun Modifier.darwinGlass(
 ): Modifier {
     val liquidState = LocalDarwinLiquidState.current
     val isDark = LocalDarwinColors.current.isDark
+    val glassType = LocalDarwinGlassType.current
     return if (liquidState != null) {
-        val tint = if (isDark) Color.Black.copy(alpha = 0.30f)
-                   else Color.White.copy(alpha = 0.40f)
+        // Tinted = more opaque tint → glass surface appears denser
+        val tint = when {
+            glassType == GlassType.Tinted && isDark -> Color.Black.copy(alpha = 0.50f)
+            glassType == GlassType.Tinted -> Color.White.copy(alpha = 0.65f)
+            isDark -> Color.Black.copy(alpha = 0.30f)
+            else -> Color.White.copy(alpha = 0.40f)
+        }
         this.liquid(liquidState) {
             this.frost = frost
             this.shape = shape
@@ -231,7 +257,7 @@ fun Modifier.darwinGlass(
  *
  * @param shape The clipping shape for the material.
  * @param materialSize The material size tier (Small, Medium, Large).
- * @param tintColor Optional accent tint overlay for "tinted" glass variants.
+ * @param tintColor Optional color overlay for custom tinting.
  */
 @Composable
 fun Modifier.darwinGlassMaterial(
@@ -240,7 +266,15 @@ fun Modifier.darwinGlassMaterial(
     tintColor: Color? = null,
 ): Modifier {
     val isDark = LocalDarwinColors.current.isDark
+    val glassType = LocalDarwinGlassType.current
     val spec = resolveGlassMaterial(materialSize, isDark)
+
+    // Tinted = more opaque tint overlay → denser glass surface
+    val effectiveTint = if (glassType == GlassType.Tinted) {
+        spec.tint.copy(alpha = (spec.tint.alpha * 1.5f).coerceAtMost(1f))
+    } else {
+        spec.tint
+    }
 
     var result = this
         .shadow(
@@ -250,7 +284,7 @@ fun Modifier.darwinGlassMaterial(
             spotColor = spec.shadowColor,
         )
         .clip(shape)
-        .background(spec.tint, shape)
+        .background(effectiveTint, shape)
         .background(spec.baseColor.copy(alpha = 0.6f), shape)
     if (tintColor != null) {
         result = result.background(tintColor.copy(alpha = 0.15f), shape)

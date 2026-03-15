@@ -39,6 +39,8 @@ import io.github.kdroidfilter.darwinui.theme.LocalSidebarResize
 import io.github.kdroidfilter.darwinui.theme.LocalSidebarWidth
 import io.github.kdroidfilter.darwinui.theme.LocalTitleBarHeight
 import io.github.kdroidfilter.darwinui.theme.SidebarResizeCallbacks
+import io.github.kdroidfilter.darwinui.theme.GlassType
+import io.github.kdroidfilter.darwinui.theme.LocalDarwinGlassType
 import io.github.kdroidfilter.darwinui.theme.LocalToolbarGlassState
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import io.github.kdroidfilter.darwinui.theme.darwinTween
@@ -132,7 +134,14 @@ fun DarwinScaffold(
     val rootLiquidState = LocalDarwinLiquidState.current
 
     val isDark = DarwinTheme.colorScheme.isDark
-    val glassTint = if (isDark) Color.Black.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.15f)
+    val glassType = LocalDarwinGlassType.current
+    // Tinted = more opaque tint → glass surface appears denser
+    val glassTint = when {
+        glassType == GlassType.Tinted && isDark -> Color.Black.copy(alpha = 0.30f)
+        glassType == GlassType.Tinted -> Color.White.copy(alpha = 0.30f)
+        isDark -> Color.Black.copy(alpha = 0.15f)
+        else -> Color.White.copy(alpha = 0.15f)
+    }
     val borderColor = if (isDark) Color.Black.copy(alpha = 0.5f) else Color.Black.copy(alpha = 0.1f)
 
     Row(

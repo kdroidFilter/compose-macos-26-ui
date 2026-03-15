@@ -57,10 +57,12 @@ import io.github.kdroidfilter.darwinui.icons.LucideLogOut
 import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.GlassMaterialSize
 import io.github.kdroidfilter.darwinui.theme.LocalControlSize
 import io.github.kdroidfilter.darwinui.theme.LocalSidebarResize
 import io.github.kdroidfilter.darwinui.theme.SidebarStyle
 import io.github.kdroidfilter.darwinui.theme.LocalSidebarWidth
+import io.github.kdroidfilter.darwinui.theme.darwinGlassMaterial
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -253,7 +255,10 @@ fun Sidebar(
                         )
                     }
                 }
-                .clip(sidebarContentShape)
+                .darwinGlassMaterial(
+                    shape = sidebarContentShape,
+                    materialSize = GlassMaterialSize.Large,
+                )
                 .border(1.dp, sidebarBorderColor, sidebarContentShape),
         ) {
             // ---- Pinned header (height fraction + alpha, stays in tree) ----

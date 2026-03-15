@@ -30,6 +30,7 @@ fun DarwinTheme(
     globalMetrics: GlobalMetrics = GlobalMetrics(),
     componentStyling: ComponentStyling = defaultComponentStyling(colorScheme),
     liquidGlass: Boolean = true,
+    glassType: GlassType = GlassType.Regular,
     content: @Composable () -> Unit,
 ) {
     val manrope = ManropeFontFamily()
@@ -50,6 +51,7 @@ fun DarwinTheme(
         LocalDarwinComponentStyling provides componentStyling,
         LocalDarwinTextStyle provides resolvedTypography.body,
         LocalDarwinContentColor provides colorScheme.textPrimary,
+        LocalDarwinGlassType provides glassType,
         LocalDarwinLiquidState provides if (liquidGlass) liquidState else null,
     ) {
         PlatformContextMenuOverride {
@@ -115,6 +117,12 @@ object DarwinTheme {
         @Composable
         @ReadOnlyComposable
         get() = LocalControlSize.current
+
+    /** Current glass type (Regular or Tinted). */
+    val glassType: GlassType
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalDarwinGlassType.current
 
     /** Current surface appearance (ContentArea or OverGlass). */
     val surface: DarwinSurface

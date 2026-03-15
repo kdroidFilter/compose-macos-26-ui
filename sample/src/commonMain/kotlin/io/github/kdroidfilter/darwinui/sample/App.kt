@@ -131,6 +131,7 @@ import io.github.kdroidfilter.darwinui.components.Switch
 import io.github.kdroidfilter.darwinui.theme.AccentColor
 import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.GlassType
 import io.github.kdroidfilter.darwinui.theme.VibrantColors
 import io.github.kdroidfilter.darwinui.theme.vibrant
 
@@ -186,6 +187,7 @@ fun App() {
     var accentColor by remember { mutableStateOf(AccentColor.Blue) }
     var sidebarControlSize by remember { mutableStateOf(ControlSize.Regular) }
     var isVibrant by remember { mutableStateOf(false) }
+    var glassType by remember { mutableStateOf(GlassType.Regular) }
 
     val baseColorScheme = if (isDark) {
         io.github.kdroidfilter.darwinui.theme.darkColorScheme(accentColor)
@@ -199,7 +201,7 @@ fun App() {
         baseColorScheme
     }
 
-    DarwinTheme(darkTheme = isDark, accentColor = accentColor, colorScheme = colorScheme) {
+    DarwinTheme(darkTheme = isDark, accentColor = accentColor, colorScheme = colorScheme, glassType = glassType) {
         val toastState = rememberToastState()
         var selectedPage by remember { mutableStateOf("button") }
         var searchQuery by remember { mutableStateOf("") }
@@ -334,6 +336,19 @@ fun App() {
                                                 onCheckedChange = { isVibrant = it },
                                             )
                                         }
+                                    }
+                                    Text(
+                                        text = "Glass Type",
+                                        style = DarwinTheme.typography.caption1,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = DarwinTheme.colorScheme.textSecondary,
+                                    )
+                                    ControlSize(ControlSize.Small) {
+                                        SegmentedControl(
+                                            options = listOf("Regular", "Tinted"),
+                                            selectedIndex = GlassType.entries.indexOf(glassType),
+                                            onSelectedIndexChange = { glassType = GlassType.entries[it] },
+                                        )
                                     }
                                     Text(
                                         text = "Sidebar Icon Size",
