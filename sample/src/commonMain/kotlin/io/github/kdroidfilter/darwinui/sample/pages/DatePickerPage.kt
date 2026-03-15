@@ -24,6 +24,7 @@ import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
+import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -204,6 +205,83 @@ fun DatePickerStatesExample() {
     }
 }
 
+@GalleryExample("DatePicker", "Time Button Sizes")
+@Composable
+fun TimePickerButtonSizesExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        var time by remember { mutableStateOf(LocalTime(10, 30)) }
+        for (size in ControlSize.entries) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = size.name,
+                    style = DarwinTheme.typography.caption1,
+                    color = DarwinTheme.colorScheme.textTertiary,
+                    modifier = Modifier.widthIn(min = 72.dp),
+                )
+                ControlSize(size) {
+                    TimePickerButton(
+                        value = time,
+                        onValueChange = { time = it },
+                    )
+                }
+            }
+        }
+    }
+}
+
+@GalleryExample("DatePicker", "DateTime Buttons Sizes")
+@Composable
+fun DateTimePickerButtonSizesExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        var dateTime by remember { mutableStateOf(LocalDateTime(2025, 4, 1, 10, 30)) }
+        for (size in ControlSize.entries) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = size.name,
+                    style = DarwinTheme.typography.caption1,
+                    color = DarwinTheme.colorScheme.textTertiary,
+                    modifier = Modifier.widthIn(min = 72.dp),
+                )
+                ControlSize(size) {
+                    DateTimePickerButton(
+                        value = dateTime,
+                        onValueChange = { dateTime = it },
+                    )
+                }
+            }
+        }
+    }
+}
+
+@GalleryExample("DatePicker", "Inline Time Picker Sizes")
+@Composable
+fun TimePickerSizesExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        var time by remember { mutableStateOf(LocalTime(10, 30)) }
+        for (size in ControlSize.entries) {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    text = size.name,
+                    style = DarwinTheme.typography.caption1,
+                    color = DarwinTheme.colorScheme.textTertiary,
+                )
+                ControlSize(size) {
+                    TimePicker(
+                        value = time,
+                        onValueChange = { time = it },
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Composable
 internal fun DatePickerPage() {
     GalleryPage("Date Picker", "A macOS-style inline picker for selecting dates and times.") {
@@ -239,6 +317,16 @@ internal fun DatePickerPage() {
             DateTimePickerBasicExample()
         }
 
+        SectionHeader("Control Sizes")
+        ExampleCard(title = "Time Button Sizes", sourceCode = GallerySources.TimePickerButtonSizesExample) {
+            TimePickerButtonSizesExample()
+        }
+        ExampleCard(title = "DateTime Buttons Sizes", sourceCode = GallerySources.DateTimePickerButtonSizesExample) {
+            DateTimePickerButtonSizesExample()
+        }
+        ExampleCard(title = "Inline Time Picker Sizes", sourceCode = GallerySources.TimePickerSizesExample) {
+            TimePickerSizesExample()
+        }
         SectionHeader("States")
         ExampleCard(title = "Enabled & Disabled", sourceCode = GallerySources.DatePickerStatesExample) {
             DatePickerStatesExample()

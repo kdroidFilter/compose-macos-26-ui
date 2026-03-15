@@ -46,6 +46,7 @@ data class ComponentStyling(
     val stepper: StepperStyle,
     val progress: ProgressStyle = ProgressStyle(),
     val sidebar: SidebarStyle = SidebarStyle(),
+    val timePicker: TimePickerStyle = TimePickerStyle(),
 )
 
 // ---------------------------------------------------------------------------

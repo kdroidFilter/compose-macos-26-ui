@@ -3,7 +3,9 @@ package io.github.kdroidfilter.darwinui.theme
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 // ===========================================================================
 // 1.1 — Component Style system
@@ -874,4 +876,200 @@ data class CardStyle(
         val footerPadding: Dp = 12.dp,
         val elevation: Dp = 0.dp,
     )
+}
+
+
+// ---------------------------------------------------------------------------
+// TimePickerStyle
+// ---------------------------------------------------------------------------
+
+@Immutable
+data class TimePickerStyle(
+    val metrics: Metrics = Metrics(),
+) {
+    @Immutable
+    data class Metrics(
+        val disabledAlpha: Float = 0.45f,
+    ) {
+        // -- Inline row (TimePicker / DateTimePicker) -------------------------
+
+        /** Height of the inline TimePickerRow */
+        fun rowHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 32.dp
+            ControlSize.Small -> 40.dp
+            ControlSize.Regular -> 52.dp
+            ControlSize.Large -> 60.dp
+            ControlSize.ExtraLarge -> 72.dp
+        }
+
+        // -- Pill / trigger button -------------------------------------------
+
+        /** Height of the time value pill and trigger buttons */
+        fun pillHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 20.dp
+            ControlSize.Small -> 26.dp
+            ControlSize.Regular -> 34.dp
+            ControlSize.Large -> 40.dp
+            ControlSize.ExtraLarge -> 48.dp
+        }
+
+        /** Minimum width of the time value pill */
+        fun pillMinWidthFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 42.dp
+            ControlSize.Small -> 52.dp
+            ControlSize.Regular -> 67.dp
+            ControlSize.Large -> 78.dp
+            ControlSize.ExtraLarge -> 92.dp
+        }
+
+        /** Horizontal padding inside pills and trigger buttons */
+        fun pillHorizontalPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 6.dp
+            ControlSize.Small -> 8.dp
+            ControlSize.Regular -> 12.dp
+            ControlSize.Large -> 14.dp
+            ControlSize.ExtraLarge -> 16.dp
+        }
+
+        /** Font size for labels and pill text */
+        fun labelFontSizeFor(controlSize: ControlSize): TextUnit = when (controlSize) {
+            ControlSize.Mini -> 11.sp
+            ControlSize.Small -> 13.sp
+            ControlSize.Regular -> 17.sp
+            ControlSize.Large -> 20.sp
+            ControlSize.ExtraLarge -> 22.sp
+        }
+
+        // -- AM/PM segmented control -----------------------------------------
+
+        /** Width of the AM/PM segmented control */
+        fun amPmWidthFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 60.dp
+            ControlSize.Small -> 76.dp
+            ControlSize.Regular -> 100.dp
+            ControlSize.Large -> 120.dp
+            ControlSize.ExtraLarge -> 144.dp
+        }
+
+        /** Height of the AM/PM segmented control */
+        fun amPmHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 22.dp
+            ControlSize.Small -> 28.dp
+            ControlSize.Regular -> 36.dp
+            ControlSize.Large -> 42.dp
+            ControlSize.ExtraLarge -> 50.dp
+        }
+
+        /** Corner radius of the AM/PM container */
+        fun amPmCornerRadiusFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 11.dp
+            ControlSize.Small -> 14.dp
+            ControlSize.Regular -> 22.dp
+            ControlSize.Large -> 21.dp
+            ControlSize.ExtraLarge -> 25.dp
+        }
+
+        /** Inner padding of the AM/PM container */
+        fun amPmPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 2.dp
+            ControlSize.Small -> 3.dp
+            ControlSize.Regular -> 4.dp
+            ControlSize.Large -> 5.dp
+            ControlSize.ExtraLarge -> 6.dp
+        }
+
+        /** Height of the AM/PM active pill indicator */
+        fun amPmPillHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 18.dp
+            ControlSize.Small -> 22.dp
+            ControlSize.Regular -> 28.dp
+            ControlSize.Large -> 32.dp
+            ControlSize.ExtraLarge -> 38.dp
+        }
+
+        /** Corner radius of the AM/PM pill */
+        fun amPmPillCornerRadiusFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 9.dp
+            ControlSize.Small -> 11.dp
+            ControlSize.Regular -> 14.dp
+            ControlSize.Large -> 16.dp
+            ControlSize.ExtraLarge -> 19.dp
+        }
+
+        /** Font size for AM/PM text */
+        fun amPmFontSizeFor(controlSize: ControlSize): TextUnit = when (controlSize) {
+            ControlSize.Mini -> 10.sp
+            ControlSize.Small -> 11.sp
+            ControlSize.Regular -> 14.sp
+            ControlSize.Large -> 16.sp
+            ControlSize.ExtraLarge -> 18.sp
+        }
+
+        // -- Spacing ----------------------------------------------------------
+
+        /** Spacing between pill and AM/PM, between trigger buttons */
+        fun spacingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 4.dp
+            ControlSize.Small -> 6.dp
+            ControlSize.Regular -> 8.dp
+            ControlSize.Large -> 10.dp
+            ControlSize.ExtraLarge -> 12.dp
+        }
+
+        // -- Wheel picker -----------------------------------------------------
+
+        /** Width of the wheel picker container */
+        fun wheelWidthFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 200.dp
+            ControlSize.Small -> 240.dp
+            ControlSize.Regular -> 297.dp
+            ControlSize.Large -> 340.dp
+            ControlSize.ExtraLarge -> 400.dp
+        }
+
+        /** Height of each wheel item row */
+        fun wheelItemHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 22.dp
+            ControlSize.Small -> 26.dp
+            ControlSize.Regular -> 34.dp
+            ControlSize.Large -> 40.dp
+            ControlSize.ExtraLarge -> 48.dp
+        }
+
+        /** Corner radius of the wheel selection indicator */
+        fun wheelIndicatorCornerFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 11.dp
+            ControlSize.Small -> 13.dp
+            ControlSize.Regular -> 17.dp
+            ControlSize.Large -> 20.dp
+            ControlSize.ExtraLarge -> 24.dp
+        }
+
+        /** Number of visible items in the wheel */
+        fun wheelVisibleItemsFor(controlSize: ControlSize): Int = when (controlSize) {
+            ControlSize.Mini -> 5
+            ControlSize.Small -> 5
+            ControlSize.Regular -> 7
+            ControlSize.Large -> 7
+            ControlSize.ExtraLarge -> 9
+        }
+
+        /** Font size for the selected wheel item */
+        fun wheelSelectedFontSizeFor(controlSize: ControlSize): TextUnit = when (controlSize) {
+            ControlSize.Mini -> 15.sp
+            ControlSize.Small -> 18.sp
+            ControlSize.Regular -> 23.sp
+            ControlSize.Large -> 27.sp
+            ControlSize.ExtraLarge -> 32.sp
+        }
+
+        /** Font size for unselected wheel items */
+        fun wheelUnselectedFontSizeFor(controlSize: ControlSize): TextUnit = when (controlSize) {
+            ControlSize.Mini -> 13.sp
+            ControlSize.Small -> 16.sp
+            ControlSize.Regular -> 20.sp
+            ControlSize.Large -> 24.sp
+            ControlSize.ExtraLarge -> 28.sp
+        }
+    }
 }

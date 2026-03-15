@@ -58,6 +58,7 @@ import io.github.kdroidfilter.darwinui.icons.LucideChevronLeft
 import io.github.kdroidfilter.darwinui.icons.LucideChevronRight
 import io.github.kdroidfilter.darwinui.theme.darwinGlass
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
+import io.github.kdroidfilter.darwinui.theme.LocalControlSize
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinLiquidState
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
@@ -190,7 +191,8 @@ fun TimePicker(
     is24Hour: Boolean = false,
     label: String = "Time",
 ) {
-    PickerContainer(modifier = modifier.then(if (!enabled) Modifier.alpha(0.45f) else Modifier)) {
+    val disabledAlpha = DarwinTheme.componentStyling.timePicker.metrics.disabledAlpha
+    PickerContainer(modifier = modifier.then(if (!enabled) Modifier.alpha(disabledAlpha) else Modifier)) {
         TimePickerRow(
             value = value,
             onValueChange = onValueChange,
@@ -231,8 +233,9 @@ fun DateTimePicker(
     var displayedYear by remember(value) { mutableStateOf(value.date.year) }
     var displayedMonth by remember(value) { mutableStateOf(value.date.month) }
     var calendarView by remember { mutableStateOf(CalendarView.Calendar) }
+    val disabledAlpha = DarwinTheme.componentStyling.timePicker.metrics.disabledAlpha
 
-    PickerContainer(modifier = modifier.then(if (!enabled) Modifier.alpha(0.45f) else Modifier)) {
+    PickerContainer(modifier = modifier.then(if (!enabled) Modifier.alpha(disabledAlpha) else Modifier)) {
         CalendarHeader(
             year = displayedYear,
             month = displayedMonth,
@@ -755,18 +758,20 @@ private fun TimePickerRow(
     val isDark = DarwinTheme.colorScheme.isDark
     val textPrimary = DarwinTheme.colorScheme.textPrimary
     val tertiaryFill = if (isDark) Color(0x3D767680) else Color(0x1F767680)
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.timePicker.metrics
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(52.dp),
+            .height(metrics.rowHeightFor(controlSize)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         // Label
         Text(
             text = label,
             color = textPrimary,
-            fontSize = 17.sp,
+            fontSize = metrics.labelFontSizeFor(controlSize),
             fontWeight = FontWeight.Medium,
         )
 
@@ -784,7 +789,7 @@ private fun TimePickerRow(
 
         // AM/PM segmented control (only in 12-hour mode)
         if (!is24Hour) {
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(metrics.spacingFor(controlSize)))
             AmPmSegmentedControl(
                 isPm = value.hour >= 12,
                 enabled = enabled,
@@ -818,6 +823,8 @@ private fun TimeValuePill(
     val accentColor = DarwinTheme.colorScheme.accent
     var expanded by remember { mutableStateOf(false) }
     var anchorSize by remember { mutableStateOf(IntSize.Zero) }
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.timePicker.metrics
 
     val displayText = if (is24Hour) {
         "${value.hour.toString().padStart(2, '0')}:${value.minute.toString().padStart(2, '0')}"
@@ -833,8 +840,8 @@ private fun TimeValuePill(
     Box {
         Box(
             modifier = Modifier
-                .height(34.dp)
-                .widthIn(min = 67.dp)
+                .height(metrics.pillHeightFor(controlSize))
+                .widthIn(min = metrics.pillMinWidthFor(controlSize))
                 .onSizeChanged { anchorSize = it }
                 .clip(shape)
                 .background(bgColor, shape)
@@ -849,13 +856,13 @@ private fun TimeValuePill(
                         Modifier
                     },
                 )
-                .padding(horizontal = 12.dp),
+                .padding(horizontal = metrics.pillHorizontalPaddingFor(controlSize)),
             contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = displayText,
                 color = if (expanded) accentColor else textColor,
-                fontSize = 17.sp,
+                fontSize = metrics.labelFontSizeFor(controlSize),
                 fontWeight = FontWeight.Medium,
             )
         }
@@ -896,9 +903,14 @@ private fun AmPmSegmentedControl(
     val isDark = DarwinTheme.colorScheme.isDark
     val textPrimary = DarwinTheme.colorScheme.textPrimary
     val activeBg = if (isDark) Color(0xFF6C6C71) else Color.White
-    val pillShape = RoundedCornerShape(20.dp)
-    val containerShape = RoundedCornerShape(22.dp)
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.timePicker.metrics
+    val pillShape = RoundedCornerShape(metrics.amPmPillCornerRadiusFor(controlSize))
+    val containerShape = RoundedCornerShape(metrics.amPmCornerRadiusFor(controlSize))
     val density = androidx.compose.ui.platform.LocalDensity.current
+    val amPmPadding = metrics.amPmPaddingFor(controlSize)
+    val pillHeight = metrics.amPmPillHeightFor(controlSize)
+    val amPmFontSize = metrics.amPmFontSizeFor(controlSize)
 
     val segmentWidthPx = remember { mutableStateOf(0f) }
     val indicatorOffset = remember { Animatable(0f) }
@@ -919,11 +931,11 @@ private fun AmPmSegmentedControl(
 
     Box(
         modifier = Modifier
-            .width(100.dp)
-            .height(36.dp)
+            .width(metrics.amPmWidthFor(controlSize))
+            .height(metrics.amPmHeightFor(controlSize))
             .clip(containerShape)
             .background(bgColor, containerShape)
-            .padding(4.dp),
+            .padding(amPmPadding),
     ) {
         // Sliding indicator pill
         if (segmentWidthPx.value > 0f) {
@@ -932,7 +944,7 @@ private fun AmPmSegmentedControl(
                     .offset(x = with(density) { indicatorOffset.value.toDp() })
                     .size(
                         width = with(density) { segmentWidthPx.value.toDp() },
-                        height = 28.dp,
+                        height = pillHeight,
                     )
                     .background(activeBg, pillShape),
             )
@@ -943,7 +955,7 @@ private fun AmPmSegmentedControl(
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .height(28.dp)
+                    .height(pillHeight)
                     .onSizeChanged { segmentWidthPx.value = it.width.toFloat() }
                     .clip(pillShape)
                     .then(
@@ -962,7 +974,7 @@ private fun AmPmSegmentedControl(
                 Text(
                     text = "AM",
                     color = textPrimary,
-                    fontSize = 14.sp,
+                    fontSize = amPmFontSize,
                     fontWeight = if (!isPm) FontWeight.Bold else FontWeight.SemiBold,
                 )
             }
@@ -971,7 +983,7 @@ private fun AmPmSegmentedControl(
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .height(28.dp)
+                    .height(pillHeight)
                     .clip(pillShape)
                     .then(
                         if (enabled) {
@@ -989,7 +1001,7 @@ private fun AmPmSegmentedControl(
                 Text(
                     text = "PM",
                     color = textPrimary,
-                    fontSize = 14.sp,
+                    fontSize = amPmFontSize,
                     fontWeight = if (isPm) FontWeight.Bold else FontWeight.SemiBold,
                 )
             }
@@ -1025,11 +1037,15 @@ fun WheelTimePicker(
     val containerBg = if (isDark) Color(0xFF121212) else Color(0xFFFAFAFA)
     val useGlass = LocalDarwinLiquidState.current != null
     val indicatorBg = if (isDark) Color(0x2E767680) else Color(0x14747480)
-    val indicatorShape = RoundedCornerShape(17.dp)
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.timePicker.metrics
+    val indicatorShape = RoundedCornerShape(metrics.wheelIndicatorCornerFor(controlSize))
 
-    val itemHeight = 34.dp
-    val visibleItems = 7
+    val itemHeight = metrics.wheelItemHeightFor(controlSize)
+    val visibleItems = metrics.wheelVisibleItemsFor(controlSize)
     val totalHeight = itemHeight * visibleItems
+    val selectedFontSize = metrics.wheelSelectedFontSizeFor(controlSize)
+    val unselectedFontSize = metrics.wheelUnselectedFontSizeFor(controlSize)
 
     val hours = if (is24Hour) (0..23).toList() else (1..12).toList()
     val minutes = (0..59).toList()
@@ -1050,7 +1066,7 @@ fun WheelTimePicker(
     var isPm by remember { mutableStateOf(value.hour >= 12) }
 
     Box(
-        modifier = modifier.width(297.dp).height(totalHeight),
+        modifier = modifier.width(metrics.wheelWidthFor(controlSize)).height(totalHeight),
         contentAlignment = Alignment.Center,
     ) {
         // Selection indicator bar
@@ -1072,6 +1088,8 @@ fun WheelTimePicker(
                 initialIndex = initialHourIndex,
                 itemHeight = itemHeight,
                 visibleItems = visibleItems,
+                selectedFontSize = selectedFontSize,
+                unselectedFontSize = unselectedFontSize,
                 fadeBgColor = if (useGlass) Color.Transparent else containerBg,
                 onSelectedChanged = { index ->
                     val pickedHour = hours[index]
@@ -1094,6 +1112,8 @@ fun WheelTimePicker(
                 initialIndex = value.minute,
                 itemHeight = itemHeight,
                 visibleItems = visibleItems,
+                selectedFontSize = selectedFontSize,
+                unselectedFontSize = unselectedFontSize,
                 fadeBgColor = if (useGlass) Color.Transparent else containerBg,
                 onSelectedChanged = { index ->
                     selectedMinute = minutes[index]
@@ -1111,6 +1131,8 @@ fun WheelTimePicker(
                     initialIndex = if (isPm) 1 else 0,
                     itemHeight = itemHeight,
                     visibleItems = visibleItems,
+                    selectedFontSize = selectedFontSize,
+                    unselectedFontSize = unselectedFontSize,
                     fadeBgColor = if (useGlass) Color.Transparent else containerBg,
                     onSelectedChanged = { index ->
                         val newIsPm = index == 1
@@ -1144,6 +1166,8 @@ private fun <T> WheelColumn(
     initialIndex: Int,
     itemHeight: androidx.compose.ui.unit.Dp,
     visibleItems: Int,
+    selectedFontSize: androidx.compose.ui.unit.TextUnit = 23.sp,
+    unselectedFontSize: androidx.compose.ui.unit.TextUnit = 20.sp,
     fadeBgColor: Color,
     onSelectedChanged: (Int) -> Unit,
     textForItem: (T) -> String,
@@ -1228,7 +1252,7 @@ private fun <T> WheelColumn(
                         Text(
                             text = textForItem(items[realIndex]),
                             color = textPrimary,
-                            fontSize = if (isSelected) 23.sp else 20.sp,
+                            fontSize = if (isSelected) selectedFontSize else unselectedFontSize,
                             fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
                             textAlign = TextAlign.Center,
                         )
@@ -1287,6 +1311,8 @@ private fun PickerTriggerButton(
     val accent = DarwinTheme.colorScheme.accent
     val textPrimary = DarwinTheme.colorScheme.textPrimary
     val tertiaryFill = if (isDark) Color(0x3D767680) else Color(0x1F767680)
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.timePicker.metrics
 
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -1304,7 +1330,7 @@ private fun PickerTriggerButton(
     )
 
     val textColor = when {
-        !enabled -> textPrimary.copy(alpha = 0.45f)
+        !enabled -> textPrimary.copy(alpha = metrics.disabledAlpha)
         expanded -> accent
         else -> textPrimary
     }
@@ -1313,7 +1339,7 @@ private fun PickerTriggerButton(
 
     Box(
         modifier = modifier
-            .height(34.dp)
+            .height(metrics.pillHeightFor(controlSize))
             .clip(shape)
             .background(bgColor, shape)
             .then(
@@ -1330,13 +1356,13 @@ private fun PickerTriggerButton(
                     Modifier
                 },
             )
-            .padding(horizontal = 14.dp),
+            .padding(horizontal = metrics.pillHorizontalPaddingFor(controlSize)),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = text,
             color = textColor,
-            fontSize = 17.sp,
+            fontSize = metrics.labelFontSizeFor(controlSize),
             fontWeight = FontWeight.Medium,
         )
     }
@@ -1475,16 +1501,19 @@ fun DateTimePickerButton(
     is24Hour: Boolean = false,
     label: String? = null,
 ) {
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.timePicker.metrics
+
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(metrics.spacingFor(controlSize)),
     ) {
         if (label != null) {
             Text(
                 text = label,
                 color = DarwinTheme.colorScheme.textPrimary,
-                fontSize = 17.sp,
+                fontSize = metrics.labelFontSizeFor(controlSize),
                 fontWeight = FontWeight.Medium,
             )
             Spacer(Modifier.weight(1f))
