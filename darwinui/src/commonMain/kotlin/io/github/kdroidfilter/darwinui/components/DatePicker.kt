@@ -27,6 +27,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -1544,13 +1545,16 @@ private fun PickerPopover(
 ) {
     val density = androidx.compose.ui.platform.LocalDensity.current
     val gapPx = with(density) { 4.dp.roundToPx() }
+    val controlSize = LocalControlSize.current
 
     Popup(
         onDismissRequest = onDismissRequest,
         properties = PopupProperties(focusable = true),
         offset = IntOffset(0, anchorSize.height + gapPx),
     ) {
-        content()
+        CompositionLocalProvider(LocalControlSize provides controlSize) {
+            content()
+        }
     }
 }
 
