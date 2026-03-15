@@ -579,7 +579,7 @@ internal fun IconsPage() {
     GalleryPage("Icons", "All available Darwin icons with SF Symbol mapping.") {
         Text(
             text = "On Apple platforms (macOS and iOS), icons are rendered using native SF Symbols. " +
-                "On all other platforms (Android, Web), Lucide vector icons are used as fallback.",
+                "On all other platforms (Android, Web, Windows, Linux), Lucide vector icons are used as fallback.",
             style = DarwinTheme.typography.callout,
             color = DarwinTheme.colorScheme.textSecondary,
         )
