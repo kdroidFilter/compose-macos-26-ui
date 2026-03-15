@@ -1,7 +1,7 @@
 package io.github.kdroidfilter.darwinui.icons
 
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.toComposeImageBitmap
+import androidx.compose.ui.graphics.asComposeImageBitmap
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
@@ -9,7 +9,6 @@ import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Image
 import platform.UIKit.UIImage
 import platform.UIKit.UIImageSymbolConfiguration
-import platform.UIKit.UIImageSymbolWeight
 import platform.Foundation.NSData
 import platform.posix.memcpy
 
@@ -21,10 +20,7 @@ actual fun loadPlatformSymbol(name: String): ImageBitmap? {
     if (name.isEmpty() || name in missed) return null
     cache[name]?.let { return it }
 
-    val config = UIImageSymbolConfiguration.configurationWithPointSize(
-        pointSize = 96.0,
-        weight = UIImageSymbolWeight.UIImageSymbolWeightRegular,
-    )
+    val config = UIImageSymbolConfiguration.configurationWithPointSize(96.0)
     val uiImage = UIImage.systemImageNamed(name, withConfiguration = config)
     if (uiImage == null) {
         missed.add(name)
@@ -42,7 +38,7 @@ actual fun loadPlatformSymbol(name: String): ImageBitmap? {
     val bitmap = Bitmap()
     bitmap.allocPixels(skImage.imageInfo)
     skImage.readPixels(bitmap, 0, 0)
-    val composeBitmap = bitmap.toComposeImageBitmap()
+    val composeBitmap = bitmap.asComposeImageBitmap()
     cache[name] = composeBitmap
     return composeBitmap
 }
