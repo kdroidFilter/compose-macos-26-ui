@@ -50,6 +50,7 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import kotlinx.coroutines.flow.distinctUntilChanged
 import io.github.kdroidfilter.darwinui.icons.Icon
+import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.icons.LucideChevronLeft
 import io.github.kdroidfilter.darwinui.icons.LucideChevronRight
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
@@ -90,28 +91,45 @@ fun DatePicker(
 ) {
     var displayedYear by remember(value) { mutableStateOf(value.year) }
     var displayedMonth by remember(value) { mutableStateOf(value.month) }
+    var showMonthGrid by remember { mutableStateOf(false) }
 
     PickerContainer(modifier = modifier.then(if (!enabled) Modifier.alpha(0.45f) else Modifier)) {
         CalendarHeader(
             year = displayedYear,
             month = displayedMonth,
             enabled = enabled,
+            showMonthGrid = showMonthGrid,
+            onTitleClick = { if (enabled) showMonthGrid = !showMonthGrid },
             onPreviousMonth = {
-                val (y, m) = previousMonth(displayedYear, displayedMonth)
-                displayedYear = y; displayedMonth = m
+                if (showMonthGrid) displayedYear-- else {
+                    val (y, m) = previousMonth(displayedYear, displayedMonth)
+                    displayedYear = y; displayedMonth = m
+                }
             },
             onNextMonth = {
-                val (y, m) = nextMonth(displayedYear, displayedMonth)
-                displayedYear = y; displayedMonth = m
+                if (showMonthGrid) displayedYear++ else {
+                    val (y, m) = nextMonth(displayedYear, displayedMonth)
+                    displayedYear = y; displayedMonth = m
+                }
             },
         )
-        CalendarMonth(
-            year = displayedYear,
-            month = displayedMonth,
-            selectedDate = value,
-            enabled = enabled,
-            onDateSelected = onValueChange,
-        )
+        if (showMonthGrid) {
+            MonthYearGrid(
+                selectedMonth = displayedMonth,
+                onMonthSelected = { month ->
+                    displayedMonth = month
+                    showMonthGrid = false
+                },
+            )
+        } else {
+            CalendarMonth(
+                year = displayedYear,
+                month = displayedMonth,
+                selectedDate = value,
+                enabled = enabled,
+                onDateSelected = onValueChange,
+            )
+        }
     }
 }
 
@@ -182,28 +200,45 @@ fun DateTimePicker(
 ) {
     var displayedYear by remember(value) { mutableStateOf(value.date.year) }
     var displayedMonth by remember(value) { mutableStateOf(value.date.month) }
+    var showMonthGrid by remember { mutableStateOf(false) }
 
     PickerContainer(modifier = modifier.then(if (!enabled) Modifier.alpha(0.45f) else Modifier)) {
         CalendarHeader(
             year = displayedYear,
             month = displayedMonth,
             enabled = enabled,
+            showMonthGrid = showMonthGrid,
+            onTitleClick = { if (enabled) showMonthGrid = !showMonthGrid },
             onPreviousMonth = {
-                val (y, m) = previousMonth(displayedYear, displayedMonth)
-                displayedYear = y; displayedMonth = m
+                if (showMonthGrid) displayedYear-- else {
+                    val (y, m) = previousMonth(displayedYear, displayedMonth)
+                    displayedYear = y; displayedMonth = m
+                }
             },
             onNextMonth = {
-                val (y, m) = nextMonth(displayedYear, displayedMonth)
-                displayedYear = y; displayedMonth = m
+                if (showMonthGrid) displayedYear++ else {
+                    val (y, m) = nextMonth(displayedYear, displayedMonth)
+                    displayedYear = y; displayedMonth = m
+                }
             },
         )
-        CalendarMonth(
-            year = displayedYear,
-            month = displayedMonth,
-            selectedDate = value.date,
-            enabled = enabled,
-            onDateSelected = { date -> onValueChange(LocalDateTime(date, value.time)) },
-        )
+        if (showMonthGrid) {
+            MonthYearGrid(
+                selectedMonth = displayedMonth,
+                onMonthSelected = { month ->
+                    displayedMonth = month
+                    showMonthGrid = false
+                },
+            )
+        } else {
+            CalendarMonth(
+                year = displayedYear,
+                month = displayedMonth,
+                selectedDate = value.date,
+                enabled = enabled,
+                onDateSelected = { date -> onValueChange(LocalDateTime(date, value.time)) },
+            )
+        }
         // Separator
         Box(
             Modifier
@@ -269,6 +304,8 @@ private fun CalendarHeader(
     year: Int,
     month: Month,
     enabled: Boolean,
+    showMonthGrid: Boolean,
+    onTitleClick: () -> Unit,
     onPreviousMonth: () -> Unit,
     onNextMonth: () -> Unit,
 ) {
@@ -281,20 +318,33 @@ private fun CalendarHeader(
             .height(40.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // Month Year title
-        Text(
-            text = "${monthFullName(month)} $year",
-            color = textPrimary,
-            fontSize = 17.sp,
-            fontWeight = FontWeight.Bold,
-        )
-        Spacer(Modifier.width(4.dp))
-        // Disclosure chevron
-        Icon(
-            imageVector = LucideChevronRight,
-            modifier = Modifier.size(13.dp),
-            tint = accent,
-        )
+        // Month Year title — clickable to toggle month grid
+        Row(
+            modifier = Modifier
+                .clip(RoundedCornerShape(6.dp))
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    enabled = enabled,
+                    onClick = onTitleClick,
+                )
+                .padding(end = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = if (showMonthGrid) "$year" else "${monthFullName(month)} $year",
+                color = textPrimary,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Bold,
+            )
+            Spacer(Modifier.width(4.dp))
+            // Disclosure chevron — rotates down when month grid is shown
+            Icon(
+                imageVector = if (showMonthGrid) LucideChevronDown else LucideChevronRight,
+                modifier = Modifier.size(13.dp),
+                tint = accent,
+            )
+        }
 
         Spacer(Modifier.weight(1f))
 
@@ -323,6 +373,72 @@ private fun CalendarHeader(
                         ),
                     tint = accent,
                 )
+            }
+        }
+    }
+}
+
+// ===========================================================================
+// MonthYearGrid — 4×3 month selection grid
+//
+// Shown when the user clicks the disclosure chevron in the header.
+// Allows fast navigation to any month without repeated arrow clicking.
+// ===========================================================================
+
+@Composable
+private fun MonthYearGrid(
+    selectedMonth: Month,
+    onMonthSelected: (Month) -> Unit,
+) {
+    val accent = DarwinTheme.colorScheme.accent
+    val textPrimary = DarwinTheme.colorScheme.textPrimary
+
+    val shortNames = listOf("JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC")
+
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        for (row in 0 until 3) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+            ) {
+                for (col in 0 until 4) {
+                    val monthIndex = row * 4 + col
+                    val month = Month.entries[monthIndex]
+                    val isSelected = month == selectedMonth
+
+                    val cellShape = RoundedCornerShape(8.dp)
+                    val bgColor = when {
+                        isSelected -> accent
+                        else -> Color.Transparent
+                    }
+                    val labelColor = when {
+                        isSelected -> Color.White
+                        else -> textPrimary
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .size(width = 72.dp, height = 40.dp)
+                            .clip(cellShape)
+                            .background(bgColor, cellShape)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = { onMonthSelected(month) },
+                            ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = shortNames[monthIndex],
+                            color = labelColor,
+                            fontSize = 14.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                        )
+                    }
+                }
             }
         }
     }
