@@ -1,4 +1,4 @@
-# ComposeDarwinUI — Plan de développement
+# ComposeMacosUI — Plan de développement
 
 Comparaison avec Jewel (IntelliJ Compose theme) et composants macOS natifs manquants.
 
@@ -9,39 +9,39 @@ Comparaison avec Jewel (IntelliJ Compose theme) et composants macOS natifs manqu
 ### 1.1 Système Style par composant
 Actuellement chaque composant n'a que des `*Colors`. Jewel encapsule Colors + Metrics + Icons dans un objet `*Style` unique.
 
-- [x] Créer `ButtonStyle(colors, metrics)` — `theme/DarwinComponentStyles.kt`
-- [x] Créer `TextFieldStyle(colors, metrics)` — `theme/DarwinComponentStyles.kt`
-- [x] Créer `CheckboxStyle(colors, metrics)` — `theme/DarwinComponentStyles.kt`
-- [x] Créer `RadioButtonStyle(colors, metrics)` — `theme/DarwinComponentStyles.kt`
-- [x] Créer `SwitchStyle(colors, metrics)` — `theme/DarwinComponentStyles.kt`
-- [x] Créer `SliderStyle(colors, metrics)` — `theme/DarwinComponentStyles.kt`
-- [x] Créer `TabStyle(colors, metrics)` — `theme/DarwinComponentStyles.kt`
-- [x] Créer `ComboBoxStyle(colors, metrics)` — `theme/DarwinComponentStyles.kt`
-- [x] Créer `SegmentedControlStyle(colors, metrics)` — `theme/DarwinComponentStyles.kt`
-- [x] Créer `TooltipStyle(colors, metrics)` — `theme/DarwinComponentStyles.kt`
-- [x] Créer `CardStyle(colors, metrics)` — `theme/DarwinComponentStyles.kt`
-- [x] Créer `ComponentStyling` registry + `defaultComponentStyling()` — `theme/DarwinComponentStyling.kt`
-- [x] Exposer via `DarwinTheme.componentStyling` + `LocalDarwinComponentStyling`
-- [x] Migrer les Defaults existants vers ce pattern — `TextFieldDefaults` et `CheckboxDefaults` lisent depuis `DarwinTheme.componentStyling`
+- [x] Créer `ButtonStyle(colors, metrics)` — `theme/ComponentStyles.kt`
+- [x] Créer `TextFieldStyle(colors, metrics)` — `theme/ComponentStyles.kt`
+- [x] Créer `CheckboxStyle(colors, metrics)` — `theme/ComponentStyles.kt`
+- [x] Créer `RadioButtonStyle(colors, metrics)` — `theme/ComponentStyles.kt`
+- [x] Créer `SwitchStyle(colors, metrics)` — `theme/ComponentStyles.kt`
+- [x] Créer `SliderStyle(colors, metrics)` — `theme/ComponentStyles.kt`
+- [x] Créer `TabStyle(colors, metrics)` — `theme/ComponentStyles.kt`
+- [x] Créer `ComboBoxStyle(colors, metrics)` — `theme/ComponentStyles.kt`
+- [x] Créer `SegmentedControlStyle(colors, metrics)` — `theme/ComponentStyles.kt`
+- [x] Créer `TooltipStyle(colors, metrics)` — `theme/ComponentStyles.kt`
+- [x] Créer `CardStyle(colors, metrics)` — `theme/ComponentStyles.kt`
+- [x] Créer `ComponentStyling` registry + `defaultComponentStyling()` — `theme/ComponentStyling.kt`
+- [x] Exposer via `MacosTheme.componentStyling` + `LocalComponentStyling`
+- [x] Migrer les Defaults existants vers ce pattern — `TextFieldDefaults` et `CheckboxDefaults` lisent depuis `MacosTheme.componentStyling`
 
 ### 1.2 Hiérarchie d'états d'interaction
 Jewel définit une hiérarchie claire : InteractiveComponentState → FocusableComponentState / SelectableComponentState / ToggleableComponentState.
 
-- [x] `InteractiveComponentState` (isActive, isEnabled, isHovered, isPressed) — `theme/DarwinComponentStates.kt`
-- [x] `FocusableComponentState` extends interactive + isFocused — `theme/DarwinComponentStates.kt`
-- [x] `SelectableComponentState` extends interactive + isSelected — `theme/DarwinComponentStates.kt`
-- [x] `FocusableSelectableComponentState` (combo) — `theme/DarwinComponentStates.kt`
-- [x] `ToggleableComponentState` avec toggleableState (on/off/indeterminate) — `theme/DarwinComponentStates.kt`
+- [x] `InteractiveComponentState` (isActive, isEnabled, isHovered, isPressed) — `theme/ComponentStates.kt`
+- [x] `FocusableComponentState` extends interactive + isFocused — `theme/ComponentStates.kt`
+- [x] `SelectableComponentState` extends interactive + isSelected — `theme/ComponentStates.kt`
+- [x] `FocusableSelectableComponentState` (combo) — `theme/ComponentStates.kt`
+- [x] `ToggleableComponentState` avec toggleableState (on/off/indeterminate) — `theme/ComponentStates.kt`
 - [x] Intégrer dans les composants existants — `TextFieldState : FocusableComponentState`, `CheckboxState : ToggleableComponentState` ajoutés
 
 ### 1.3 GlobalColors et GlobalMetrics
-- [x] `GlobalColors` — borders (normal/disabled/focused/strong), outlines (focused/warning/error variants), semantic content tints — `theme/DarwinGlobalColors.kt`
-- [x] `GlobalMetrics` — outlineWidth, borderWidth, component heights (mini/small/regular/large), cornerRadii, spacing — `theme/DarwinGlobalMetrics.kt`
-- [x] Exposer via `DarwinTheme.globalColors` / `DarwinTheme.globalMetrics`
-- [x] Provided in `DarwinTheme` via `LocalDarwinGlobalColors` / `LocalDarwinGlobalMetrics`
+- [x] `GlobalColors` — borders (normal/disabled/focused/strong), outlines (focused/warning/error variants), semantic content tints — `theme/GlobalColors.kt`
+- [x] `GlobalMetrics` — outlineWidth, borderWidth, component heights (mini/small/regular/large), cornerRadii, spacing — `theme/GlobalMetrics.kt`
+- [x] Exposer via `MacosTheme.globalColors` / `MacosTheme.globalMetrics`
+- [x] Provided in `MacosTheme` via `LocalGlobalColors` / `LocalGlobalMetrics`
 
 ### 1.4 Système Outline / Validation
-- [x] `Outline` enum : None, Warning, Error — `theme/DarwinOutline.kt`
+- [x] `Outline` enum : None, Warning, Error — `theme/Outline.kt`
 - [x] `Modifier.focusOutline(shape, color, outlineWidth)` — focus ring macOS standardisé
 - [x] `Modifier.outline(outline, shape, outlines)` — outline de validation
 - [x] `Modifier.focusOrValidationOutline(isFocused, outline, shape, outlines)` — combiné
@@ -49,10 +49,10 @@ Jewel définit une hiérarchie claire : InteractiveComponentState → FocusableC
 
 ### 1.5 Typography macOS
 Remplacer les styles Material-like par la vraie échelle typographique macOS :
-- [x] LargeTitle (34sp Bold) — `theme/DarwinTypography.kt`
-- [x] Title1 (28sp), Title2 (22sp), Title3 (20sp) — `theme/DarwinTypography.kt`
-- [x] Headline (17sp SemiBold), Body (17sp), Callout (16sp) — `theme/DarwinTypography.kt`
-- [x] Subheadline (15sp), Footnote (13sp), Caption1 (12sp), Caption2 (11sp) — `theme/DarwinTypography.kt`
+- [x] LargeTitle (34sp Bold) — `theme/Typography.kt`
+- [x] Title1 (28sp), Title2 (22sp), Title3 (20sp) — `theme/Typography.kt`
+- [x] Headline (17sp SemiBold), Body (17sp), Callout (16sp) — `theme/Typography.kt`
+- [x] Subheadline (15sp), Footnote (13sp), Caption1 (12sp), Caption2 (11sp) — `theme/Typography.kt`
 - [x] Conserver les noms Material pour compatibilité (displayLarge, bodyMedium, etc.)
 
 ---
@@ -218,7 +218,7 @@ Manquants :
 - [ ] `ComponentStyling` interface — registry de tous les styles
 - [ ] `DefaultComponentStyling` — implémentation par défaut
 - [ ] Permet de themer tous les composants en un seul endroit
-- [ ] Intégrer dans `DarwinTheme`
+- [ ] Intégrer dans `MacosTheme`
 
 ### 5.4 Animations
 - [ ] Animations de fenêtre inactive (griser les contrôles)

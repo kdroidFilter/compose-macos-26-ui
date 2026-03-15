@@ -22,7 +22,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Publish to Maven Central
-        run: ./gradlew :darwinui:publishAndReleaseToMavenCentral --no-configuration-cache
+        run: ./gradlew :macosui:publishAndReleaseToMavenCentral --no-configuration-cache
         env:
           GITHUB_REF: ${{ github.ref }}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVENCENTRALUSERNAME }}

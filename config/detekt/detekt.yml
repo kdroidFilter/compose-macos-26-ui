@@ -1,4 +1,4 @@
-# Detekt configuration for DarwinUI (Compose Multiplatform UI library)
+# Detekt configuration for MacosUI (Compose Multiplatform UI library)
 # Builds upon the default config — only overrides are listed here.
 
 complexity:
@@ -43,7 +43,7 @@ style:
       - 'androidx.compose.ui.unit.*'
       - 'androidx.compose.ui.text.*'
       - 'androidx.compose.animation.*'
-      - 'io.github.kdroidfilter.darwinui.theme.*'
+      - 'io.github.kdroidfilter.nucleus.ui.apple.macos.theme.*'
   MaxLineLength:
     maxLineLength: 140
     excludeRawStrings: true

@@ -1,18 +1,18 @@
-# Spécification : Alignement API ComposeDarwinUI sur Apple SwiftUI/AppKit
+# Spécification : Alignement API ComposeMacosUI sur Apple SwiftUI/AppKit
 
 ## Contexte
 
-L'API actuelle de `DarwinScaffold`, `TitleBar` et `Sidebar` couvre le cas basique (sidebar + titlebar + content) mais diverge significativement de l'API Apple sur plusieurs axes : layout multi-colonnes, système de toolbar flexible, inspecteur, styles de fenêtre, et sidebar redimensionnable. Ce document décrit en détail le comportement attendu de chaque API à implémenter pour matcher Apple à 100%.
+L'API actuelle de `Scaffold`, `TitleBar` et `Sidebar` couvre le cas basique (sidebar + titlebar + content) mais diverge significativement de l'API Apple sur plusieurs axes : layout multi-colonnes, système de toolbar flexible, inspecteur, styles de fenêtre, et sidebar redimensionnable. Ce document décrit en détail le comportement attendu de chaque API à implémenter pour matcher Apple à 100%.
 
 ---
 
-## 1. Layout multi-colonnes — `NavigationSplitView` → `DarwinScaffold`
+## 1. Layout multi-colonnes — `NavigationSplitView` → `Scaffold`
 
 ### 1.1 Layout 2 colonnes (existant, à adapter)
 
 **API actuelle :**
 ```kotlin
-DarwinScaffold(
+Scaffold(
     sidebar = { ... },
     content = { paddingValues -> ... }
 )
@@ -24,7 +24,7 @@ DarwinScaffold(
 
 **API cible :**
 ```kotlin
-DarwinScaffold(
+Scaffold(
     sidebar = { ... },
     contentList = { ... },   // NOUVEAU — colonne du milieu
     content = { paddingValues -> ... }  // colonne de droite (detail)
@@ -40,7 +40,7 @@ DarwinScaffold(
 - Le title bar s'étend sur toute la largeur (au-dessus des 3 colonnes) comme dans Finder/Mail
 - Quand la sidebar est masquée, `contentList` reste visible (comme Apple Mail)
 - Le contenu `content` prend tout l'espace restant (weight = 1f)
-- Animation : quand `contentList` apparaît/disparaît, utiliser `darwinSpring(DarwinSpringPreset.Snappy)` comme la sidebar
+- Animation : quand `contentList` apparaît/disparaît, utiliser `macosSpring(SpringPreset.Snappy)` comme la sidebar
 
 **Exemple concret (Apple Mail) :**
 ```
@@ -68,9 +68,9 @@ enum class ColumnVisibility {
 }
 ```
 
-**Intégration dans DarwinScaffold :**
+**Intégration dans Scaffold :**
 ```kotlin
-DarwinScaffold(
+Scaffold(
     columnVisibility: ColumnVisibility = ColumnVisibility.Automatic,
     onColumnVisibilityChange: ((ColumnVisibility) -> Unit)? = null,
     // ... existing params
@@ -82,7 +82,7 @@ DarwinScaffold(
 - `DoubleColumn` : sidebar masquée avec animation slide-out, contentList + content visibles
 - `DetailOnly` : sidebar + contentList masquées, seul content visible en plein écran
 - `Automatic` : équivalent à `All` sur desktop, pourrait s'adapter sur mobile (futur)
-- Le changement de visibilité est toujours animé avec `darwinSpring(DarwinSpringPreset.Snappy)`
+- Le changement de visibilité est toujours animé avec `macosSpring(SpringPreset.Snappy)`
 - Le bouton sidebar toggle bascule entre `All` ↔ `DoubleColumn` (pas `DetailOnly`)
 - **Rétrocompatibilité** : `sidebarVisible: Boolean` et `onSidebarVisibleChange` restent fonctionnels mais sont marqués `@Deprecated` en faveur de `columnVisibility`
 
@@ -94,9 +94,9 @@ DarwinScaffold(
 
 **API cible :**
 ```kotlin
-DarwinScaffold(
-    sidebarWidth: DarwinColumnWidth = DarwinColumnWidth.Fixed(240.dp),
-    contentListWidth: DarwinColumnWidth = DarwinColumnWidth.Flexible(
+Scaffold(
+    sidebarWidth: ColumnWidth = ColumnWidth.Fixed(240.dp),
+    contentListWidth: ColumnWidth = ColumnWidth.Flexible(
         min = 200.dp, ideal = 250.dp, max = 400.dp
     ),
     // ...
@@ -104,13 +104,13 @@ DarwinScaffold(
 ```
 
 ```kotlin
-sealed class DarwinColumnWidth {
-    data class Fixed(val width: Dp) : DarwinColumnWidth()
+sealed class ColumnWidth {
+    data class Fixed(val width: Dp) : ColumnWidth()
     data class Flexible(
         val min: Dp,
         val ideal: Dp,
         val max: Dp
-    ) : DarwinColumnWidth()
+    ) : ColumnWidth()
 }
 ```
 
@@ -124,7 +124,7 @@ sealed class DarwinColumnWidth {
 - **Snap** : pas de snap magnétique, le drag est fluide
 - **Double-clic** : remet la colonne à sa largeur `ideal`
 - **Curseur** : change en `↔` (col-resize) au survol de la zone de hit
-- **Hover visuel** : la ligne passe à 2.dp d'épaisseur et change de couleur vers `accent.copy(alpha = 0.5f)` au survol, avec `darwinTween(DarwinDuration.Fast)`
+- **Hover visuel** : la ligne passe à 2.dp d'épaisseur et change de couleur vers `accent.copy(alpha = 0.5f)` au survol, avec `macosTween(MacosDuration.Fast)`
 
 **Dividers présents :**
 - Entre sidebar et contentList (ou entre sidebar et content si pas de contentList)
@@ -136,13 +136,13 @@ sealed class DarwinColumnWidth {
 
 ### 3.1 API cible
 
-**Paramètres dans DarwinScaffold :**
+**Paramètres dans Scaffold :**
 ```kotlin
-DarwinScaffold(
+Scaffold(
     inspector: (@Composable () -> Unit)? = null,
     inspectorVisible: Boolean = false,
     onInspectorVisibleChange: ((Boolean) -> Unit)? = null,
-    inspectorWidth: DarwinColumnWidth = DarwinColumnWidth.Flexible(
+    inspectorWidth: ColumnWidth = ColumnWidth.Flexible(
         min = 200.dp, ideal = 260.dp, max = 400.dp
     ),
     // ...
@@ -164,7 +164,7 @@ DarwinScaffold(
 
 - L'inspector s'affiche à **droite** du content, séparé par un divider draggable
 - Il est **indépendant** du système de colonnes sidebar/contentList : on peut avoir `sidebar | contentList | content | inspector` (4 colonnes)
-- **Animation d'apparition** : slide-in depuis la droite avec `darwinSpring(DarwinSpringPreset.Snappy)` + `expandHorizontally(expandFrom = Alignment.End)`
+- **Animation d'apparition** : slide-in depuis la droite avec `macosSpring(SpringPreset.Snappy)` + `expandHorizontally(expandFrom = Alignment.End)`
 - **Animation de disparition** : slide-out vers la droite avec `shrinkHorizontally(shrinkTowards = Alignment.End)`
 - L'inspector a un **fond distinct** : même traitement que la sidebar (`surface` avec bordure gauche)
 - Le title bar s'étend sur toute la largeur (y compris au-dessus de l'inspector)
@@ -193,9 +193,9 @@ enum class ToolbarPlacement {
 
 ### 4.2 Bottom Bar (nouveau slot)
 
-**Paramètre dans DarwinScaffold :**
+**Paramètre dans Scaffold :**
 ```kotlin
-DarwinScaffold(
+Scaffold(
     bottomBar: (@Composable () -> Unit)? = null,
     bottomBarHeight: Int = 38,
     // ...
@@ -292,10 +292,10 @@ fun TitleBar(
 - Les boutons `TitleBarButtonGroup` ont une hauteur augmentée : **36.dp**
 - Cas d'usage : apps créatives, apps avec toolbar chargée
 
-### 5.3 Intégration avec DarwinScaffold
+### 5.3 Intégration avec Scaffold
 
 ```kotlin
-DarwinScaffold(
+Scaffold(
     titleBarHeight: Int = 52,  // Existant, auto-calculé si non fourni
     // ...
 )
@@ -303,7 +303,7 @@ DarwinScaffold(
 
 - Quand `titleBar` est fourni et utilise un `TitleBarStyle`, le `titleBarHeight` du scaffold doit correspondre
 - **Recommandation** : le scaffold devrait pouvoir détecter la hauteur automatiquement via un `CompositionLocal` plutôt que la passer en doublon
-- **Nouveau CompositionLocal** : `LocalTitleBarHeight` fourni par `TitleBar`, lu par `DarwinScaffold` pour calculer le padding
+- **Nouveau CompositionLocal** : `LocalTitleBarHeight` fourni par `TitleBar`, lu par `Scaffold` pour calculer le padding
 
 ---
 
@@ -327,12 +327,12 @@ fun Sidebar(
 - L'animation interpole entre `collapsedWidth` et `width`
 - Le scaffold passe la largeur courante (après drag) à la sidebar
 
-### 6.2 Changements dans DarwinScaffold
+### 6.2 Changements dans Scaffold
 
 Le scaffold gère l'état de la largeur et passe la valeur à la Sidebar :
 
 ```kotlin
-DarwinScaffold(
+Scaffold(
     sidebarWidth: Dp = 240.dp,
     sidebarMinWidth: Dp = 180.dp,
     sidebarMaxWidth: Dp = 360.dp,
@@ -361,9 +361,9 @@ enum class TitleDisplayMode {
 }
 ```
 
-**Paramètre dans DarwinScaffold :**
+**Paramètre dans Scaffold :**
 ```kotlin
-DarwinScaffold(
+Scaffold(
     navigationTitle: String? = null,
     titleDisplayMode: TitleDisplayMode = TitleDisplayMode.Inline,
     // ...
@@ -389,7 +389,7 @@ DarwinScaffold(
   - La zone `largeTitle` collapse de 52.dp à 0.dp
   - Simultanément, le titre apparaît en `inline` dans le title bar (fade-in)
   - Seuil de transition : quand le scroll dépasse **44.dp**, le titre inline est fully visible
-  - Spring animation : `darwinSpring(DarwinSpringPreset.Smooth)`
+  - Spring animation : `macosSpring(SpringPreset.Smooth)`
 - **Snap behavior** : si le scroll est entre 0 et 44.dp au relâchement, snap vers 0 ou 44 (le plus proche)
 
 > **Note** : Le mode `Large` est surtout pertinent pour iOS. Sur desktop, `Inline` est le standard Apple. Cette feature est **basse priorité**.
@@ -434,16 +434,16 @@ sealed class TitleBarBackground {
 ```kotlin
 @Composable
 fun TitleBar(
-    forcedColorScheme: DarwinColorScheme? = null,  // null = hérite du thème
+    forcedColorScheme: ColorScheme? = null,  // null = hérite du thème
     // ...
 )
 ```
 
 **Comportement :**
 - Quand non-null, le title bar et TOUS ses enfants utilisent le color scheme forcé
-- Implémenté via `CompositionLocalProvider(LocalDarwinColors provides forcedColorScheme)`
+- Implémenté via `CompositionLocalProvider(LocalColorScheme provides forcedColorScheme)`
 - Cas d'usage : title bar sombre sur un contenu clair (comme Safari en navigation privée)
-- Affecte : couleurs des boutons, texte, bordures, icônes — tout ce qui lit `DarwinTheme.colorScheme`
+- Affecte : couleurs des boutons, texte, bordures, icônes — tout ce qui lit `MacosTheme.colorScheme`
 
 ---
 
@@ -454,7 +454,7 @@ fun TitleBar(
 **Pas besoin d'une nouvelle API** — le comportement est déjà possible :
 
 ```kotlin
-DarwinScaffold(
+Scaffold(
     titleBar = null,  // Pas de title bar
     titleBarHeight = 0,
     content = { ... }
@@ -489,7 +489,7 @@ class SidebarItem(
 
 - Quand `children` est non-vide, l'item affiche un **chevron de disclosure** (▶) à droite
 - Au clic sur le chevron (ou sur l'item si pas de `onClick`) : les enfants s'expand/collapse
-- **Animation** : les enfants apparaissent avec `expandVertically` + `fadeIn` utilisant `darwinSpring(DarwinSpringPreset.Snappy)`
+- **Animation** : les enfants apparaissent avec `expandVertically` + `fadeIn` utilisant `macosSpring(SpringPreset.Snappy)`
 - Le chevron **tourne** de 0° à 90° avec `animateFloatAsState`
 - Les enfants sont **indentés** de `16.dp` supplémentaires par rapport au parent
 - Le chevron est visible uniquement quand la sidebar est expanded (disparaît quand collapsed)
@@ -518,13 +518,13 @@ class SidebarItem(
 
 | Fichier | Changements |
 |---------|-------------|
-| `DarwinScaffold.kt` | Ajouter `contentList`, `inspector`, `bottomBar`, `columnVisibility`, sidebar resizable, dividers draggables |
+| `Scaffold.kt` | Ajouter `contentList`, `inspector`, `bottomBar`, `columnVisibility`, sidebar resizable, dividers draggables |
 | `TitleBar.kt` | Ajouter `TitleBarStyle`, `TitleBarBackground`, `forcedColorScheme`, `showsTitle` |
 | `Sidebar.kt` | Paramétrer `width`/`collapsedWidth`, supporter `children` (disclosure) |
-| `DarwinGlass.kt` | Ajouter `LocalTitleBarHeight` CompositionLocal |
+| `Glass.kt` | Ajouter `LocalTitleBarHeight` CompositionLocal |
 | **Nouveau** `ColumnDivider.kt` | Composant de séparateur vertical draggable réutilisable |
 | **Nouveau** `ColumnVisibility.kt` | Enum + logique de visibilité |
-| **Nouveau** `DarwinColumnWidth.kt` | Sealed class pour les largeurs flexibles |
+| **Nouveau** `ColumnWidth.kt` | Sealed class pour les largeurs flexibles |
 | **Nouveau** `TitleBarStyle.kt` | Enum + dimensions par style |
 | `ScaffoldPage.kt` (sample) | Exemples pour chaque nouveau feature |
 

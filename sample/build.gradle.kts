@@ -48,8 +48,8 @@ kotlin {
             implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
-            implementation(project(":darwinui"))
-            implementation(project(":darwinui-icons-extended"))
+            implementation(project(":macosui"))
+            implementation(project(":macosui-icons-extended"))
             implementation(project(":gallery-annotations"))
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
@@ -92,11 +92,11 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>().con
 }
 
 android {
-    namespace = "io.github.kdroidfilter.darwinui.sample"
+    namespace = "io.github.kdroidfilter.nucleus.ui.apple.macos.sample"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "io.github.kdroidfilter.darwinui.sample"
+        applicationId = "io.github.kdroidfilter.nucleus.ui.apple.macos.sample"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -120,11 +120,11 @@ android {
 
 compose.desktop {
     application {
-        mainClass = "io.github.kdroidfilter.darwinui.sample.MainKt"
+        mainClass = "io.github.kdroidfilter.nucleus.ui.apple.macos.sample.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "io.github.kdroidfilter.darwinui.sample"
+            packageName = "io.github.kdroidfilter.nucleus.ui.apple.macos.sample"
             packageVersion = "1.0.0"
         }
     }

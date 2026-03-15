@@ -1,4 +1,4 @@
-# Compose Darwin UI
+# Compose Macos UI
 
 A Compose Multiplatform adaptation of the native macos 26 style. This port brings the same design language to Android, iOS, Desktop, and Web through Compose Multiplatform.
 
@@ -7,7 +7,7 @@ A Compose Multiplatform adaptation of the native macos 26 style. This port bring
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Commercial License](https://img.shields.io/badge/License-Commercial-green.svg)](#commercial-license--20)
 
-[Documentation & Live Demo](https://kdroidfilter.github.io/ComposeDarwinUi/)
+[Documentation & Live Demo](https://kdroidfilter.github.io/ComposeMacosUi/)
 
 ## Features
 
@@ -37,22 +37,22 @@ A Compose Multiplatform adaptation of the native macos 26 style. This port bring
 kotlin {
     sourceSets {
         commonMain.dependencies {
-            implementation("io.github.kdroidfilter:compose-darwin-ui:<version>")
+            implementation("io.github.kdroidfilter:compose-macos-ui:<version>")
         }
     }
 }
 ```
 
-### 2. Wrap your app with DarwinTheme
+### 2. Wrap your app with MacosTheme
 
 ```kotlin
-import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 
 @Composable
 fun App() {
-    DarwinTheme(darkTheme = false) {
+    MacosTheme(darkTheme = false) {
         // Your content here
-        // Access design tokens via DarwinTheme.colors, DarwinTheme.typography, etc.
+        // Access design tokens via MacosTheme.colors, MacosTheme.typography, etc.
     }
 }
 ```
@@ -60,19 +60,30 @@ fun App() {
 ### 3. Use components
 
 ```kotlin
-import io.github.kdroidfilter.darwinui.components.*
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.*
 
 @Composable
-fun MyScreen() {
-    Card {
-        CardHeader {
-            CardTitle("Welcome")
-            CardDescription("A macOS-inspired component library")
-        }
-        CardContent {
-            PrimaryButton(
-                onClick = { /* ... */ },
-            ) {
+fun MyApp() {
+    var selectedItem by remember { mutableStateOf("inbox") }
+
+    Scaffold(
+        sidebar = {
+            Sidebar(
+                items = listOf(
+                    SidebarItem("inbox", "Inbox", icon = Icons.Home),
+                    SidebarItem("sent", "Sent", icon = Icons.Share2),
+                    SidebarItem("settings", "Settings", icon = Icons.Settings),
+                ),
+                activeItem = selectedItem,
+            )
+        },
+        titleBar = {
+            TitleBar(title = { Text("Mail") })
+        },
+    ) { padding ->
+        Column(Modifier.padding(padding).padding(16.dp)) {
+            Text("Welcome to macOS UI", style = MacosTheme.typography.title1)
+            PrimaryButton(onClick = { /* ... */ }) {
                 Text("Get Started")
             }
         }
@@ -80,15 +91,15 @@ fun MyScreen() {
 }
 ```
 
-For the full component catalog, API details, and interactive demos, visit the [documentation](https://kdroidfilter.github.io/ComposeDarwinUi/).
+For the full component catalog, API details, and interactive demos, visit the [documentation](https://kdroidfilter.github.io/ComposeMacosUi/).
 
 ## License
 
-Compose Darwin UI is available under a **dual license**:
+Compose Macos UI is available under a **dual license**:
 
 ### Open Source — GPL v3
 
-Free for open-source projects. If your project is distributed under a GPL-compatible license, you can use Compose Darwin UI at no cost under the terms of the [GNU General Public License v3.0](LICENSE).
+Free for open-source projects. If your project is distributed under a GPL-compatible license, you can use Compose Macos UI at no cost under the terms of the [GNU General Public License v3.0](LICENSE).
 
 ### Commercial License — $20
 

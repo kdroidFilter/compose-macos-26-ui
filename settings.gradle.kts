@@ -1,4 +1,4 @@
-rootProject.name = "ComposeDarwinUi"
+rootProject.name = "ComposeMacosUi"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
@@ -32,4 +32,4 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-include(":darwinui", ":darwinui-icons", ":darwinui-icons-extended", ":sample", ":gallery-annotations", ":gallery-ksp")
+include(":macosui", ":macosui-icons", ":macosui-icons-extended", ":sample", ":gallery-annotations", ":gallery-ksp")
