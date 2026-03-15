@@ -104,7 +104,7 @@ fun DatePicker(
     var displayedMonth by remember(value) { mutableStateOf(value.month) }
     var calendarView by remember { mutableStateOf(CalendarView.Calendar) }
 
-    PickerContainer(modifier = modifier.then(if (!enabled) Modifier.alpha(0.45f) else Modifier), useGlass = useGlass) {
+    PickerContainer(modifier = modifier.width(370.dp).then(if (!enabled) Modifier.alpha(0.45f) else Modifier), useGlass = useGlass) {
         CalendarHeader(
             year = displayedYear,
             month = displayedMonth,
@@ -193,7 +193,7 @@ fun TimePicker(
     label: String = "Time",
 ) {
     val disabledAlpha = DarwinTheme.componentStyling.timePicker.metrics.disabledAlpha
-    PickerContainer(modifier = modifier.then(if (!enabled) Modifier.alpha(disabledAlpha) else Modifier)) {
+    PickerContainer(modifier = modifier.width(370.dp).then(if (!enabled) Modifier.alpha(disabledAlpha) else Modifier)) {
         TimePickerRow(
             value = value,
             onValueChange = onValueChange,
@@ -236,7 +236,7 @@ fun DateTimePicker(
     var calendarView by remember { mutableStateOf(CalendarView.Calendar) }
     val disabledAlpha = DarwinTheme.componentStyling.timePicker.metrics.disabledAlpha
 
-    PickerContainer(modifier = modifier.then(if (!enabled) Modifier.alpha(disabledAlpha) else Modifier)) {
+    PickerContainer(modifier = modifier.width(370.dp).then(if (!enabled) Modifier.alpha(disabledAlpha) else Modifier)) {
         CalendarHeader(
             year = displayedYear,
             month = displayedMonth,
@@ -332,7 +332,6 @@ private fun PickerContainer(
 
     Column(
         modifier = modifier
-            .width(370.dp)
             .shadow(
                 elevation = 25.dp,
                 shape = shape,
