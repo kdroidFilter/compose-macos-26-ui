@@ -66,6 +66,7 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
 import io.github.kdroidfilter.darwinui.theme.darwinGlass
+import io.github.kdroidfilter.darwinui.util.isApplePlatform
 
 // CompositionLocal to allow items to auto-close the menu
 internal val LocalContextMenuClose = staticCompositionLocalOf<() -> Unit> { {} }
@@ -435,14 +436,37 @@ fun ContextMenuSeparator(modifier: Modifier = Modifier) {
 // Context Menu Shortcut
 // =============================================================================
 
+/**
+ * A right-aligned keyboard shortcut label within a [ContextMenuItem].
+ *
+ * Renders platform-appropriate modifier symbols automatically:
+ * - Apple (macOS/iOS): ⌘ ⇧ ⌥ ⌃
+ * - Other platforms: Ctrl+ Shift+ Alt+
+ *
+ * @param key The key label (e.g., "Z", "C", "⌫").
+ * @param command Whether the Command/Ctrl modifier is included.
+ * @param shift Whether the Shift modifier is included.
+ * @param option Whether the Option/Alt modifier is included.
+ * @param control Whether the Control modifier is included (distinct from command on Apple).
+ * @param modifier Modifier applied to the shortcut text.
+ */
 @Composable
 fun ContextMenuShortcut(
-    text: String,
+    key: String,
+    command: Boolean = false,
+    shift: Boolean = false,
+    option: Boolean = false,
+    control: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
-    // Inherits the text style (including color) from the parent ContextMenuItem
-    // via LocalDarwinTextStyle, so shortcut color matches the item text color
     val parentStyle = LocalDarwinTextStyle.current
+    val text = buildShortcutText(
+        key = key,
+        command = command,
+        shift = shift,
+        option = option,
+        control = control,
+    )
 
     BasicText(
         text = text,
@@ -451,6 +475,31 @@ fun ContextMenuShortcut(
         ),
         modifier = modifier,
     )
+}
+
+private fun buildShortcutText(
+    key: String,
+    command: Boolean,
+    shift: Boolean,
+    option: Boolean,
+    control: Boolean,
+): String = if (isApplePlatform) {
+    buildString {
+        if (control) append("⌃")
+        if (option) append("⌥")
+        if (shift) append("⇧")
+        if (command) append("⌘")
+        append(key)
+    }
+} else {
+    val modifiers = buildList {
+        if (control) add("Ctrl")
+        if (command) add("Ctrl")
+        if (option) add("Alt")
+        if (shift) add("Shift")
+    }
+    if (modifiers.isEmpty()) key
+    else modifiers.joinToString("+", postfix = "+$key")
 }
 
 @Preview

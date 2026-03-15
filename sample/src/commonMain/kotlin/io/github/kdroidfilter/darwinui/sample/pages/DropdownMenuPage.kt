@@ -20,7 +20,6 @@ import io.github.kdroidfilter.darwinui.components.DropdownMenuCheckboxItem
 import io.github.kdroidfilter.darwinui.components.DropdownMenuItem
 import io.github.kdroidfilter.darwinui.components.DropdownMenuLabel
 import io.github.kdroidfilter.darwinui.components.DropdownMenuSeparator
-import io.github.kdroidfilter.darwinui.components.DropdownMenuShortcut
 import io.github.kdroidfilter.darwinui.components.DropdownMenuSubMenu
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
@@ -52,7 +51,7 @@ fun DropdownMenuDefaultExample() {
     }
 }
 
-@GalleryExample("DropdownMenu", "With Labels & Shortcuts")
+@GalleryExample("DropdownMenu", "With Labels")
 @Composable
 fun DropdownMenuLabelsExample() {
     var dropdownExpanded by remember { mutableStateOf(false) }
@@ -67,14 +66,8 @@ fun DropdownMenuLabelsExample() {
             onDismissRequest = { dropdownExpanded = false },
         ) {
             DropdownMenuLabel(text = "Actions")
-            DropdownMenuItem(
-                onClick = { dropdownExpanded = false },
-                trailingContent = { DropdownMenuShortcut(text = "Cmd+N") },
-            ) { Text("New File") }
-            DropdownMenuItem(
-                onClick = { dropdownExpanded = false },
-                trailingContent = { DropdownMenuShortcut(text = "Cmd+O") },
-            ) { Text("Open") }
+            DropdownMenuItem(onClick = { dropdownExpanded = false }) { Text("New File") }
+            DropdownMenuItem(onClick = { dropdownExpanded = false }) { Text("Open") }
             DropdownMenuSeparator()
             DropdownMenuLabel(text = "Options")
             DropdownMenuCheckboxItem(checked = checkboxState, onCheckedChange = { checkboxState = it }) { Text("Auto-save") }
@@ -167,7 +160,7 @@ internal fun DropdownMenuPage() {
         SectionHeader("Examples")
         ExampleCard(title = "Default", sourceCode = GallerySources.DropdownMenuDefaultExample) { DropdownMenuDefaultExample() }
         ExampleCard(
-            title = "With Labels & Shortcuts",
+            title = "With Labels",
             sourceCode = GallerySources.DropdownMenuLabelsExample,
         ) { DropdownMenuLabelsExample() }
         ExampleCard(

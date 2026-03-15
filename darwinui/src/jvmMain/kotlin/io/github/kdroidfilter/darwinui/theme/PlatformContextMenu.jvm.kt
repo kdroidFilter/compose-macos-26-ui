@@ -8,6 +8,7 @@ import androidx.compose.foundation.text.contextmenu.data.TextContextMenuItemWith
 internal actual fun TextContextMenuComponent.toItemInfo(): ContextMenuItemInfo? {
     if (this !is TextContextMenuItemWithComposableLeadingIcon) return null
     return ContextMenuItemInfo(
+        key = key,
         label = label,
         enabled = enabled,
         onClick = onClick,

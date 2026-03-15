@@ -657,31 +657,6 @@ fun DropdownMenuSeparator(modifier: Modifier = Modifier) {
     )
 }
 
-// =============================================================================
-// DropdownMenuShortcut
-// =============================================================================
-
-/**
- * A right-aligned keyboard shortcut label within a [DropdownMenuItem].
- *
- * @param text The shortcut text to display (e.g., "Cmd+C").
- * @param modifier Modifier applied to the shortcut text.
- */
-@Composable
-fun DropdownMenuShortcut(
-    text: String,
-    modifier: Modifier = Modifier,
-) {
-    val parentStyle = LocalDarwinTextStyle.current
-
-    BasicText(
-        text = text,
-        style = parentStyle.merge(
-            TextStyle(letterSpacing = 0.sp)
-        ),
-        modifier = modifier,
-    )
-}
 
 @Preview
 @Composable

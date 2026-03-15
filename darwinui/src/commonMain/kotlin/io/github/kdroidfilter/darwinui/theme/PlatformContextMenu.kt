@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
@@ -27,6 +28,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.contextmenu.data.TextContextMenuComponent
+import androidx.compose.foundation.text.contextmenu.data.TextContextMenuKeys
 import androidx.compose.foundation.text.contextmenu.data.TextContextMenuSeparator
 import androidx.compose.foundation.text.contextmenu.data.TextContextMenuSession
 import androidx.compose.foundation.text.contextmenu.provider.LocalTextContextMenuDropdownProvider
@@ -53,12 +55,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import io.github.kdroidfilter.darwinui.util.isApplePlatform
 import kotlinx.coroutines.channels.Channel
 
 /**
  * Extracted info from a platform-specific [TextContextMenuComponent] subtype.
  */
 internal data class ContextMenuItemInfo(
+    val key: Any,
     val label: String,
     val enabled: Boolean,
     val onClick: (TextContextMenuSession) -> Unit,
@@ -190,6 +194,7 @@ private fun DarwinContextMenuPopup(
                     val itemInfo = component.toItemInfo() ?: continue
                     DarwinContextMenuItemRow(
                         label = itemInfo.label,
+                        shortcut = shortcutForKey(itemInfo.key),
                         enabled = itemInfo.enabled,
                         onClick = { itemInfo.onClick(session) },
                         colors = colors,
@@ -200,9 +205,21 @@ private fun DarwinContextMenuPopup(
     }
 }
 
+private fun shortcutForKey(key: Any): String? {
+    val letter = when (key) {
+        TextContextMenuKeys.CutKey -> "X"
+        TextContextMenuKeys.CopyKey -> "C"
+        TextContextMenuKeys.PasteKey -> "V"
+        TextContextMenuKeys.SelectAllKey -> "A"
+        else -> return null
+    }
+    return if (isApplePlatform) "⌘$letter" else "Ctrl+$letter"
+}
+
 @Composable
 private fun DarwinContextMenuItemRow(
     label: String,
+    shortcut: String?,
     enabled: Boolean,
     onClick: () -> Unit,
     colors: ColorScheme,
@@ -225,6 +242,11 @@ private fun DarwinContextMenuItemRow(
     }
 
     val itemShape = RoundedCornerShape(8.dp)
+    val textStyle = TextStyle(
+        fontSize = 13.sp,
+        color = textColor,
+        letterSpacing = (-0.2).sp,
+    )
 
     Row(
         modifier = Modifier
@@ -245,11 +267,15 @@ private fun DarwinContextMenuItemRow(
     ) {
         BasicText(
             text = label,
-            style = TextStyle(
-                fontSize = 13.sp,
-                color = textColor,
-                letterSpacing = (-0.2).sp,
-            ),
+            style = textStyle,
+            modifier = Modifier.weight(1f),
         )
+        if (shortcut != null) {
+            Spacer(modifier = Modifier.width(16.dp))
+            BasicText(
+                text = shortcut,
+                style = textStyle.copy(letterSpacing = 0.sp),
+            )
+        }
     }
 }

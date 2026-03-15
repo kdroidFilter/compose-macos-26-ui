@@ -98,7 +98,7 @@ fun ContextMenuWithIconsExample() {
                     colorFilter = ColorFilter.tint(tint),
                 )
             },
-            trailingContent = { ContextMenuShortcut("⌘Z") },
+            trailingContent = { ContextMenuShortcut("Z", command = true) },
         ) { Text("Undo") }
         ContextMenuItem(
             onSelect = {},
@@ -112,7 +112,7 @@ fun ContextMenuWithIconsExample() {
                     colorFilter = ColorFilter.tint(tint),
                 )
             },
-            trailingContent = { ContextMenuShortcut("⌘⇧Z") },
+            trailingContent = { ContextMenuShortcut("Z", command = true, shift = true) },
         ) { Text("Redo") }
         ContextMenuSeparator()
         ContextMenuItem(
@@ -126,7 +126,7 @@ fun ContextMenuWithIconsExample() {
                     colorFilter = ColorFilter.tint(tint),
                 )
             },
-            trailingContent = { ContextMenuShortcut("⌘C") },
+            trailingContent = { ContextMenuShortcut("C", command = true) },
         ) { Text("Copy") }
         ContextMenuItem(
             onSelect = {},
@@ -139,7 +139,7 @@ fun ContextMenuWithIconsExample() {
                     colorFilter = ColorFilter.tint(tint),
                 )
             },
-            trailingContent = { ContextMenuShortcut("⌘F") },
+            trailingContent = { ContextMenuShortcut("F", command = true) },
         ) { Text("Find…") }
         ContextMenuSeparator()
         ContextMenuItem(
