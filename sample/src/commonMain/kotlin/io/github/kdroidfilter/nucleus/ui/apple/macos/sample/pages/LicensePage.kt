@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.mikepenz.markdown.model.rememberMarkdownState
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.GroupBox
 import composemacosui.sample.generated.resources.Res
 import io.github.kdroidfilter.nucleus.ui.apple.macos.markdown.Markdown
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.GalleryPage
@@ -17,9 +18,11 @@ internal fun LicensePage() {
     }
 
     GalleryPage("License") {
-        Markdown(
-            markdownState = markdownState,
-            modifier = Modifier.fillMaxWidth(),
-        )
+        GroupBox(modifier = Modifier.fillMaxWidth()) {
+            Markdown(
+                markdownState = markdownState,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
     }
 }

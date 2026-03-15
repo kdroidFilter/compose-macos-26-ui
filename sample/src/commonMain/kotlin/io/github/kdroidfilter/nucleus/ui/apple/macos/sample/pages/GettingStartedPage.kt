@@ -20,6 +20,7 @@ import com.mikepenz.markdown.compose.elements.MarkdownCodeFence
 import com.mikepenz.markdown.model.rememberMarkdownState
 import composemacosui.sample.generated.resources.Res
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icon
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.GroupBox
 import io.github.kdroidfilter.nucleus.ui.apple.macos.markdown.Markdown
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.CodeBlock
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.GalleryPage
@@ -69,10 +70,12 @@ internal fun GettingStartedPage() {
     }
 
     GalleryPage("Getting Started") {
-        Markdown(
-            markdownState = markdownState,
-            modifier = Modifier.fillMaxWidth(),
-            components = galleryComponents,
-        )
+        GroupBox(modifier = Modifier.fillMaxWidth()) {
+            Markdown(
+                markdownState = markdownState,
+                modifier = Modifier.fillMaxWidth(),
+                components = galleryComponents,
+            )
+        }
     }
 }
