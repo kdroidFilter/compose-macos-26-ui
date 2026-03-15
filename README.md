@@ -78,7 +78,16 @@ fun MyApp() {
             )
         },
         titleBar = {
-            TitleBar(title = { Text("Mail") })
+            TitleBar(
+                title = { Text("Mail") },
+                actions = {
+                    IconButton(
+                        icon = Icons.Share2,
+                        onClick = { /* open https://github.com/kdroidFilter/compose-macos-26-ui */ },
+                        style = IconButtonStyle.Borderless,
+                    )
+                },
+            )
         },
     ) { padding ->
         Column(Modifier.padding(padding).padding(16.dp)) {
