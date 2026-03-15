@@ -7,69 +7,122 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.LocalControlSize
+import kotlin.math.floor
+
+private const val SPOKE_COUNT = 8
+private const val ROTATION_DURATION_MS = 800
+
+// Opacity values for each spoke relative to the brightest one (index 0 = brightest)
+private val SPOKE_OPACITIES = floatArrayOf(1f, 0.87f, 0.75f, 0.63f, 0.51f, 0.39f, 0.27f, 0.15f)
 
 /**
- * A small indeterminate circular spinner drawn with Canvas.
+ * macOS-style indeterminate spinner with 8 radial spokes.
  *
- * Replaces `material3.CircularProgressIndicator` for use in loading states
- * (e.g., the [Button] loading spinner).
- *
- * @param modifier Modifier applied to the canvas.
- * @param color The color of the spinning arc.
+ * @param modifier Modifier applied to the component.
  * @param size Diameter of the spinner.
- * @param strokeWidth Width of the arc stroke.
+ * @param color Color of the spokes.
  */
 @Composable
 fun Spinner(
     modifier: Modifier = Modifier,
-    color: Color = Color.White,
-    size: Dp = 16.dp,
-    strokeWidth: Dp = 2.dp,
+    size: Dp = DarwinTheme.componentStyling.progress.metrics.spinnerSizeFor(LocalControlSize.current),
+    color: Color = DarwinTheme.colorScheme.textSecondary,
 ) {
-    val infiniteTransition = rememberInfiniteTransition()
-    val rotation by infiniteTransition.animateFloat(
+    val infiniteTransition = rememberInfiniteTransition(label = "spinner")
+    val animatedStep by infiniteTransition.animateFloat(
         initialValue = 0f,
-        targetValue = 360f,
+        targetValue = SPOKE_COUNT.toFloat(),
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 800, easing = LinearEasing),
+            animation = tween(
+                durationMillis = ROTATION_DURATION_MS,
+                easing = LinearEasing,
+            ),
             repeatMode = RepeatMode.Restart,
         ),
+        label = "spinner_step",
     )
 
     Canvas(modifier = modifier.size(size)) {
-        val stroke = Stroke(
-            width = strokeWidth.toPx(),
-            cap = StrokeCap.Round,
-        )
-        val arcSize = androidx.compose.ui.geometry.Size(
-            width = this.size.width - stroke.width,
-            height = this.size.height - stroke.width,
-        )
-        val topLeft = androidx.compose.ui.geometry.Offset(
-            x = stroke.width / 2f,
-            y = stroke.width / 2f,
-        )
+        val currentStep = floor(animatedStep).toInt() % SPOKE_COUNT
+        drawSpokes(color, currentStep)
+    }
+}
 
-        drawArc(
-            color = color,
-            startAngle = rotation - 90f,
-            sweepAngle = 270f,
-            useCenter = false,
-            topLeft = topLeft,
-            size = arcSize,
-            style = stroke,
+/**
+ * macOS-style indeterminate spinner with a text label.
+ *
+ * @param label Text displayed next to the spinner.
+ * @param modifier Modifier applied to the row container.
+ * @param spinnerSize Diameter of the spinner.
+ * @param color Color of the spokes.
+ */
+@Composable
+fun Spinner(
+    label: String,
+    modifier: Modifier = Modifier,
+    spinnerSize: Dp = DarwinTheme.componentStyling.progress.metrics.spinnerSizeFor(LocalControlSize.current),
+    color: Color = DarwinTheme.colorScheme.textSecondary,
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Spinner(size = spinnerSize, color = color)
+        Text(
+            text = label,
+            style = DarwinTheme.typography.body,
+            color = DarwinTheme.colorScheme.textSecondary,
         )
+    }
+}
+
+private fun DrawScope.drawSpokes(color: Color, currentStep: Int) {
+    val diameter = size.minDimension
+    // Spoke proportions derived from Sketch: small 3/22 wide, 7/22 tall; large 4/30 wide, 10/30 tall
+    val spokeWidth = diameter * 4f / 30f
+    val spokeHeight = diameter * 10f / 30f
+    val cornerRadius = CornerRadius(spokeWidth / 2f, spokeWidth / 2f)
+    val center = Offset(size.width / 2f, size.height / 2f)
+    // Spoke is drawn from top edge toward center
+    val spokeTopLeft = Offset(
+        x = center.x - spokeWidth / 2f,
+        y = 0f,
+    )
+    val spokeSize = Size(spokeWidth, spokeHeight)
+
+    for (i in 0 until SPOKE_COUNT) {
+        val angle = i * 360f / SPOKE_COUNT
+        // Opacity index: spoke 0 is brightest, then fading around
+        val opacityIndex = (i - currentStep + SPOKE_COUNT) % SPOKE_COUNT
+        val alpha = SPOKE_OPACITIES[opacityIndex]
+
+        rotate(degrees = angle, pivot = center) {
+            drawRoundRect(
+                color = color.copy(alpha = alpha * color.alpha),
+                topLeft = spokeTopLeft,
+                size = spokeSize,
+                cornerRadius = cornerRadius,
+            )
+        }
     }
 }
 
@@ -77,6 +130,9 @@ fun Spinner(
 @Composable
 private fun SpinnerPreview() {
     DarwinTheme {
-        Spinner(color = Color.Black)
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Spinner()
+            Spinner(label = "Checking for Update\u2026")
+        }
     }
 }

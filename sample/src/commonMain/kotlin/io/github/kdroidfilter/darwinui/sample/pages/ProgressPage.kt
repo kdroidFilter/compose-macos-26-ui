@@ -10,7 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.LinearProgress
-import io.github.kdroidfilter.darwinui.components.ProgressRing
+import io.github.kdroidfilter.darwinui.components.Spinner
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.CodeBlock
@@ -32,12 +32,15 @@ private fun ProgressPreview() {
         LinearProgress(value = 65f, max = 100f, enabled = false)
         LinearProgress(indeterminate = true)
         LinearProgress(indeterminate = true, enabled = false)
-        ControlSize(ControlSize.Large) {
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                ProgressRing(progress = 0.75f)
-                ProgressRing(progress = 0.45f, color = DarwinTheme.colorScheme.success)
-                ProgressRing()
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Spinner()
+            ControlSize(ControlSize.Large) {
+                Spinner()
             }
+            Spinner(label = "Checking for Update\u2026")
         }
     }
 }
@@ -60,7 +63,7 @@ fun ProgressSizesExample() {
                         modifier = Modifier.widthIn(min = 72.dp),
                     )
                     LinearProgress(value = 65f, max = 100f, modifier = Modifier.weight(1f))
-                    ProgressRing(progress = 0.65f)
+                    Spinner()
                 }
             }
         }
@@ -91,15 +94,18 @@ fun ProgressIndeterminateExample() {
     }
 }
 
-@GalleryExample("Progress", "Circular")
+@GalleryExample("Progress", "Spinner")
 @Composable
-fun ProgressCircularExample() {
-    ControlSize(ControlSize.Large) {
-        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            ProgressRing(progress = 0.75f)
-            ProgressRing(progress = 0.45f, color = DarwinTheme.colorScheme.success)
-            ProgressRing()
+fun ProgressSpinnerExample() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Spinner()
+        ControlSize(ControlSize.Large) {
+            Spinner()
         }
+        Spinner(label = "Checking for Update\u2026")
     }
 }
 
@@ -111,12 +117,13 @@ internal fun ProgressPage() {
         SectionHeader("Usage")
         CodeBlock("""LinearProgress(value = 65f, max = 100f)
 LinearProgress(indeterminate = true)
-ProgressRing(progress = 0.75f)""")
+Spinner()
+Spinner(label = "Loading…")""")
 
         SectionHeader("Sizes")
         ExampleCard(
             title = "All Sizes",
-            description = "LinearProgress and ProgressRing at each ControlSize level",
+            description = "LinearProgress and Spinner at each ControlSize level",
             sourceCode = GallerySources.ProgressSizesExample,
         ) { ProgressSizesExample() }
 
@@ -132,8 +139,9 @@ ProgressRing(progress = 0.75f)""")
             sourceCode = GallerySources.ProgressIndeterminateExample,
         ) { ProgressIndeterminateExample() }
         ExampleCard(
-            title = "Circular",
-            sourceCode = GallerySources.ProgressCircularExample,
-        ) { ProgressCircularExample() }
+            title = "Spinner",
+            description = "Indeterminate spinner with optional label",
+            sourceCode = GallerySources.ProgressSpinnerExample,
+        ) { ProgressSpinnerExample() }
     }
 }

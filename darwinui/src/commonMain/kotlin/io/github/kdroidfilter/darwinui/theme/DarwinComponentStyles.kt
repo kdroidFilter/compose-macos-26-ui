@@ -642,9 +642,8 @@ data class ProgressStyle(
         val heightSm: Dp = 6.dp,
         val heightMd: Dp = 10.dp,
         val heightLg: Dp = 14.dp,
-        val ringSizeSm: Dp = 16.dp,
-        val ringSizeMd: Dp = 32.dp,
-        val ringSizeLg: Dp = 64.dp,
+        val spinnerSizeSm: Dp = 22.dp,
+        val spinnerSizeLg: Dp = 30.dp,
     ) {
         fun heightFor(controlSize: ControlSize): Dp = when (controlSize) {
             ControlSize.Mini -> 4.dp
@@ -654,12 +653,12 @@ data class ProgressStyle(
             ControlSize.ExtraLarge -> 18.dp
         }
 
-        fun ringSizeFor(controlSize: ControlSize): Dp = when (controlSize) {
-            ControlSize.Mini -> 12.dp
-            ControlSize.Small -> ringSizeSm
-            ControlSize.Regular -> ringSizeMd
-            ControlSize.Large -> ringSizeLg
-            ControlSize.ExtraLarge -> 96.dp
+        fun spinnerSizeFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 16.dp
+            ControlSize.Small -> spinnerSizeSm
+            ControlSize.Regular -> spinnerSizeSm
+            ControlSize.Large -> spinnerSizeLg
+            ControlSize.ExtraLarge -> 38.dp
         }
     }
 }

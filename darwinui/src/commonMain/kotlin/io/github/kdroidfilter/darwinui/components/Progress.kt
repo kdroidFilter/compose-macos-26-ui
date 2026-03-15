@@ -10,15 +10,11 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -27,12 +23,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalControlSize
@@ -178,152 +172,6 @@ private fun DrawScope.drawIndeterminateBar(
     }
 }
 
-// ==================== ProgressRing (circular) ====================
-
-/**
- * Determinate circular progress ring.
- *
- * @param progress Progress value from 0f to 1f.
- * @param modifier Modifier applied to the component.
- * @param size Diameter of the ring.
- * @param width Stroke width of the ring.
- * @param color Fill color for the progress arc.
- */
-@Composable
-fun ProgressRing(
-    progress: Float,
-    modifier: Modifier = Modifier,
-    size: Dp = DarwinTheme.componentStyling.progress.metrics.ringSizeFor(LocalControlSize.current),
-    width: Dp = size * 3 / 32,
-    color: Color = DarwinTheme.colorScheme.accent,
-) {
-    val trackColor = if (DarwinTheme.colorScheme.isDark) {
-        Color.White.copy(alpha = 0.10f)
-    } else {
-        Color.Black.copy(alpha = 0.06f)
-    }
-
-    val targetFraction = progress.coerceIn(0f, 1f)
-    val animatedFraction by animateFloatAsState(
-        targetValue = targetFraction,
-        animationSpec = tween(400, easing = CubicBezierEasing(0f, 0f, 0.58f, 1f)),
-    )
-
-    Box(
-        modifier = modifier.size(size),
-        contentAlignment = Alignment.Center,
-    ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val stroke = Stroke(width = width.toPx(), cap = StrokeCap.Round)
-            val arcSize = Size(
-                width = this.size.width - stroke.width,
-                height = this.size.height - stroke.width,
-            )
-            val topLeft = Offset(stroke.width / 2f, stroke.width / 2f)
-
-            drawArc(
-                color = trackColor,
-                startAngle = 0f,
-                sweepAngle = 360f,
-                useCenter = false,
-                topLeft = topLeft,
-                size = arcSize,
-                style = stroke,
-            )
-
-            val sweepAngle = animatedFraction * 360f
-            if (sweepAngle > 0f) {
-                drawArc(
-                    color = color,
-                    startAngle = -90f,
-                    sweepAngle = sweepAngle,
-                    useCenter = false,
-                    topLeft = topLeft,
-                    size = arcSize,
-                    style = stroke,
-                )
-            }
-        }
-    }
-}
-
-/**
- * Indeterminate circular progress ring.
- *
- * @param modifier Modifier applied to the component.
- * @param size Diameter of the ring.
- * @param width Stroke width of the ring.
- * @param color Fill color for the progress arc.
- */
-@Composable
-fun ProgressRing(
-    modifier: Modifier = Modifier,
-    size: Dp = DarwinTheme.componentStyling.progress.metrics.ringSizeFor(LocalControlSize.current),
-    width: Dp = size * 3 / 32,
-    color: Color = DarwinTheme.colorScheme.accent,
-) {
-    val trackColor = if (DarwinTheme.colorScheme.isDark) {
-        Color.White.copy(alpha = 0.10f)
-    } else {
-        Color.Black.copy(alpha = 0.06f)
-    }
-
-    val infiniteTransition = rememberInfiniteTransition(label = "circular_indeterminate")
-    val indeterminateProgress by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 2000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "circular_progress",
-    )
-
-    Box(
-        modifier = modifier.size(size),
-        contentAlignment = Alignment.Center,
-    ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val stroke = Stroke(width = width.toPx(), cap = StrokeCap.Round)
-            val arcSize = Size(
-                width = this.size.width - stroke.width,
-                height = this.size.height - stroke.width,
-            )
-            val topLeft = Offset(stroke.width / 2f, stroke.width / 2f)
-
-            drawArc(
-                color = trackColor,
-                startAngle = 0f,
-                sweepAngle = 360f,
-                useCenter = false,
-                topLeft = topLeft,
-                size = arcSize,
-                style = stroke,
-            )
-
-            val t = indeterminateProgress
-            val startAngle: Float
-            val sweepAngle: Float
-            if (t < 0.5f) {
-                startAngle = -90f + 360f * t
-                sweepAngle = 720f * t
-            } else {
-                startAngle = -450f + 1080f * t
-                sweepAngle = 720f * (1f - t)
-            }
-
-            drawArc(
-                color = color,
-                startAngle = startAngle,
-                sweepAngle = sweepAngle.coerceIn(0f, 360f),
-                useCenter = false,
-                topLeft = topLeft,
-                size = arcSize,
-                style = stroke,
-            )
-        }
-    }
-}
 
 @Preview
 @Composable
@@ -333,8 +181,6 @@ private fun ProgressPreview() {
             LinearProgress(value = 60f)
             LinearProgress(value = 60f, enabled = false)
             LinearProgress(indeterminate = true)
-            ProgressRing(progress = 0.75f)
-            ProgressRing()
         }
     }
 }
