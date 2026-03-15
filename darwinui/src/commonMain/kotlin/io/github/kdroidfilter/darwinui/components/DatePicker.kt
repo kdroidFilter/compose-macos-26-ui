@@ -58,6 +58,7 @@ import io.github.kdroidfilter.darwinui.icons.LucideChevronLeft
 import io.github.kdroidfilter.darwinui.icons.LucideChevronRight
 import io.github.kdroidfilter.darwinui.theme.darwinGlass
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
+import io.github.kdroidfilter.darwinui.theme.LocalDarwinLiquidState
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import kotlinx.datetime.LocalDate
@@ -1022,6 +1023,7 @@ fun WheelTimePicker(
 ) {
     val isDark = DarwinTheme.colorScheme.isDark
     val containerBg = if (isDark) Color(0xFF121212) else Color(0xFFFAFAFA)
+    val useGlass = LocalDarwinLiquidState.current != null
     val indicatorBg = if (isDark) Color(0x2E767680) else Color(0x14747480)
     val indicatorShape = RoundedCornerShape(17.dp)
 
@@ -1070,7 +1072,7 @@ fun WheelTimePicker(
                 initialIndex = initialHourIndex,
                 itemHeight = itemHeight,
                 visibleItems = visibleItems,
-                fadeBgColor = containerBg,
+                fadeBgColor = if (useGlass) Color.Transparent else containerBg,
                 onSelectedChanged = { index ->
                     val pickedHour = hours[index]
                     selectedHour = if (is24Hour) {
@@ -1092,7 +1094,7 @@ fun WheelTimePicker(
                 initialIndex = value.minute,
                 itemHeight = itemHeight,
                 visibleItems = visibleItems,
-                fadeBgColor = containerBg,
+                fadeBgColor = if (useGlass) Color.Transparent else containerBg,
                 onSelectedChanged = { index ->
                     selectedMinute = minutes[index]
                     onValueChange(LocalTime(selectedHour, selectedMinute))
@@ -1109,7 +1111,7 @@ fun WheelTimePicker(
                     initialIndex = if (isPm) 1 else 0,
                     itemHeight = itemHeight,
                     visibleItems = visibleItems,
-                    fadeBgColor = containerBg,
+                    fadeBgColor = if (useGlass) Color.Transparent else containerBg,
                     onSelectedChanged = { index ->
                         val newIsPm = index == 1
                         if (newIsPm != isPm) {
@@ -1235,22 +1237,23 @@ private fun <T> WheelColumn(
             }
         }
 
-        // Top fade overlay
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(itemHeight * 2.5f)
-                .align(Alignment.TopCenter)
-                .background(topFade),
-        )
-        // Bottom fade overlay
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(itemHeight * 2.5f)
-                .align(Alignment.BottomCenter)
-                .background(bottomFade),
-        )
+        // Top/bottom fade overlays — skip when glass is active (transparent bg)
+        if (fadeBgColor != Color.Transparent) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(itemHeight * 2.5f)
+                    .align(Alignment.TopCenter)
+                    .background(topFade),
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(itemHeight * 2.5f)
+                    .align(Alignment.BottomCenter)
+                    .background(bottomFade),
+            )
+        }
     }
 }
 
