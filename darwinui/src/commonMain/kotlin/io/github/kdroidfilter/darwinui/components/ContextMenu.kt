@@ -67,6 +67,7 @@ import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
 import io.github.kdroidfilter.darwinui.theme.darwinGlass
 import io.github.kdroidfilter.darwinui.util.isApplePlatform
+import io.github.kdroidfilter.darwinui.util.isWebPlatform
 
 // CompositionLocal to allow items to auto-close the menu
 internal val LocalContextMenuClose = staticCompositionLocalOf<() -> Unit> { {} }
@@ -483,7 +484,7 @@ private fun buildShortcutText(
     shift: Boolean,
     option: Boolean,
     control: Boolean,
-): String = if (isApplePlatform) {
+): String = if (isApplePlatform && !isWebPlatform) {
     buildString {
         if (control) append("⌃")
         if (option) append("⌥")
@@ -491,6 +492,15 @@ private fun buildShortcutText(
         if (command) append("⌘")
         append(key)
     }
+} else if (isApplePlatform) {
+    val modifiers = buildList {
+        if (control) add("Ctrl")
+        if (option) add("Opt")
+        if (shift) add("Shift")
+        if (command) add("Cmd")
+    }
+    if (modifiers.isEmpty()) key
+    else modifiers.joinToString("+", postfix = "+$key")
 } else {
     val modifiers = buildList {
         if (control) add("Ctrl")

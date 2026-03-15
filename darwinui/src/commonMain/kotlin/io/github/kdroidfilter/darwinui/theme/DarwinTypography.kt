@@ -12,11 +12,6 @@ import composedarwinui.darwinui.generated.resources.manrope_bold
 import composedarwinui.darwinui.generated.resources.manrope_medium
 import composedarwinui.darwinui.generated.resources.manrope_regular
 import composedarwinui.darwinui.generated.resources.manrope_semibold
-import composedarwinui.darwinui.generated.resources.sf_pro_display_bold
-import composedarwinui.darwinui.generated.resources.sf_pro_display_medium
-import composedarwinui.darwinui.generated.resources.sf_pro_display_regular
-import composedarwinui.darwinui.generated.resources.sf_pro_display_semibold
-import io.github.kdroidfilter.darwinui.util.isApplePlatform
 import org.jetbrains.compose.resources.Font
 
 @Composable
@@ -28,15 +23,7 @@ fun ManropeFontFamily(): FontFamily = FontFamily(
 )
 
 @Composable
-fun SFProFontFamily(): FontFamily = FontFamily(
-    Font(Res.font.sf_pro_display_regular, FontWeight.Normal),
-    Font(Res.font.sf_pro_display_medium, FontWeight.Medium),
-    Font(Res.font.sf_pro_display_semibold, FontWeight.SemiBold),
-    Font(Res.font.sf_pro_display_bold, FontWeight.Bold),
-)
-
-@Composable
-fun DarwinFontFamily(): FontFamily = if (isApplePlatform) SFProFontFamily() else ManropeFontFamily()
+expect fun DarwinFontFamily(): FontFamily
 
 /**
  * Darwin UI typography scale — macOS Human Interface Guidelines naming.

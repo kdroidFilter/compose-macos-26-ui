@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import io.github.kdroidfilter.darwinui.util.isApplePlatform
+import io.github.kdroidfilter.darwinui.util.isWebPlatform
 import kotlinx.coroutines.channels.Channel
 
 /**
@@ -213,7 +214,11 @@ private fun shortcutForKey(key: Any): String? {
         TextContextMenuKeys.SelectAllKey -> "A"
         else -> return null
     }
-    return if (isApplePlatform) "⌘$letter" else "Ctrl+$letter"
+    return when {
+        isApplePlatform && !isWebPlatform -> "⌘$letter"
+        isApplePlatform -> "Cmd+$letter"
+        else -> "Ctrl+$letter"
+    }
 }
 
 @Composable
