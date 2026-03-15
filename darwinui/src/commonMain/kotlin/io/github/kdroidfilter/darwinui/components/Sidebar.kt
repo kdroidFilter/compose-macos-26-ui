@@ -50,10 +50,10 @@ import io.github.kdroidfilter.darwinui.components.VerticalScrollbar
 import io.github.kdroidfilter.darwinui.components.TrackClickBehavior
 import io.github.kdroidfilter.darwinui.components.rememberScrollbarState
 import io.github.kdroidfilter.darwinui.components.Text
-import io.github.kdroidfilter.darwinui.icons.Icon
-import io.github.kdroidfilter.darwinui.icons.LucideChevronRight
+import io.github.kdroidfilter.darwinui.icons.DarwinIcons
 import io.github.kdroidfilter.darwinui.icons.LucideChevronsLeft
-import io.github.kdroidfilter.darwinui.icons.LucideLogOut
+import io.github.kdroidfilter.darwinui.icons.Icon
+import io.github.kdroidfilter.darwinui.icons.SystemIcon
 import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
@@ -372,7 +372,7 @@ fun Sidebar(
                             label = logoutLabel,
                             onClick = onLogout,
                             active = false,
-                            icon = LucideLogOut,
+                            icon = DarwinIcons.LogOut,
                             isCollapsed = collapsed,
                             controlSize = controlSize,
                             sidebarMetrics = sidebarMetrics,
@@ -459,7 +459,7 @@ private fun SidebarItemWithVisibility(
             label = item.label,
             onClick = item.onClick,
             active = activeItem == item.id,
-            icon = item.icon,
+            icon = item.icon?.let { SystemIcon(it) },
             isCollapsed = collapsed,
             controlSize = controlSize,
             sidebarMetrics = sidebarMetrics,
@@ -548,7 +548,7 @@ private fun DisclosureItem(
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                LucideChevronRight,
+                icon = DarwinIcons.ChevronRight,
                 modifier = Modifier.size(12.dp),
                 tint = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.25f)
                     else Color.Black.copy(alpha = 0.25f),
@@ -561,7 +561,7 @@ private fun DisclosureItem(
                 label = item.label,
                 onClick = { expanded = !expanded },
                 active = activeItem == item.id,
-                icon = item.icon,
+                icon = item.icon?.let { SystemIcon(it) },
                 isCollapsed = collapsed,
                 controlSize = controlSize,
                 sidebarMetrics = sidebarMetrics,
@@ -670,7 +670,7 @@ private fun SidebarItemRow(
     label: String,
     onClick: () -> Unit,
     active: Boolean,
-    icon: ImageVector?,
+    icon: SystemIcon?,
     isCollapsed: Boolean,
     controlSize: ControlSize,
     sidebarMetrics: SidebarStyle.Metrics,
@@ -741,10 +741,8 @@ private fun SidebarItemRow(
     ) {
         if (icon != null) {
             Icon(
-                imageVector = icon,
+                icon = icon,
                 tint = contentColor,
-                // Describe the icon when collapsed (icon is the only visible label);
-                // null when expanded (the text label is present and the icon is decorative).
                 contentDescription = if (isCollapsed) (iconContentDescription ?: label) else null,
                 modifier = Modifier.size(iconDp).then(iconModifier),
             )
@@ -775,8 +773,6 @@ private fun CollapseToggle(
 ) {
     val iconRotation by animateFloatAsState(
         targetValue = if (isCollapsed) 180f else 0f,
-        // Tween intentional here: rotation arc reads better with an easing curve
-        // than a spring. Label fade stays on sidebarSpring() inside SidebarItemRow.
         animationSpec = sidebarSpring(),
     )
 
@@ -784,7 +780,7 @@ private fun CollapseToggle(
         label = "Collapse",
         onClick = onClick,
         active = false,
-        icon = LucideChevronsLeft,
+        icon = SystemIcon(LucideChevronsLeft),
         isCollapsed = isCollapsed,
         controlSize = controlSize,
         sidebarMetrics = sidebarMetrics,

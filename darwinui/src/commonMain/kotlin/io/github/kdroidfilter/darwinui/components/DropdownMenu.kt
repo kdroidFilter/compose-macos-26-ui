@@ -69,9 +69,8 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import io.github.kdroidfilter.darwinui.components.PushButton
 import io.github.kdroidfilter.darwinui.components.Text
+import io.github.kdroidfilter.darwinui.icons.DarwinIcons
 import io.github.kdroidfilter.darwinui.icons.Icon
-import io.github.kdroidfilter.darwinui.icons.LucideCheck
-import io.github.kdroidfilter.darwinui.icons.LucideChevronRight
 import kotlinx.coroutines.delay
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
@@ -508,7 +507,7 @@ fun DropdownMenuSubMenu(
 
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
-                LucideChevronRight,
+                icon = DarwinIcons.ChevronRight,
                 modifier = Modifier.size(12.dp),
                 tint = chevronColor,
             )
@@ -583,7 +582,7 @@ fun DropdownMenuCheckboxItem(
             ) {
                 if (checked) {
                     Icon(
-                        imageVector = LucideCheck,
+                        icon = DarwinIcons.Check,
                         modifier = Modifier.size(12.dp),
                         tint = if (DarwinTheme.colorScheme.isDark) Color(0xFFD4D4D8) else Color(0xFF3F3F46),
                     )

@@ -51,10 +51,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.kdroidfilter.darwinui.icons.DarwinIcons
 import io.github.kdroidfilter.darwinui.icons.Icon
-import io.github.kdroidfilter.darwinui.icons.LucideCheck
-import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
-import io.github.kdroidfilter.darwinui.icons.LucideX
 import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalControlSize
@@ -258,7 +256,7 @@ fun MultiSelectComboBox(
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
-                            imageVector = LucideChevronDown,
+                            icon = DarwinIcons.ChevronDown,
                             tint = chevronTint,
                             modifier = Modifier
                                 .size(10.dp)
@@ -330,7 +328,7 @@ fun MultiSelectComboBox(
                             }
                             if (isSelected) {
                                 Icon(
-                                    imageVector = LucideCheck,
+                                    icon = DarwinIcons.Check,
                                     tint = colors.accent,
                                     modifier = Modifier
                                         .align(Alignment.CenterStart)
@@ -408,7 +406,7 @@ fun MultiSelectComboBox(
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Icon(
-                                    imageVector = LucideX,
+                                    icon = DarwinIcons.X,
                                     tint = if (isRemoveHovered) {
                                         if (isDark) Color(0xFFE4E4E7) else Color(0xFF3F3F46)
                                     } else {

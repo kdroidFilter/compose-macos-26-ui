@@ -97,6 +97,9 @@ kotlin {
             api(libs.kotlinx.datetime)
             implementation(libs.liquid)
         }
+        jvmMain.dependencies {
+            implementation(libs.jna)
+        }
     }
 }
 

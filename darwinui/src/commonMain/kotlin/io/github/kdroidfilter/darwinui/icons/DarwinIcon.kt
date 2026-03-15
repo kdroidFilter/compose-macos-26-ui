@@ -2,14 +2,14 @@ package io.github.kdroidfilter.darwinui.icons
 
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.layout.ContentScale
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 
 /**
@@ -70,6 +70,26 @@ fun Icon(
         bitmap = bitmap,
         contentDescription = contentDescription,
         modifier = modifier,
+        contentScale = ContentScale.Fit,
         colorFilter = ColorFilter.tint(resolvedTint),
     )
+}
+
+/**
+ * Renders a [SystemIcon] — uses the native SF Symbol on macOS JVM,
+ * falls back to the bundled Lucide vector on all other platforms.
+ */
+@Composable
+fun Icon(
+    icon: SystemIcon,
+    contentDescription: String? = null,
+    modifier: Modifier = Modifier,
+    tint: Color = LocalDarwinContentColor.current,
+) {
+    val bitmap = remember(icon.sfSymbolName) { loadPlatformSymbol(icon.sfSymbolName) }
+    if (bitmap != null) {
+        Icon(bitmap = bitmap, contentDescription = contentDescription, modifier = modifier, tint = tint)
+    } else {
+        Icon(imageVector = icon.fallback, contentDescription = contentDescription, modifier = modifier, tint = tint)
+    }
 }

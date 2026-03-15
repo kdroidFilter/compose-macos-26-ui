@@ -55,9 +55,7 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import kotlinx.coroutines.flow.distinctUntilChanged
 import io.github.kdroidfilter.darwinui.icons.Icon
-import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
-import io.github.kdroidfilter.darwinui.icons.LucideChevronLeft
-import io.github.kdroidfilter.darwinui.icons.LucideChevronRight
+import io.github.kdroidfilter.darwinui.icons.DarwinIcons
 import io.github.kdroidfilter.darwinui.theme.darwinGlass
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.ControlSize
@@ -453,7 +451,7 @@ private fun CalendarHeader(
             )
             Spacer(Modifier.width(4.dp))
             Icon(
-                imageVector = if (calendarView != CalendarView.Calendar) LucideChevronDown else LucideChevronRight,
+                icon = if (calendarView != CalendarView.Calendar) DarwinIcons.ChevronDown else DarwinIcons.ChevronRight,
                 modifier = Modifier.size(metrics.headerChevronSizeFor(controlSize)),
                 tint = accent,
             )
@@ -465,7 +463,7 @@ private fun CalendarHeader(
         if (enabled) {
             Row(horizontalArrangement = Arrangement.spacedBy(metrics.navArrowSpacingFor(controlSize))) {
                 Icon(
-                    imageVector = LucideChevronLeft,
+                    icon = DarwinIcons.ChevronLeft,
                     modifier = Modifier
                         .size(metrics.navArrowSizeFor(controlSize))
                         .clickable(
@@ -476,7 +474,7 @@ private fun CalendarHeader(
                     tint = accent,
                 )
                 Icon(
-                    imageVector = LucideChevronRight,
+                    icon = DarwinIcons.ChevronRight,
                     modifier = Modifier
                         .size(metrics.navArrowSizeFor(controlSize))
                         .clickable(

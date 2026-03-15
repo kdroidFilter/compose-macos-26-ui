@@ -41,9 +41,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.kdroidfilter.darwinui.icons.DarwinIcons
 import io.github.kdroidfilter.darwinui.icons.Icon
-import io.github.kdroidfilter.darwinui.icons.LucideSearch
-import io.github.kdroidfilter.darwinui.icons.LucideX
 import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinSurface
@@ -190,7 +189,7 @@ fun SearchField(
                     horizontalArrangement = Arrangement.spacedBy(3.dp),
                 ) {
                     Icon(
-                        imageVector = LucideSearch,
+                        icon = DarwinIcons.Search,
                         tint = searchIconColor,
                         modifier = Modifier.size(searchIconSize),
                     )
@@ -257,7 +256,7 @@ private fun SearchClearButton(
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            imageVector = LucideX,
+            icon = DarwinIcons.X,
             tint = Color.White,
             modifier = Modifier.size(size * 0.6f),
         )

@@ -49,8 +49,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.kdroidfilter.darwinui.components.Text
+import io.github.kdroidfilter.darwinui.icons.DarwinIcons
 import io.github.kdroidfilter.darwinui.icons.Icon
-import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalControlSize
@@ -246,7 +246,7 @@ fun ComboBox(
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
-                        imageVector = LucideChevronDown,
+                        icon = DarwinIcons.ChevronDown,
                         tint = chevronTint,
                         modifier = Modifier
                             .size(10.dp)

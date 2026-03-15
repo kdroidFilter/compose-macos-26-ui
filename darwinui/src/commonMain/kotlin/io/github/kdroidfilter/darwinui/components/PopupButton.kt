@@ -54,9 +54,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import io.github.kdroidfilter.darwinui.icons.DarwinIcons
 import io.github.kdroidfilter.darwinui.icons.Icon
-import io.github.kdroidfilter.darwinui.icons.LucideCheck
-import io.github.kdroidfilter.darwinui.icons.LucideChevronsUpDown
 import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
@@ -204,7 +203,7 @@ fun <T> PopupButton(
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    imageVector = LucideChevronsUpDown,
+                    icon = DarwinIcons.ChevronsUpDown,
                     modifier = Modifier.size(chevronIconSize),
                     tint = chevronColor,
                 )
@@ -409,7 +408,7 @@ private fun PopupMenuItem(
         ) {
             if (selected) {
                 Icon(
-                    imageVector = LucideCheck,
+                    icon = DarwinIcons.Check,
                     modifier = Modifier.size(12.dp),
                     tint = checkColor,
                 )

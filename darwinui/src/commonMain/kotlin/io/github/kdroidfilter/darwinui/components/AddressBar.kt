@@ -41,8 +41,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.darwinui.icons.DarwinIcons
 import io.github.kdroidfilter.darwinui.icons.Icon
-import io.github.kdroidfilter.darwinui.icons.LucideChevronRight
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinSurface
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
@@ -294,7 +294,7 @@ private fun GoButton(
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            imageVector = LucideChevronRight,
+            icon = DarwinIcons.ChevronRight,
             tint = iconColor,
             modifier = Modifier.size(iconSize),
         )

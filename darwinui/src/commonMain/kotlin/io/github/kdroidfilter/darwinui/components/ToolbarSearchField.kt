@@ -44,6 +44,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.Key
@@ -60,9 +61,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import io.github.kdroidfilter.darwinui.icons.DarwinIcons
 import io.github.kdroidfilter.darwinui.icons.Icon
-import io.github.kdroidfilter.darwinui.icons.LucideSearch
-import io.github.kdroidfilter.darwinui.icons.LucideX
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
@@ -160,7 +160,7 @@ fun ToolbarSearchField(
         ) {
             TitleBarButtonGroup {
                 TitleBarGroupButton(onClick = { onExpandedChange(true) }) {
-                    Icon(LucideSearch, modifier = Modifier.size(16.dp))
+                    Icon(icon = DarwinIcons.Search, modifier = Modifier.size(16.dp))
                 }
             }
         }
@@ -187,6 +187,10 @@ fun ToolbarSearchField(
                 focusRequester = focusRequester,
                 onSearch = onSearch,
                 onClose = {
+                    onValueChange("")
+                    onExpandedChange(false)
+                },
+                onFocusLost = {
                     onValueChange("")
                     onExpandedChange(false)
                 },
@@ -218,6 +222,7 @@ private fun ExpandedField(
     focusRequester: FocusRequester,
     onSearch: ((String) -> Unit)?,
     onClose: () -> Unit,
+    onFocusLost: () -> Unit = {},
     keyboardState: SearchKeyboardState? = null,
 ) {
     val colors = DarwinTheme.colorScheme
@@ -231,11 +236,22 @@ private fun ExpandedField(
     val placeholderColor = colors.textTertiary
     val iconColor = colors.textTertiary
 
+    // Track whether the field has received focus at least once to avoid
+    // triggering onFocusLost during initial composition
+    var hasBeenFocused by remember { mutableStateOf(false) }
+
     BasicTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = Modifier
             .focusRequester(focusRequester)
+            .onFocusChanged { focusState ->
+                if (focusState.hasFocus) {
+                    hasBeenFocused = true
+                } else if (hasBeenFocused) {
+                    onFocusLost()
+                }
+            }
             .onPreviewKeyEvent { event ->
                 if (event.type != KeyEventType.KeyDown || keyboardState == null) return@onPreviewKeyEvent false
                 when (event.key) {
@@ -288,7 +304,7 @@ private fun ExpandedField(
             ) {
                 // Search icon
                 Icon(
-                    imageVector = LucideSearch,
+                    icon = DarwinIcons.Search,
                     tint = iconColor,
                     modifier = Modifier.size(16.dp),
                 )
@@ -358,7 +374,7 @@ private fun CloseCircleButton(
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            imageVector = LucideX,
+            icon = DarwinIcons.X,
             tint = iconColor,
             modifier = Modifier.size(10.dp),
         )

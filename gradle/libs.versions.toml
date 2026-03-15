@@ -16,6 +16,7 @@ compose-rules = "0.5.6"
 detekt = "1.23.8"
 highlights = "1.1.0"
 iconsLucideCmp = "2.2.1"
+jna = "5.16.0"
 junit = "4.13.2"
 kotlin = "2.3.10"
 kotlinx-coroutines = "1.10.2"
@@ -26,6 +27,7 @@ ksp = "2.3.1"
 liquid = { module = "io.github.fletchmckee.liquid:liquid", version.ref = "liquid" }
 highlights = { module = "dev.snipme:highlights", version.ref = "highlights" }
 icons-lucide-cmp = { module = "com.composables:icons-lucide-cmp", version.ref = "iconsLucideCmp" }
+jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { module = "junit:junit", version.ref = "junit" }

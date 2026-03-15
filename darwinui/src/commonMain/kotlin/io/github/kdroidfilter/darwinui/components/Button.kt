@@ -37,8 +37,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.darwinui.icons.DarwinIcons
 import io.github.kdroidfilter.darwinui.icons.Icon
-import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinSurface
@@ -446,7 +446,7 @@ fun ArrowButton(
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            imageVector = LucideChevronDown,
+            icon = DarwinIcons.ChevronDown,
             modifier = Modifier.size(iconSize),
             tint = iconColor,
         )
@@ -650,12 +650,12 @@ private fun PulldownChevrons(tint: Color) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Icon(
-            imageVector = LucideChevronDown,
+            icon = DarwinIcons.ChevronDown,
             modifier = Modifier.size(8.dp).rotate(180f),
             tint = tint,
         )
         Icon(
-            imageVector = LucideChevronDown,
+            icon = DarwinIcons.ChevronDown,
             modifier = Modifier.size(8.dp),
             tint = tint,
         )
@@ -715,7 +715,7 @@ fun DisclosureButton(
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            imageVector = LucideChevronDown,
+            icon = DarwinIcons.ChevronDown,
             modifier = Modifier
                 .size(16.dp)
                 .rotate(rotation),

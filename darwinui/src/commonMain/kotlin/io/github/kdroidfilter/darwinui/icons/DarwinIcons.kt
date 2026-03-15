@@ -1,0 +1,61 @@
+package io.github.kdroidfilter.darwinui.icons
+
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
+
+/**
+ * Describes an icon with a platform-native SF Symbol name and a Lucide fallback.
+ *
+ * On macOS JVM, the SF Symbol is loaded natively via AppKit.
+ * On all other platforms, the [fallback] Lucide vector is used.
+ */
+data class SystemIcon(
+    val sfSymbolName: String,
+    val fallback: ImageVector,
+) {
+    constructor(fallback: ImageVector) : this("", fallback)
+}
+
+internal expect fun loadPlatformSymbol(name: String): ImageBitmap?
+
+/**
+ * Platform-aware icon set. Resolves to SF Symbols on macOS JVM, Lucide everywhere else.
+ */
+object DarwinIcons {
+    val Plus = SystemIcon("plus", LucidePlus)
+    val Settings = SystemIcon("gearshape", LucideSettings)
+    val Heart = SystemIcon("heart", LucideHeart)
+    val X = SystemIcon("xmark", LucideX)
+    val Check = SystemIcon("checkmark", LucideCheck)
+    val Trash2 = SystemIcon("trash", LucideTrash2)
+    val Download = SystemIcon("arrow.down.circle", LucideDownload)
+    val Share2 = SystemIcon("square.and.arrow.up", LucideShare2)
+    val Sun = SystemIcon("sun.max", LucideSun)
+    val Moon = SystemIcon("moon", LucideMoon)
+    val Search = SystemIcon("magnifyingglass", LucideSearch)
+    val ChevronDown = SystemIcon("chevron.down", LucideChevronDown)
+    val Info = SystemIcon("info.circle", LucideInfo)
+    val TriangleAlert = SystemIcon("exclamationmark.triangle", LucideTriangleAlert)
+    val CircleCheck = SystemIcon("checkmark.circle", LucideCircleCheck)
+    val CircleX = SystemIcon("xmark.circle", LucideCircleX)
+    val Calendar = SystemIcon("calendar", LucideCalendar)
+    val ChevronLeft = SystemIcon("chevron.left", LucideChevronLeft)
+    val Copy = SystemIcon("doc.on.doc", LucideCopy)
+    val Upload = SystemIcon("arrow.up.circle", LucideUpload)
+    val ImageIcon = SystemIcon("photo", LucideImage)
+    val Star = SystemIcon("star", LucideStar)
+    val StarOff = SystemIcon("star.slash", LucideStarOff)
+    val ArrowLeftRight = SystemIcon("arrow.left.arrow.right", LucideArrowLeftRight)
+    val ChevronRight = SystemIcon("chevron.right", LucideChevronRight)
+    val ChevronsLeft = SystemIcon("chevron.left.2", LucideChevronsLeft)
+    val LogOut = SystemIcon("rectangle.portrait.and.arrow.right", LucideLogOut)
+    val Home = SystemIcon("house", LucideHome)
+    val Folder = SystemIcon("folder", LucideFolder)
+    val BarChart3 = SystemIcon("chart.bar", LucideBarChart3)
+    val ChevronsUpDown = SystemIcon("chevron.up.chevron.down", LucideChevronsUpDown)
+    val PanelLeft = SystemIcon("sidebar.left", LucidePanelLeft)
+    val LayoutGrid = SystemIcon("square.grid.2x2", LucideLayoutGrid)
+    val List = SystemIcon("list.bullet", LucideList)
+    val Ellipsis = SystemIcon("ellipsis", LucideEllipsis)
+    val Tag = SystemIcon("tag", LucideTag)
+}

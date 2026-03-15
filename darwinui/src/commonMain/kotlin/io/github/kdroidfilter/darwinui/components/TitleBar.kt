@@ -22,11 +22,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.darwinui.icons.DarwinIcons
 import io.github.kdroidfilter.darwinui.icons.Icon
-import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
-import io.github.kdroidfilter.darwinui.icons.LucideChevronLeft
-import io.github.kdroidfilter.darwinui.icons.LucideChevronRight
-import io.github.kdroidfilter.darwinui.icons.LucidePanelLeft
 import io.github.kdroidfilter.darwinui.theme.*
 
 /**
@@ -283,6 +280,7 @@ fun TitleBarGroupButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    iconScale: Float = 1.2f,
     content: @Composable () -> Unit,
 ) {
     val isDark = DarwinTheme.colorScheme.isDark
@@ -337,7 +335,15 @@ fun TitleBarGroupButton(
                     .size(iconAreaSize)
                     .background(bgOverlay, CircleShape),
             )
-            content()
+            if (iconScale != 1f) {
+                Box(
+                    modifier = Modifier.graphicsLayer {
+                        scaleX = iconScale; scaleY = iconScale; clip = true
+                    },
+                ) { content() }
+            } else {
+                content()
+            }
         }
     }
 }
@@ -385,15 +391,17 @@ fun NavigationButtons(
         TitleBarGroupButton(
             onClick = onBack,
             enabled = backEnabled,
+            iconScale = 1f,
         ) {
-            Icon(LucideChevronLeft, modifier = Modifier.size(style.iconSize + 4.dp))
+            Icon(icon = DarwinIcons.ChevronLeft, modifier = Modifier.size(style.iconSize + 4.dp))
         }
         ToolbarSeparator()
         TitleBarGroupButton(
             onClick = onForward,
             enabled = forwardEnabled,
+            iconScale = 1f,
         ) {
-            Icon(LucideChevronRight, modifier = Modifier.size(style.iconSize + 4.dp))
+            Icon(icon = DarwinIcons.ChevronRight, modifier = Modifier.size(style.iconSize + 4.dp))
         }
     }
 }
@@ -424,7 +432,7 @@ fun SidebarButton(
     enabled: Boolean = true,
     icon: @Composable () -> Unit = {
         val style = LocalTitleBarStyle.current
-        Icon(LucidePanelLeft, modifier = Modifier.size(style.iconSize))
+        Icon(icon = DarwinIcons.PanelLeft, modifier = Modifier.size(style.iconSize + 4.dp))
     },
     menuContent: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
@@ -447,7 +455,7 @@ fun SidebarButton(
                     onClick = { menuExpanded = true },
                     enabled = enabled,
                 ) {
-                    Icon(LucideChevronDown, modifier = Modifier.size(12.dp))
+                    Icon(icon = DarwinIcons.ChevronDown, modifier = Modifier.size(12.dp))
                 }
             }
         }

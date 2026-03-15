@@ -70,6 +70,7 @@ import io.github.kdroidfilter.darwinui.components.TrackClickBehavior
 import io.github.kdroidfilter.darwinui.components.VerticalScrollbar
 import io.github.kdroidfilter.darwinui.components.rememberScrollbarState
 import io.github.kdroidfilter.darwinui.components.NavigationButtons
+import io.github.kdroidfilter.darwinui.components.SidebarButton
 import io.github.kdroidfilter.darwinui.components.TitleBarButtonGroup
 import io.github.kdroidfilter.darwinui.components.TitleBarGroupButton
 import io.github.kdroidfilter.darwinui.components.Popover
@@ -85,6 +86,7 @@ import io.github.kdroidfilter.darwinui.components.TitleBar
 import io.github.kdroidfilter.darwinui.components.ToastHost
 import io.github.kdroidfilter.darwinui.components.ToolbarSearchField
 import io.github.kdroidfilter.darwinui.components.rememberToastState
+import io.github.kdroidfilter.darwinui.icons.DarwinIcons
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideMoon
 import io.github.kdroidfilter.darwinui.icons.LucideSettings
@@ -270,15 +272,8 @@ fun App() {
                                             color = DarwinTheme.colorScheme.textTertiary,
                                         )
                                     }
-                                    Icon(
-                                        LucidePanelLeft,
-                                        modifier = Modifier
-                                            .size(20.dp)
-                                            .clickable(
-                                                interactionSource = null,
-                                                indication = null,
-                                                onClick = { columnVisibility = ColumnVisibility.DoubleColumn },
-                                            ),
+                                    SidebarButton(
+                                        onClick = { columnVisibility = ColumnVisibility.DoubleColumn },
                                     )
                                 }
                             },

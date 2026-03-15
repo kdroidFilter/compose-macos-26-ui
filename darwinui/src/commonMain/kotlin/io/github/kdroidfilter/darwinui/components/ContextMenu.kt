@@ -61,7 +61,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import io.github.kdroidfilter.darwinui.components.Text
-import io.github.kdroidfilter.darwinui.icons.LucideCheck
+import io.github.kdroidfilter.darwinui.icons.DarwinIcons
+import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
@@ -357,11 +358,10 @@ fun ContextMenuCheckboxItem(
             contentAlignment = Alignment.Center,
         ) {
             if (checked) {
-                androidx.compose.foundation.Image(
-                    imageVector = LucideCheck,
-                    contentDescription = null,
+                Icon(
+                    icon = DarwinIcons.Check,
                     modifier = Modifier.size(12.dp),
-                    colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(effectiveTextColor),
+                    tint = effectiveTextColor,
                 )
             }
         }
