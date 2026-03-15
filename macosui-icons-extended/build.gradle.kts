@@ -31,7 +31,7 @@ mavenPublishing {
             "Extended icon set for Compose Macos UI — includes Lucide icons for Compose Multiplatform.",
         )
         inceptionYear.set("2025")
-        url.set("https://github.com/kdroidFilter/ComposeMacosUI")
+        url.set("https://github.com/kdroidFilter/compose-macos-26-ui")
 
         licenses {
             license {
@@ -49,7 +49,7 @@ mavenPublishing {
         }
 
         scm {
-            url.set("https://github.com/kdroidFilter/ComposeMacosUI")
+            url.set("https://github.com/kdroidFilter/compose-macos-26-ui")
         }
     }
 

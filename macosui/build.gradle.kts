@@ -32,7 +32,7 @@ mavenPublishing {
                 "with 30+ components, full light/dark theme support, and a built-in design system.",
         )
         inceptionYear.set("2025")
-        url.set("https://github.com/kdroidFilter/ComposeMacosUI")
+        url.set("https://github.com/kdroidFilter/compose-macos-26-ui")
 
         licenses {
             license {
@@ -50,7 +50,7 @@ mavenPublishing {
         }
 
         scm {
-            url.set("https://github.com/kdroidFilter/ComposeMacosUI")
+            url.set("https://github.com/kdroidFilter/compose-macos-26-ui")
         }
     }
 

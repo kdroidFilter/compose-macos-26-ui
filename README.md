@@ -7,7 +7,7 @@ A Compose Multiplatform adaptation of the native macos 26 style. This port bring
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Commercial License](https://img.shields.io/badge/License-Commercial-green.svg)](#commercial-license--20)
 
-[Documentation & Live Demo](https://kdroidfilter.github.io/ComposeMacosUi/)
+[Documentation & Live Demo](https://kdroidfilter.github.io/compose-macos-26-ui/)
 
 ## Features
 
@@ -91,7 +91,7 @@ fun MyApp() {
 }
 ```
 
-For the full component catalog, API details, and interactive demos, visit the [documentation](https://kdroidfilter.github.io/ComposeMacosUi/).
+For the full component catalog, API details, and interactive demos, visit the [documentation](https://kdroidfilter.github.io/compose-macos-26-ui/).
 
 ## License
 
