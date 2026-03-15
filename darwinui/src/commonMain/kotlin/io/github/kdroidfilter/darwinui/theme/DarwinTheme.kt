@@ -33,8 +33,8 @@ fun DarwinTheme(
     glassType: GlassType = GlassType.Regular,
     content: @Composable () -> Unit,
 ) {
-    val manrope = ManropeFontFamily()
-    val resolvedTypography = typography.withFontFamily(manrope)
+    val fontFamily = DarwinFontFamily()
+    val resolvedTypography = typography.withFontFamily(fontFamily)
     val liquidState = rememberLiquidState()
     val accentColorValue = if (darkTheme) accentColor.dark else accentColor.light
     val globalColors = if (darkTheme) GlobalColors.dark(accentColorValue) else GlobalColors.light(accentColorValue)
