@@ -60,10 +60,12 @@ static atomic_bool sShutdownInProgress = false;
 
 @end
 
-// ─── MacosUIFSObserver ──────────────────────────────────────────────────────────
-// Manages constraints and toolbar around fullscreen transitions.
+// ─── MacosUIWindowObserver ───────────────────────────────────────────────────────
+// Manages constraints and toolbar around fullscreen transitions, window
+// activation, and appearance changes. Re-applies Auto Layout constraints
+// whenever macOS may have recreated the titlebar view hierarchy.
 
-@interface MacosUIFSObserver : NSObject
+@interface MacosUIWindowObserver : NSObject
 @property (nonatomic, weak) NSWindow *window;
 - (instancetype)initWithWindow:(NSWindow *)window;
 @end
@@ -71,7 +73,29 @@ static atomic_bool sShutdownInProgress = false;
 static void removeExistingConstraints(NSWindow *window);
 static void applyConstraints(NSWindow *window, float height);
 
-@implementation MacosUIFSObserver
+// Helper: re-apply constraints from stored height, skip if fullscreen.
+static void reapplyTitleBarIfNeeded(NSWindow *window) {
+    if (!window) return;
+    if ((window.styleMask & NSWindowStyleMaskFullScreen) != 0) return;
+
+    NSNumber *storedHeight = objc_getAssociatedObject(window, &kTitleBarHeightKey);
+    float height = storedHeight ? [storedHeight floatValue] : kMinHeightForFullSize;
+
+    // Ensure transparent titlebar properties are still set
+    [window setTitlebarAppearsTransparent:YES];
+    [window setTitleVisibility:NSWindowTitleHidden];
+
+    // Reinstall toolbar if macOS removed it
+    if (!window.toolbar) {
+        NSToolbar *toolbar = [[NSToolbar alloc] initWithIdentifier:@"MacosUIToolbar"];
+        toolbar.showsBaselineSeparator = NO;
+        window.toolbar = toolbar;
+    }
+
+    applyConstraints(window, height);
+}
+
+@implementation MacosUIWindowObserver
 
 - (instancetype)initWithWindow:(NSWindow *)window {
     self = [super init];
@@ -82,12 +106,27 @@ static void applyConstraints(NSWindow *window, float height);
                    name:NSWindowWillEnterFullScreenNotification object:window];
         [nc addObserver:self selector:@selector(didExitFullScreen:)
                    name:NSWindowDidExitFullScreenNotification object:window];
+        [nc addObserver:self selector:@selector(windowDidBecomeKey:)
+                   name:NSWindowDidBecomeKeyNotification object:window];
+        [nc addObserver:self selector:@selector(windowDidChangeBackingProperties:)
+                   name:NSWindowDidChangeBackingPropertiesNotification object:window];
+
+        // KVO on effectiveAppearance — fires on dark/light mode switch
+        [window addObserver:self
+                 forKeyPath:@"effectiveAppearance"
+                    options:0
+                    context:NULL];
     }
     return self;
 }
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    NSWindow *w = self.window;
+    if (w) {
+        @try { [w removeObserver:self forKeyPath:@"effectiveAppearance"]; }
+        @catch (NSException *e) { /* already removed */ }
+    }
 }
 
 - (void)willEnterFullScreen:(NSNotification *)note {
@@ -100,41 +139,58 @@ static void applyConstraints(NSWindow *window, float height);
 - (void)didExitFullScreen:(NSNotification *)note {
     NSWindow *w = self.window;
     if (!w) return;
-
-    NSNumber *storedHeight = objc_getAssociatedObject(w, &kTitleBarHeightKey);
-    float height = storedHeight ? [storedHeight floatValue] : kMinHeightForFullSize;
-
-    // Reinstall invisible toolbar
-    if (!w.toolbar) {
-        NSToolbar *toolbar = [[NSToolbar alloc] initWithIdentifier:@"MacosUIToolbar"];
-        toolbar.showsBaselineSeparator = NO;
-        w.toolbar = toolbar;
-    }
-
-    applyConstraints(w, height);
-
+    reapplyTitleBarIfNeeded(w);
     [[w standardWindowButton:NSWindowCloseButton] setHidden:NO];
     [[w standardWindowButton:NSWindowMiniaturizeButton] setHidden:NO];
     [[w standardWindowButton:NSWindowZoomButton] setHidden:NO];
+}
+
+- (void)windowDidBecomeKey:(NSNotification *)note {
+    reapplyTitleBarIfNeeded(self.window);
+}
+
+- (void)windowDidChangeBackingProperties:(NSNotification *)note {
+    reapplyTitleBarIfNeeded(self.window);
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context {
+    if ([keyPath isEqualToString:@"effectiveAppearance"]) {
+        // Delay to let macOS finish its appearance transition
+        NSWindow *w = self.window;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!atomic_load(&sShutdownInProgress)) {
+                reapplyTitleBarIfNeeded(w);
+            }
+        });
+    }
 }
 
 @end
 
 // ─── Zoom button responder ──────────────────────────────────────────────────────
 // Re-enables movable when hovering the zoom button (macOS 15 tiling fix).
+// Saves and restores the previous movable state instead of hardcoding NO,
+// which was permanently breaking window drag after a single hover.
 
 @interface MacosUIZoomResponder : NSObject
 @property (nonatomic, weak) NSWindow *window;
+@property (nonatomic, assign) BOOL savedMovable;
 @end
 
 @implementation MacosUIZoomResponder
 
 - (void)mouseEntered:(NSEvent *)event {
-    if (self.window) self.window.movable = YES;
+    if (self.window) {
+        self.savedMovable = self.window.movable;
+        self.window.movable = YES;
+    }
 }
 
 - (void)mouseExited:(NSEvent *)event {
-    if (self.window) self.window.movable = NO;
+    if (self.window) self.window.movable = self.savedMovable;
 }
 
 @end
@@ -320,9 +376,9 @@ static void ensureDragView(NSWindow *window) {
                              OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-static void ensureFullscreenObserver(NSWindow *window) {
+static void ensureWindowObserver(NSWindow *window) {
     if (objc_getAssociatedObject(window, &kFullscreenObserverKey)) return;
-    MacosUIFSObserver *obs = [[MacosUIFSObserver alloc] initWithWindow:window];
+    MacosUIWindowObserver *obs = [[MacosUIWindowObserver alloc] initWithWindow:window];
     objc_setAssociatedObject(window, &kFullscreenObserverKey, obs,
                              OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
@@ -412,7 +468,7 @@ Java_io_github_kdroidfilter_nucleus_ui_apple_macos_window_MacosWindowBridge_nati
             objc_setAssociatedObject(w, &kTitleBarHeightKey,
                                      @(capturedHeight), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 
-            ensureFullscreenObserver(w);
+            ensureWindowObserver(w);
             ensureAdjustWindowSwizzle(w);
             installZoomButtonResponder(w);
 
@@ -461,7 +517,7 @@ Java_io_github_kdroidfilter_nucleus_ui_apple_macos_window_MacosWindowBridge_nati
                 objc_setAssociatedObject(w, &kDragViewKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             }
 
-            // Remove fullscreen observer
+            // Remove window observer (also removes its KVO)
             objc_setAssociatedObject(w, &kFullscreenObserverKey, nil,
                                      OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 
@@ -469,10 +525,32 @@ Java_io_github_kdroidfilter_nucleus_ui_apple_macos_window_MacosWindowBridge_nati
             objc_setAssociatedObject(w, &kZoomResponderKey, nil,
                                      OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 
+            // Restore movable in case zoom responder left it disabled
+            w.movable = YES;
+
             // Remove toolbar and restore defaults
             w.toolbar = nil;
             [w setTitlebarAppearsTransparent:NO];
             [w setTitleVisibility:NSWindowTitleVisible];
+        }
+    });
+}
+
+JNIEXPORT void JNICALL
+Java_io_github_kdroidfilter_nucleus_ui_apple_macos_window_MacosWindowBridge_nativeRevalidateTitleBar(
+    JNIEnv *env, jclass clazz, jlong nsWindowPtr) {
+
+    if (nsWindowPtr == 0) return;
+    void *rawPtr = (void *)nsWindowPtr;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (atomic_load(&sShutdownInProgress)) return;
+        @autoreleasepool {
+            NSWindow *w = nil;
+            for (NSWindow *win in [NSApp windows]) {
+                if ((__bridge void *)win == rawPtr) { w = win; break; }
+            }
+            if (!w) return;
+            reapplyTitleBarIfNeeded(w);
         }
     });
 }

@@ -50,6 +50,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosTween
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.offset
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
@@ -142,6 +143,13 @@ fun Scaffold(
     val titleBarGlassState = rememberLiquidState()
     val bottomBarGlassState = rememberLiquidState()
     val rootLiquidState = LocalLiquidState.current
+
+    // Re-apply native titlebar constraints after sidebar show/hide animation.
+    // macOS may invalidate the titlebar view hierarchy during content relayout.
+    val revalidateTitleBar = LocalTitleBarRevalidate.current
+    LaunchedEffect(showSidebar) {
+        revalidateTitleBar?.invoke()
+    }
 
     val isDark = MacosTheme.colorScheme.isDark
     val glassTint = titleBarGlassTint

@@ -17,6 +17,7 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.LocalTitleBarRevalidate
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.LocalWindowControlInset
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalColorScheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.util.isApplePlatform
@@ -75,6 +76,7 @@ fun MacosWindow(
         onKeyEvent = onKeyEvent,
     ) {
         var trafficLightInset: Dp by remember { mutableStateOf(FALLBACK_INSET) }
+        var revalidateCallback: (() -> Unit)? by remember { mutableStateOf(null) }
 
         if (isApplePlatform) {
             if (MacosWindowBridge.isLoaded) {
@@ -89,8 +91,10 @@ fun MacosWindow(
                         }
                         val inset = MacosWindowBridge.nativeApplyTitleBar(ptr, DEFAULT_TITLE_BAR_HEIGHT)
                         trafficLightInset = inset.dp
+                        revalidateCallback = { MacosWindowBridge.nativeRevalidateTitleBar(ptr) }
                     }
                     onDispose {
+                        revalidateCallback = null
                         if (ptr != 0L) {
                             MacosWindowBridge.nativeResetTitleBar(ptr)
                         }
@@ -138,6 +142,7 @@ fun MacosWindow(
 
         CompositionLocalProvider(
             LocalWindowControlInset provides if (isApplePlatform) trafficLightInset else 0.dp,
+            LocalTitleBarRevalidate provides revalidateCallback,
         ) {
             content()
         }
