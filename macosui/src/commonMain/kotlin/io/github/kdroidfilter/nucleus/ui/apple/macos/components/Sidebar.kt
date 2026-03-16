@@ -454,8 +454,12 @@ private fun SidebarItemWithVisibility(
 
     // Leaf items add disclosureWidth so their content aligns with disclosure parents at the same level,
     // and is properly indented one level deeper than the parent above.
+    // Animates to 0 when collapsed so icons can center in the narrow sidebar.
     val disclosureWidth = sidebarMetrics.disclosureWidthFor(controlSize)
-    val indentPadding = sidebarMetrics.indentFor(indentLevel, controlSize) + disclosureWidth
+    val indentPadding by animateDpAsState(
+        targetValue = if (collapsed) 0.dp else sidebarMetrics.indentFor(indentLevel, controlSize) + disclosureWidth,
+        animationSpec = sidebarSpring(),
+    )
 
     if (item.icon != null) {
         SidebarItemRow(
@@ -517,14 +521,22 @@ private fun DisclosureItem(
         animationSpec = sidebarSpring(),
     )
 
-    val indentPadding = sidebarMetrics.indentFor(indentLevel, controlSize)
     val disclosureWidth = sidebarMetrics.disclosureWidthFor(controlSize)
+    // Animate indent and chevron width to 0 when collapsed so the icon can center.
+    val animatedIndent by animateDpAsState(
+        targetValue = if (collapsed) 0.dp else sidebarMetrics.indentFor(indentLevel, controlSize),
+        animationSpec = sidebarSpring(),
+    )
+    val animatedDisclosureWidth by animateDpAsState(
+        targetValue = if (collapsed) 0.dp else disclosureWidth,
+        animationSpec = sidebarSpring(),
+    )
 
     // Parent item row with chevron
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = indentPadding),
+            .padding(start = animatedIndent),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         // Disclosure chevron (hidden when sidebar is collapsed)
@@ -534,7 +546,7 @@ private fun DisclosureItem(
         )
         Box(
             modifier = Modifier
-                .width(disclosureWidth)
+                .width(animatedDisclosureWidth)
                 .height(sidebarMetrics.itemHeightFor(controlSize))
                 .graphicsLayer {
                     alpha = chevronAlpha
