@@ -58,7 +58,7 @@ fun TitleBar(
     title: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     backgroundColor: Color = MacosTheme.colorScheme.background,
-    showBottomBorder: Boolean = true,
+    showBottomBorder: Boolean = false,
     glass: Boolean = false,
     height: Int = style.height,
 ) {

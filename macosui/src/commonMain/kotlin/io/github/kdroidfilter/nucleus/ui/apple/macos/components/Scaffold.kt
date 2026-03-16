@@ -40,12 +40,11 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarResize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarWidth
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalTitleBarHeight
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SidebarResizeCallbacks
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.GlassType
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalGlassType
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalToolbarGlassState
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosSpring
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosTween
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.ui.unit.IntSize
 
 /**
@@ -96,6 +95,8 @@ fun Scaffold(
     titleBar: (@Composable () -> Unit)? = null,
     titleBarStyle: TitleBarStyle = TitleBarStyle.Unified,
     titleBarHeight: Int = titleBarStyle.height,
+    titleBarGlassTint: Color = Color.Transparent,
+    showDividers: Boolean = false,
     bottomBar: (@Composable () -> Unit)? = null,
     bottomBarHeight: Int = 38,
     content: @Composable (PaddingValues) -> Unit,
@@ -137,15 +138,12 @@ fun Scaffold(
     val rootLiquidState = LocalLiquidState.current
 
     val isDark = MacosTheme.colorScheme.isDark
-    val glassType = LocalGlassType.current
-    // Tinted = more opaque tint → glass surface appears denser
-    val glassTint = when {
-        glassType == GlassType.Tinted && isDark -> Color.Black.copy(alpha = 0.30f)
-        glassType == GlassType.Tinted -> Color.White.copy(alpha = 0.30f)
-        isDark -> Color.Black.copy(alpha = 0.15f)
-        else -> Color.White.copy(alpha = 0.15f)
+    val glassTint = titleBarGlassTint
+    val borderColor = if (showDividers) {
+        if (isDark) Color.Black.copy(alpha = 0.5f) else Color.Black.copy(alpha = 0.1f)
+    } else {
+        Color.Transparent
     }
-    val borderColor = if (isDark) Color.Black.copy(alpha = 0.5f) else Color.Black.copy(alpha = 0.1f)
 
     Row(
         modifier = modifier
@@ -154,19 +152,15 @@ fun Scaffold(
     ) {
         // ---- Sidebar (full height, side-by-side with the title bar) ----
         if (sidebar != null) {
-            // Critically damped spring (no overshoot/bounce) for a natural Apple-style slide
-            val sidebarSpring = spring<IntSize>(
-                dampingRatio = 1.0f,
-                stiffness = SpringPreset.Snappy.stiffness,
-            )
+            val sidebarTween = tween<IntSize>(durationMillis = 200, easing = FastOutSlowInEasing)
             AnimatedVisibility(
                 visible = showSidebar,
                 enter = expandHorizontally(
-                    animationSpec = sidebarSpring,
+                    animationSpec = sidebarTween,
                     expandFrom = Alignment.Start,
                 ),
                 exit = shrinkHorizontally(
-                    animationSpec = sidebarSpring,
+                    animationSpec = sidebarTween,
                     shrinkTowards = Alignment.Start,
                 ),
             ) {
@@ -368,20 +362,17 @@ fun Scaffold(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         if (managedToggle) {
-                            val toggleSpring = spring<IntSize>(
-                                dampingRatio = 1.0f,
-                                stiffness = SpringPreset.Snappy.stiffness,
-                            )
+                            val toggleTween = tween<IntSize>(durationMillis = 200, easing = FastOutSlowInEasing)
                             AnimatedVisibility(
                                 visible = !showSidebar,
                                 enter = expandHorizontally(
-                                    animationSpec = toggleSpring,
+                                    animationSpec = toggleTween,
                                     expandFrom = Alignment.Start,
-                                ) + fadeIn(macosTween(MacosDuration.Normal)),
+                                ) + fadeIn(tween(durationMillis = 200, easing = FastOutSlowInEasing)),
                                 exit = shrinkHorizontally(
-                                    animationSpec = toggleSpring,
+                                    animationSpec = toggleTween,
                                     shrinkTowards = Alignment.Start,
-                                ) + fadeOut(macosTween(MacosDuration.Fast)),
+                                ) + fadeOut(tween(durationMillis = 100, easing = FastOutSlowInEasing)),
                             ) {
                                 val windowControlInset = LocalWindowControlInset.current
                                 val startPadding = if (windowControlInset != Dp.Unspecified) windowControlInset else 12.dp
