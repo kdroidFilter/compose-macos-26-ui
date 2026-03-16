@@ -697,20 +697,20 @@ data class SidebarStyle(
     @Immutable
     data class Metrics(
         /** Sketch: Small=18dp, Medium=22dp, Large=24dp */
-        val iconDpSm: Dp = 18.dp,
-        val iconDpMd: Dp = 22.dp,
-        val iconDpLg: Dp = 24.dp,
+        val iconDpSm: Dp = 13.dp,
+        val iconDpMd: Dp = 16.dp,
+        val iconDpLg: Dp = 22.dp,
         /** Sketch: Small=24dp, Medium=32dp, Large=40dp */
         val itemHeightSm: Dp = 24.dp,
         val itemHeightMd: Dp = 32.dp,
         val itemHeightLg: Dp = 40.dp,
     ) {
         fun iconDpFor(controlSize: ControlSize): Dp = when (controlSize) {
-            ControlSize.Mini -> 14.dp
+            ControlSize.Mini -> 13.dp
             ControlSize.Small -> iconDpSm
             ControlSize.Regular -> iconDpMd
             ControlSize.Large -> iconDpLg
-            ControlSize.ExtraLarge -> 26.dp
+            ControlSize.ExtraLarge -> 22.dp
         }
 
         fun itemHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
@@ -721,13 +721,12 @@ data class SidebarStyle(
             ControlSize.ExtraLarge -> 44.dp
         }
 
-        /** Sketch: content starts at 16dp from sidebar edge for all sizes */
         fun hPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
-            ControlSize.Mini -> 8.dp
-            ControlSize.Small -> 10.dp
-            ControlSize.Regular -> 10.dp
-            ControlSize.Large -> 10.dp
-            ControlSize.ExtraLarge -> 12.dp
+            ControlSize.Mini -> 4.dp
+            ControlSize.Small -> 6.dp
+            ControlSize.Regular -> 6.dp
+            ControlSize.Large -> 6.dp
+            ControlSize.ExtraLarge -> 8.dp
         }
 
         /** Sketch: 4dp gap between icon and label for all sizes */
