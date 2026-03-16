@@ -8,7 +8,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -311,9 +310,6 @@ fun TitleBarGroupButton(
         label = "tbar_grp_btn_content",
     )
 
-    // Icon area size matches Sketch: XL=28dp, Medium=20dp
-    val iconAreaSize = style.buttonHeight - (style.buttonPadding * 2)
-
     // Scale icons by increasing density so vectors render natively at the larger size
     // (avoids graphicsLayer bitmap scaling which causes blur)
     val currentDensity = LocalDensity.current
@@ -335,6 +331,7 @@ fun TitleBarGroupButton(
         Box(
             modifier = modifier
                 .size(style.buttonHeight)
+                .background(bgOverlay)
                 .hoverable(interactionSource = interactionSource)
                 .clickable(
                     interactionSource = interactionSource,
@@ -345,12 +342,6 @@ fun TitleBarGroupButton(
                 ),
             contentAlignment = Alignment.Center,
         ) {
-            // Circular hover/press highlight inside the button
-            Box(
-                modifier = Modifier
-                    .size(iconAreaSize)
-                    .background(bgOverlay, CircleShape),
-            )
             CompositionLocalProvider(LocalDensity provides scaledDensity) {
                 content()
             }
