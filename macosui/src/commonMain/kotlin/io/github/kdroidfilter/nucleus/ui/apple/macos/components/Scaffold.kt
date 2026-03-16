@@ -5,6 +5,8 @@ import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -42,11 +44,13 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalTitleBarHeight
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SidebarResizeCallbacks
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalToolbarGlassState
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarHide
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarVisible
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosSpring
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosTween
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.offset
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 
 /**
@@ -154,15 +158,22 @@ fun Scaffold(
     ) {
         // ---- Sidebar (full height, side-by-side with the title bar) ----
         if (sidebar != null) {
-            val sidebarTween = tween<IntSize>(durationMillis = 200, easing = FastOutSlowInEasing)
+            val sidebarSizeTween = tween<IntSize>(durationMillis = 250, easing = FastOutSlowInEasing)
+            val sidebarOffsetTween = tween<IntOffset>(durationMillis = 250, easing = FastOutSlowInEasing)
             AnimatedVisibility(
                 visible = showSidebar,
-                enter = expandHorizontally(
-                    animationSpec = sidebarTween,
+                enter = slideInHorizontally(
+                    animationSpec = sidebarOffsetTween,
+                    initialOffsetX = { -it },
+                ) + expandHorizontally(
+                    animationSpec = sidebarSizeTween,
                     expandFrom = Alignment.Start,
                 ),
-                exit = shrinkHorizontally(
-                    animationSpec = sidebarTween,
+                exit = slideOutHorizontally(
+                    animationSpec = sidebarOffsetTween,
+                    targetOffsetX = { -it },
+                ) + shrinkHorizontally(
+                    animationSpec = sidebarSizeTween,
                     shrinkTowards = Alignment.Start,
                 ),
             ) {
@@ -184,6 +195,7 @@ fun Scaffold(
                     LocalSidebarWidth provides currentSidebarWidth,
                     LocalSidebarResize provides sidebarResizeCallbacks,
                     LocalSidebarHide provides hideCallback,
+                    LocalSidebarVisible provides showSidebar,
                 ) {
                     sidebar()
                 }

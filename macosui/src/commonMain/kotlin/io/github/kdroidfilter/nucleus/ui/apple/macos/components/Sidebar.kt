@@ -62,6 +62,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalControlSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarResize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SidebarStyle
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarHide
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarVisible
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarWidth
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosDuration
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosGlassMaterial
@@ -277,6 +278,7 @@ fun Sidebar(
         ) {
             // ---- Hide button (matches title bar height, aligned to end) ----
             if (effectiveHide != null) {
+                val sidebarVisible = LocalSidebarVisible.current
                 val hideFraction by animateFloatAsState(
                     targetValue = if (collapsed) 0f else 1f,
                     animationSpec = sidebarSpring(),
@@ -285,7 +287,10 @@ fun Sidebar(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clipToBounds()
-                        .graphicsLayer { alpha = hideFraction }
+                        .graphicsLayer {
+                            // Instant hide when sidebar is animating out
+                            alpha = if (sidebarVisible) hideFraction else 0f
+                        }
                         .layout { measurable, constraints ->
                             val placeable = measurable.measure(constraints)
                             val h = (placeable.height * hideFraction).toInt()

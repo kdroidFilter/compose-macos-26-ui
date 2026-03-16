@@ -61,6 +61,15 @@ val LocalSidebarResize = compositionLocalOf<SidebarResizeCallbacks?> { null }
 val LocalSidebarHide = compositionLocalOf<(() -> Unit)?> { null }
 
 /**
+ * Whether the sidebar is currently visible (not animating out).
+ * Set by [Scaffold][io.github.kdroidfilter.nucleus.ui.apple.macos.components.Scaffold]
+ * so the [Sidebar][io.github.kdroidfilter.nucleus.ui.apple.macos.components.Sidebar]
+ * can instantly hide its toggle button when the close animation starts.
+ * Defaults to true.
+ */
+val LocalSidebarVisible = compositionLocalOf { true }
+
+/**
  * The two glass appearance variants matching macOS 26.
  *
  * - [Regular] — neutral translucent glass with a lighter tint.
