@@ -32,4 +32,4 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-include(":decorated-window", ":macosui", ":macosui-icons", ":macosui-icons-extended", ":macos-markdown", ":sample", ":gallery-annotations", ":gallery-ksp")
+include(":decorated-window", ":wallpaper-color", ":macosui", ":macosui-icons", ":macosui-icons-extended", ":macos-markdown", ":sample", ":gallery-annotations", ":gallery-ksp")
