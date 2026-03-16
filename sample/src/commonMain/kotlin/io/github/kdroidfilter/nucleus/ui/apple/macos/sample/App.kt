@@ -181,7 +181,7 @@ internal val sidebarEntryDefs = listOf(
     SidebarEntryDef("stepper", "Stepper", "FORM CONTROLS", Lucide.ChevronsUpDown),
     SidebarEntryDef("popupbutton", "Pop-up Button", "FORM CONTROLS", Lucide.ChevronsUpDown),
     SidebarEntryDef("datepicker", "Date Picker", "FORM CONTROLS", Lucide.Calendar),
-    SidebarEntryDef("colorwell", "Color Well", "FORM CONTROLS", Lucide.Scan),
+    SidebarEntryDef("colorwell", "Color Wells & Pickers", "FORM CONTROLS", Lucide.Scan),
     SidebarEntryDef("scrollbar", "Scrollbar", "DATA DISPLAY", Lucide.GripVertical),
     SidebarEntryDef("groupbox", "Group Box", "DATA DISPLAY", Lucide.SquareDashed),
     SidebarEntryDef("groupedlist", "Grouped List", "DATA DISPLAY", Lucide.ListChecks),
