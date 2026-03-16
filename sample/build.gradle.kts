@@ -139,3 +139,30 @@ compose.desktop {
         }
     }
 }
+
+// Launches the sample app with a patched JVM claiming macOS SDK 26.0,
+// enabling Liquid Glass window decorations.
+val patchJvm by tasks.registering(Exec::class) {
+    group = "compose desktop"
+    description = "Patch the JVM binary for macOS SDK 26.0 (Liquid Glass)"
+    commandLine("bash", rootProject.file("scripts/run-liquidglass.sh").absolutePath, "-version")
+    // The script is idempotent and caches its output
+    outputs.upToDateWhen { false }
+}
+
+tasks.register<JavaExec>("runLiquidGlass") {
+    group = "compose desktop"
+    description = "Run the sample app with Liquid Glass enabled (macOS SDK 26.0 spoof)"
+
+    val jvmTarget = kotlin.jvm().compilations.getByName("main")
+    dependsOn(jvmTarget.compileTaskProvider, patchJvm)
+
+    mainClass.set("io.github.kdroidfilter.nucleus.ui.apple.macos.sample.MainKt")
+    classpath = jvmTarget.output.allOutputs + jvmTarget.runtimeDependencyFiles!!
+
+    val patchedJava = File(
+        System.getProperty("user.home"),
+        "Library/Caches/macosui/patched-jvm/bin/java",
+    )
+    executable = patchedJava.absolutePath
+}
