@@ -8,6 +8,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -282,6 +283,7 @@ fun TitleBarGroupButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     iconScale: Float = 1.2f,
+    circularHighlight: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val isDark = MacosTheme.colorScheme.isDark
@@ -310,6 +312,8 @@ fun TitleBarGroupButton(
         label = "tbar_grp_btn_content",
     )
 
+    val iconAreaSize = style.buttonHeight - (style.buttonPadding * 2)
+
     // Scale icons by increasing density so vectors render natively at the larger size
     // (avoids graphicsLayer bitmap scaling which causes blur)
     val currentDensity = LocalDensity.current
@@ -331,7 +335,7 @@ fun TitleBarGroupButton(
         Box(
             modifier = modifier
                 .size(style.buttonHeight)
-                .background(bgOverlay)
+                .then(if (!circularHighlight) Modifier.background(bgOverlay) else Modifier)
                 .hoverable(interactionSource = interactionSource)
                 .clickable(
                     interactionSource = interactionSource,
@@ -342,6 +346,13 @@ fun TitleBarGroupButton(
                 ),
             contentAlignment = Alignment.Center,
         ) {
+            if (circularHighlight) {
+                Box(
+                    modifier = Modifier
+                        .size(iconAreaSize)
+                        .background(bgOverlay, CircleShape),
+                )
+            }
             CompositionLocalProvider(LocalDensity provides scaledDensity) {
                 content()
             }
@@ -393,6 +404,7 @@ fun NavigationButtons(
             onClick = onBack,
             enabled = backEnabled,
             iconScale = 1f,
+            circularHighlight = true,
         ) {
             Icon(icon = Icons.ChevronLeft, modifier = Modifier.size(style.iconSize + 4.dp))
         }
@@ -401,6 +413,7 @@ fun NavigationButtons(
             onClick = onForward,
             enabled = forwardEnabled,
             iconScale = 1f,
+            circularHighlight = true,
         ) {
             Icon(icon = Icons.ChevronRight, modifier = Modifier.size(style.iconSize + 4.dp))
         }
@@ -447,6 +460,7 @@ fun SidebarButton(
             TitleBarGroupButton(
                 onClick = onClick,
                 enabled = enabled,
+                circularHighlight = true,
             ) {
                 icon()
             }
@@ -455,6 +469,7 @@ fun SidebarButton(
                 TitleBarGroupButton(
                     onClick = { menuExpanded = true },
                     enabled = enabled,
+                    circularHighlight = true,
                 ) {
                     Icon(icon = Icons.ChevronDown, modifier = Modifier.size(12.dp))
                 }
