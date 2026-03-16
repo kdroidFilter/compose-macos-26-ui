@@ -23,6 +23,13 @@ fi
 
 mkdir -p "$OUT_DIR_ARM64" "$OUT_DIR_X64"
 
+# Clear cached dylibs so the next run picks up the freshly built ones
+CACHE_DIR="$HOME/Library/Caches/macosui/native"
+if [ -d "$CACHE_DIR" ]; then
+    echo "Clearing native library cache ($CACHE_DIR)..."
+    rm -rf "$CACHE_DIR"
+fi
+
 COMMON_FLAGS=(
     -dynamiclib
     -I"$JNI_INCLUDE" -I"$JNI_INCLUDE_DARWIN"

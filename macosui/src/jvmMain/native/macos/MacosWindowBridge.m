@@ -1,6 +1,6 @@
-// MacosWindowBridge.m — Minimal JNI bridge for macOS window decoration.
-// Inspired by Nucleus's JniMacTitleBar.m but stripped to essentials:
-// transparent title bar, traffic-light repositioning, invisible toolbar.
+// MacosWindowBridge.m — JNI bridge for macOS window decoration.
+// Transparent title bar, traffic-light repositioning, invisible toolbar,
+// and fullscreen replacement buttons.
 
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/QuartzCore.h>
@@ -21,11 +21,21 @@ static const float kMaxButtonLeftMargin   = kDefaultTitleBarHeight / 2.0f;
 static const char kTitleBarConstraintsKey;
 static const char kTitleBarHeightKey;
 static const char kFullscreenObserverKey;
+static const char kFullscreenButtonsKey;
 static const char kDragViewKey;
 static const char kZoomResponderKey;
 static const char kResizeObserverKey;
 
 static atomic_bool sShutdownInProgress = false;
+
+// Forward declarations
+static void removeExistingConstraints(NSWindow *window);
+static void removeDragView(NSWindow *window);
+static void applyConstraints(NSWindow *window, float height);
+static void ensureDragView(NSWindow *window);
+static void installFullScreenButtons(NSWindow *window, float titleBarHeight);
+static void removeFullScreenButtons(NSWindow *window);
+static void updateFullScreenButtonsPosition(NSWindow *window);
 
 // ─── MacosUIDragView ────────────────────────────────────────────────────────────
 // Transparent view that forwards events to contentView, enabling window
@@ -60,6 +70,47 @@ static atomic_bool sShutdownInProgress = false;
 
 @end
 
+// ─── MacosUIButtonsView ─────────────────────────────────────────────────────────
+// Container for replacement traffic-light buttons in fullscreen.
+// Propagates mouseEntered:/mouseExited: to all button subviews so AppKit
+// activates the grouped traffic-light hover state (colored icons on hover).
+
+@interface MacosUIButtonsView : NSView
+@end
+
+@implementation MacosUIButtonsView
+
+- (void)updateTrackingAreas {
+    [super updateTrackingAreas];
+    for (NSTrackingArea *ta in self.trackingAreas) {
+        [self removeTrackingArea:ta];
+    }
+    NSTrackingArea *ta = [[NSTrackingArea alloc]
+        initWithRect:NSZeroRect
+             options:(NSTrackingMouseEnteredAndExited |
+                      NSTrackingActiveInKeyWindow |
+                      NSTrackingInVisibleRect)
+               owner:self
+            userInfo:nil];
+    [self addTrackingArea:ta];
+}
+
+- (void)mouseEntered:(NSEvent *)event {
+    [super mouseEntered:event];
+    for (NSView *btn in self.subviews) {
+        [btn mouseEntered:event];
+    }
+}
+
+- (void)mouseExited:(NSEvent *)event {
+    [super mouseExited:event];
+    for (NSView *btn in self.subviews) {
+        [btn mouseExited:event];
+    }
+}
+
+@end
+
 // ─── MacosUIWindowObserver ───────────────────────────────────────────────────────
 // Manages constraints and toolbar around fullscreen transitions, window
 // activation, and appearance changes. Re-applies Auto Layout constraints
@@ -69,9 +120,6 @@ static atomic_bool sShutdownInProgress = false;
 @property (nonatomic, weak) NSWindow *window;
 - (instancetype)initWithWindow:(NSWindow *)window;
 @end
-
-static void removeExistingConstraints(NSWindow *window);
-static void applyConstraints(NSWindow *window, float height);
 
 // Helper: re-apply constraints from stored height, skip if fullscreen.
 static void reapplyTitleBarIfNeeded(NSWindow *window) {
@@ -104,6 +152,10 @@ static void reapplyTitleBarIfNeeded(NSWindow *window) {
         NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
         [nc addObserver:self selector:@selector(willEnterFullScreen:)
                    name:NSWindowWillEnterFullScreenNotification object:window];
+        [nc addObserver:self selector:@selector(didEnterFullScreen:)
+                   name:NSWindowDidEnterFullScreenNotification object:window];
+        [nc addObserver:self selector:@selector(willExitFullScreen:)
+                   name:NSWindowWillExitFullScreenNotification object:window];
         [nc addObserver:self selector:@selector(didExitFullScreen:)
                    name:NSWindowDidExitFullScreenNotification object:window];
         [nc addObserver:self selector:@selector(windowDidBecomeKey:)
@@ -129,17 +181,71 @@ static void reapplyTitleBarIfNeeded(NSWindow *window) {
     }
 }
 
+// About to enter fullscreen — remove constraints so macOS can animate cleanly
 - (void)willEnterFullScreen:(NSNotification *)note {
     NSWindow *w = self.window;
     if (!w) return;
+
     removeExistingConstraints(w);
+    // Remove toolbar before fullscreen animation to avoid white band glitch
     w.toolbar = nil;
+    [w setTitlebarAppearsTransparent:NO];
+    [w setTitleVisibility:NSWindowTitleVisible];
 }
 
+// Finished entering fullscreen — install replacement buttons in the content view
+- (void)didEnterFullScreen:(NSNotification *)note {
+    NSWindow *w = self.window;
+    if (!w) return;
+
+    NSNumber *storedHeight = objc_getAssociatedObject(w, &kTitleBarHeightKey);
+    float height = storedHeight ? [storedHeight floatValue] : kMinHeightForFullSize;
+
+    installFullScreenButtons(w, height);
+
+    // Reinstall the toolbar (removed in willEnterFullScreen to avoid a white
+    // band glitch during the animation) so 26pt corners show in fullscreen too.
+    if (!w.toolbar) {
+        NSToolbar *toolbar = [[NSToolbar alloc] initWithIdentifier:@"MacosUIToolbar"];
+        toolbar.showsBaselineSeparator = NO;
+        w.toolbar = toolbar;
+    }
+}
+
+// About to exit fullscreen — remove replacement buttons, hide native traffic
+// lights so they don't appear at the wrong position during the transition
+- (void)willExitFullScreen:(NSNotification *)note {
+    NSWindow *w = self.window;
+    if (!w) return;
+
+    removeFullScreenButtons(w);
+    [w setTitlebarAppearsTransparent:YES];
+    [w setTitleVisibility:NSWindowTitleHidden];
+
+    // Hide standard buttons during transition to prevent position glitch
+    [[w standardWindowButton:NSWindowCloseButton] setHidden:YES];
+    [[w standardWindowButton:NSWindowMiniaturizeButton] setHidden:YES];
+    [[w standardWindowButton:NSWindowZoomButton] setHidden:YES];
+}
+
+// Finished exiting fullscreen — restore constraints, then reveal the buttons
 - (void)didExitFullScreen:(NSNotification *)note {
     NSWindow *w = self.window;
     if (!w) return;
-    reapplyTitleBarIfNeeded(w);
+
+    NSNumber *storedHeight = objc_getAssociatedObject(w, &kTitleBarHeightKey);
+    if (!storedHeight) return;
+
+    // Reinstall the invisible toolbar for 26pt corner radius
+    if (!w.toolbar) {
+        NSToolbar *toolbar = [[NSToolbar alloc] initWithIdentifier:@"MacosUIToolbar"];
+        toolbar.showsBaselineSeparator = NO;
+        w.toolbar = toolbar;
+    }
+
+    applyConstraints(w, [storedHeight floatValue]);
+
+    // Reveal buttons now that constraints are in place
     [[w standardWindowButton:NSWindowCloseButton] setHidden:NO];
     [[w standardWindowButton:NSWindowMiniaturizeButton] setHidden:NO];
     [[w standardWindowButton:NSWindowZoomButton] setHidden:NO];
@@ -158,7 +264,6 @@ static void reapplyTitleBarIfNeeded(NSWindow *window) {
                         change:(NSDictionary *)change
                        context:(void *)context {
     if ([keyPath isEqualToString:@"effectiveAppearance"]) {
-        // Delay to let macOS finish its appearance transition
         NSWindow *w = self.window;
         dispatch_async(dispatch_get_main_queue(), ^{
             if (!atomic_load(&sShutdownInProgress)) {
@@ -172,8 +277,6 @@ static void reapplyTitleBarIfNeeded(NSWindow *window) {
 
 // ─── Zoom button responder ──────────────────────────────────────────────────────
 // Re-enables movable when hovering the zoom button (macOS 15 tiling fix).
-// Saves and restores the previous movable state instead of hardcoding NO,
-// which was permanently breaking window drag after a single hover.
 
 @interface MacosUIZoomResponder : NSObject
 @property (nonatomic, weak) NSWindow *window;
@@ -202,12 +305,18 @@ static IMP sOriginalAdjustWindowToScreen = NULL;
 static BOOL sSwizzleApplied = NO;
 
 static void swizzled_adjustWindowToScreen(id self, SEL _cmd) {
-    BOOL wasMoved = [self isMovable];
-    if (!wasMoved) [self setMovable:YES];
+    NSNumber *storedHeight = objc_getAssociatedObject(self, &kTitleBarHeightKey);
+    BOOL needsRestore = storedHeight && ![(NSWindow *)self isMovable];
+
+    if (needsRestore) [(NSWindow *)self setMovable:YES];
+
     if (sOriginalAdjustWindowToScreen) {
         ((void (*)(id, SEL))sOriginalAdjustWindowToScreen)(self, _cmd);
     }
-    if (!wasMoved) [self setMovable:NO];
+
+    updateFullScreenButtonsPosition((NSWindow *)self);
+
+    if (needsRestore) [(NSWindow *)self setMovable:NO];
 }
 
 static void ensureAdjustWindowSwizzle(NSWindow *window __unused) {
@@ -223,9 +332,6 @@ static void ensureAdjustWindowSwizzle(NSWindow *window __unused) {
 }
 
 // ─── Live resize observer ────────────────────────────────────────────────────────
-// Toggles presentsWithTransaction on all CAMetalLayer instances during live
-// resize. This forces Metal to present each frame synchronously so the
-// compositor uses the freshly rendered frame instead of stretching the stale one.
 
 static void setPresentsWithTransactionRecursive(NSView *view, BOOL value) {
     CALayer *layer = view.layer;
@@ -376,6 +482,13 @@ static void ensureDragView(NSWindow *window) {
                              OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
+static void removeDragView(NSWindow *window) {
+    MacosUIDragView *dragView = objc_getAssociatedObject(window, &kDragViewKey);
+    if (!dragView) return;
+    [dragView removeFromSuperview];
+    objc_setAssociatedObject(window, &kDragViewKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
 static void ensureWindowObserver(NSWindow *window) {
     if (objc_getAssociatedObject(window, &kFullscreenObserverKey)) return;
     MacosUIWindowObserver *obs = [[MacosUIWindowObserver alloc] initWithWindow:window];
@@ -400,6 +513,113 @@ static void installZoomButtonResponder(NSWindow *window) {
     [zoomBtn addTrackingArea:area];
     objc_setAssociatedObject(window, &kZoomResponderKey, responder,
                              OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+// ─── Fullscreen button helpers ──────────────────────────────────────────────────
+
+// Hides the native NSToolbarFullScreenWindow so the system hover toolbar
+// doesn't overlap with our replacement buttons.
+static void hideToolbarFullScreenWindow(void) {
+    for (NSWindow *win in [[NSApplication sharedApplication] windows]) {
+        if ([win isKindOfClass:NSClassFromString(@"NSToolbarFullScreenWindow")]) {
+            [win.contentView setHidden:YES];
+        }
+    }
+}
+
+// Computes button size and positions matching the constraint-based layout
+// used in floating mode (applyConstraints), so there is no visual jump
+// when transitioning between fullscreen and floating.
+static void computeButtonMetrics(float titleBarHeight, float *outBtnWidth, float *outBtnHeight, float *outOffset) {
+    float shrinkFactor = fminf(titleBarHeight / kMinHeightForFullSize, 1.0f);
+    *outBtnWidth  = fminf(titleBarHeight * 0.5f, kMinHeightForFullSize * 0.5f);
+    *outBtnHeight = (*outBtnWidth) * (14.0f / 12.0f) - 2.0f;
+    *outOffset    = shrinkFactor * kDefaultButtonOffset;
+}
+
+// Creates replacement traffic-light buttons in the content view.
+// Button positions match the constraint-based layout used in floating mode.
+static void installFullScreenButtons(NSWindow *window, float titleBarHeight) {
+    if (objc_getAssociatedObject(window, &kFullscreenButtonsKey)) return;
+
+    NSView *origClose = [window standardWindowButton:NSWindowCloseButton];
+    if (!origClose) return;
+
+    hideToolbarFullScreenWindow();
+
+    float btnWidth, btnHeight, offset;
+    computeButtonMetrics(titleBarHeight, &btnWidth, &btnHeight, &offset);
+
+    MacosUIButtonsView *container = [[MacosUIButtonsView alloc] init];
+    NSView *parent = window.contentView;
+    CGFloat y = parent.frame.size.height - titleBarHeight;
+    float margin = fminf(titleBarHeight / 2.0f, kMaxButtonLeftMargin) + kToolbarExtraInset;
+    float containerWidth = margin + 2.0f * offset + btnWidth;
+    [container setFrame:NSMakeRect(0, y, containerWidth, titleBarHeight)];
+
+    NSUInteger masks = [window styleMask];
+
+    NSArray<NSNumber *> *buttonTypes = @[
+        @(NSWindowCloseButton), @(NSWindowMiniaturizeButton), @(NSWindowZoomButton)
+    ];
+    SEL actions[] = { @selector(performClose:), @selector(performMiniaturize:), @selector(toggleFullScreen:) };
+
+    for (NSUInteger idx = 0; idx < 3; idx++) {
+        NSButton *btn = [NSWindow standardWindowButton:[buttonTypes[idx] unsignedIntegerValue]
+                                          forStyleMask:masks];
+        CGFloat centerX = margin + idx * offset;
+        CGFloat centerY = titleBarHeight / 2.0f;
+        [btn setFrame:NSMakeRect(centerX - btnWidth / 2.0f, centerY - btnHeight / 2.0f,
+                                 btnWidth, btnHeight)];
+        [btn setTarget:window];
+        [btn setAction:actions[idx]];
+        [container addSubview:btn];
+    }
+
+    [parent addSubview:container];
+
+    objc_setAssociatedObject(window, &kFullscreenButtonsKey, container,
+                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+// Removes the replacement fullscreen buttons.
+static void removeFullScreenButtons(NSWindow *window) {
+    MacosUIButtonsView *container = objc_getAssociatedObject(window, &kFullscreenButtonsKey);
+    if (!container) return;
+
+    [container removeFromSuperview];
+    objc_setAssociatedObject(window, &kFullscreenButtonsKey, nil,
+                             OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+// Repositions the fullscreen button container (called from layout passes).
+static void updateFullScreenButtonsPosition(NSWindow *window) {
+    MacosUIButtonsView *container = objc_getAssociatedObject(window, &kFullscreenButtonsKey);
+    if (!container) return;
+
+    NSView *parent = window.contentView;
+    if (!parent) return;
+
+    NSNumber *storedHeight = objc_getAssociatedObject(window, &kTitleBarHeightKey);
+    float titleBarHeight = storedHeight ? [storedHeight floatValue] : kMinHeightForFullSize;
+
+    float btnWidth, btnHeight, offset;
+    computeButtonMetrics(titleBarHeight, &btnWidth, &btnHeight, &offset);
+
+    float margin = fminf(titleBarHeight / 2.0f, kMaxButtonLeftMargin) + kToolbarExtraInset;
+    float containerWidth = margin + 2.0f * offset + btnWidth;
+    CGFloat y = parent.frame.size.height - titleBarHeight;
+    [container setFrame:NSMakeRect(0, y, containerWidth, titleBarHeight)];
+
+    // Reposition each button inside the container
+    NSArray<NSView *> *buttons = [container subviews];
+    for (NSUInteger idx = 0; idx < buttons.count && idx < 3; idx++) {
+        NSView *btn = buttons[idx];
+        CGFloat centerX = margin + idx * offset;
+        CGFloat centerY = titleBarHeight / 2.0f;
+        [btn setFrame:NSMakeRect(centerX - btnWidth / 2.0f, centerY - btnHeight / 2.0f,
+                                 btnWidth, btnHeight)];
+    }
 }
 
 // ─── NSWindow pointer extraction ────────────────────────────────────────────────
@@ -472,7 +692,11 @@ Java_io_github_kdroidfilter_nucleus_ui_apple_macos_window_MacosWindowBridge_nati
             ensureAdjustWindowSwizzle(w);
             installZoomButtonResponder(w);
 
-            if ((w.styleMask & NSWindowStyleMaskFullScreen) != 0) return;
+            if ((w.styleMask & NSWindowStyleMaskFullScreen) != 0) {
+                // In fullscreen: update replacement button positions
+                updateFullScreenButtonsPosition(w);
+                return;
+            }
 
             [w setTitlebarAppearsTransparent:YES];
             [w setTitleVisibility:NSWindowTitleHidden];
@@ -509,13 +733,8 @@ Java_io_github_kdroidfilter_nucleus_ui_apple_macos_window_MacosWindowBridge_nati
 
             removeExistingConstraints(w);
             removeResizeObserver(w);
-
-            // Remove drag view
-            MacosUIDragView *dragView = objc_getAssociatedObject(w, &kDragViewKey);
-            if (dragView) {
-                [dragView removeFromSuperview];
-                objc_setAssociatedObject(w, &kDragViewKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            }
+            removeFullScreenButtons(w);
+            removeDragView(w);
 
             // Remove window observer (also removes its KVO)
             objc_setAssociatedObject(w, &kFullscreenObserverKey, nil,
