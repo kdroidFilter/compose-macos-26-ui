@@ -322,6 +322,24 @@ fun App() {
                                 }) {
                                     Icon(Lucide.Github, modifier = Modifier.size(14.dp))
                                 }
+                            }
+                            TitleBarButtonGroup {
+                                TitleBarGroupButton(onClick = {
+                                    themeMode = when (themeMode) {
+                                        ThemeMode.System -> ThemeMode.Light
+                                        ThemeMode.Light -> ThemeMode.Dark
+                                        ThemeMode.Dark -> ThemeMode.System
+                                    }
+                                }) {
+                                    Icon(
+                                        when (themeMode) {
+                                            ThemeMode.System -> Lucide.Monitor
+                                            ThemeMode.Light -> LucideSun
+                                            ThemeMode.Dark -> LucideMoon
+                                        },
+                                        modifier = Modifier.size(14.dp),
+                                    )
+                                }
                                 Popover(
                                     expanded = settingsExpanded,
                                     onDismissRequest = { settingsExpanded = false },
@@ -392,24 +410,6 @@ fun App() {
                                             )
                                         }
                                     }
-                                }
-                            }
-                            TitleBarButtonGroup {
-                                TitleBarGroupButton(onClick = {
-                                    themeMode = when (themeMode) {
-                                        ThemeMode.System -> ThemeMode.Light
-                                        ThemeMode.Light -> ThemeMode.Dark
-                                        ThemeMode.Dark -> ThemeMode.System
-                                    }
-                                }) {
-                                    Icon(
-                                        when (themeMode) {
-                                            ThemeMode.System -> Lucide.Monitor
-                                            ThemeMode.Light -> LucideSun
-                                            ThemeMode.Dark -> LucideMoon
-                                        },
-                                        modifier = Modifier.size(14.dp),
-                                    )
                                 }
                             }
                             ToolbarSearchField(
