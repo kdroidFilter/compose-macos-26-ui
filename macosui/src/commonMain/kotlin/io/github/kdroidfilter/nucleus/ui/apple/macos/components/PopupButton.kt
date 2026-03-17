@@ -310,10 +310,10 @@ private fun <T> PopupButtonMenu(
     itemText: (T) -> String,
     colors: PopupButtonColors?,
 ) {
-    val colors = MacosTheme.colorScheme
+    val scheme = MacosTheme.colorScheme
     val density = LocalDensity.current
-    val fallbackBg = if (colors.isDark) Color(0xFF262626) else Color(0xFFFAFAFA)
-    val borderColor = if (colors.isDark) Color.White.copy(alpha = 0.12f) else Color.Black.copy(alpha = 0.08f)
+    val fallbackBg = if (scheme.isDark) Color(0xFF262626) else Color(0xFFFAFAFA)
+    val borderColor = if (scheme.isDark) Color.White.copy(alpha = 0.12f) else Color.Black.copy(alpha = 0.08f)
     val menuShape = RoundedCornerShape(13.dp)
     val minMenuWidth = with(density) { anchorSize.width.toDp() }.coerceAtLeast(150.dp)
     val gapPx = with(density) { 4.dp.roundToPx() }
