@@ -1,5 +1,13 @@
 package io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages
 
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -220,6 +228,65 @@ fun AlertDialogSideBySideExample() {
     }
 }
 
+@GalleryExample("Dialog", "Small Dialog — Custom Animation")
+@Composable
+fun SmallDialogCustomAnimationExample() {
+    var showDialog by remember { mutableStateOf(false) }
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        PushButton(text = "Open Slide-In Dialog", onClick = { showDialog = true })
+    }
+    SmallDialog(
+        visible = showDialog,
+        onDismissRequest = { showDialog = false },
+        title = "Custom Animation",
+        confirmText = "Done",
+        onConfirm = { showDialog = false },
+        cancelText = "Cancel",
+        onCancel = { showDialog = false },
+        enter = slideInVertically(
+            initialOffsetY = { it },
+            animationSpec = spring(dampingRatio = 0.7f, stiffness = 300f),
+        ) + fadeIn(tween(300)),
+        exit = slideOutVertically(
+            targetOffsetY = { it },
+            animationSpec = tween(250),
+        ) + fadeOut(tween(250)),
+    ) {
+        Text(
+            text = "This dialog slides in from the bottom with a spring animation.",
+            style = MacosTheme.typography.caption1,
+            color = MacosTheme.colorScheme.textSecondary,
+        )
+    }
+}
+
+@GalleryExample("Dialog", "Alert Dialog — Custom Animation")
+@Composable
+fun AlertDialogCustomAnimationExample() {
+    var showAlertDialog by remember { mutableStateOf(false) }
+    PushButton(text = "Show Bounce Alert", onClick = { showAlertDialog = true })
+    if (showAlertDialog) {
+        AlertDialog(
+            open = true,
+            onDismissRequest = { showAlertDialog = false },
+            title = "Custom Animation",
+            message = "This alert uses a bouncy spring scale animation.",
+            confirmText = "OK",
+            cancelText = "Cancel",
+            onConfirm = { showAlertDialog = false },
+            onCancel = { showAlertDialog = false },
+            enter = scaleIn(
+                initialScale = 0.5f,
+                animationSpec = spring(dampingRatio = 0.5f, stiffness = 400f),
+            ) + fadeIn(tween(200)),
+            exit = scaleOut(
+                targetScale = 0.8f,
+                animationSpec = tween(150),
+            ) + fadeOut(tween(150)),
+        )
+    }
+}
+
 @Composable
 internal fun DialogPage() {
     GalleryPage("Dialog", "A modal dialog that interrupts the user with important content.") {
@@ -246,6 +313,18 @@ internal fun DialogPage() {
             description = "Save dialog with destructive delete action",
             sourceCode = GallerySources.SaveDialogWithDeleteExample,
         ) { SaveDialogWithDeleteExample() }
+
+        SectionHeader("Custom Animations")
+        ExampleCard(
+            title = "Slide-In Dialog",
+            description = "Small dialog with custom slide-in spring animation",
+            sourceCode = GallerySources.SmallDialogCustomAnimationExample,
+        ) { SmallDialogCustomAnimationExample() }
+        ExampleCard(
+            title = "Bounce Alert",
+            description = "Alert dialog with bouncy spring scale animation",
+            sourceCode = GallerySources.AlertDialogCustomAnimationExample,
+        ) { AlertDialogCustomAnimationExample() }
 
         SectionHeader("Alert Dialog")
         ExampleCard(

@@ -1,6 +1,8 @@
 package io.github.kdroidfilter.nucleus.ui.apple.macos.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -184,6 +186,24 @@ fun AlertBanner(
 }
 
 // ===========================================================================
+// AlertDialogDefaults — default enter/exit transitions for alert dialogs
+// ===========================================================================
+
+object AlertDialogDefaults {
+    val Enter: EnterTransition =
+        scaleIn(
+            initialScale = 0.9f,
+            animationSpec = tween(durationMillis = 200),
+        ) + fadeIn(animationSpec = tween(durationMillis = 200))
+
+    val Exit: ExitTransition =
+        scaleOut(
+            targetScale = 0.9f,
+            animationSpec = tween(durationMillis = 150),
+        ) + fadeOut(animationSpec = tween(durationMillis = 150))
+}
+
+// ===========================================================================
 // AlertDialog (Modal)
 // ===========================================================================
 
@@ -225,6 +245,8 @@ fun AlertDialog(
     onDestructive: (() -> Unit)? = null,
     onCancel: (() -> Unit)? = null,
     buttonLayout: AlertDialogButtonLayout = AlertDialogButtonLayout.Stacked,
+    enter: EnterTransition = AlertDialogDefaults.Enter,
+    exit: ExitTransition = AlertDialogDefaults.Exit,
 ) {
     // Keep the popup mounted while the exit animation plays
     var showPopup by remember { mutableStateOf(false) }
@@ -276,14 +298,8 @@ fun AlertDialog(
             ) {
                 AnimatedVisibility(
                     visible = animateIn,
-                    enter = scaleIn(
-                        initialScale = 0.9f,
-                        animationSpec = tween(durationMillis = 200),
-                    ) + fadeIn(animationSpec = tween(durationMillis = 200)),
-                    exit = scaleOut(
-                        targetScale = 0.9f,
-                        animationSpec = tween(durationMillis = 150),
-                    ) + fadeOut(animationSpec = tween(durationMillis = 150)),
+                    enter = enter,
+                    exit = exit,
                 ) {
                     AlertDialogContent(
                         title = title,

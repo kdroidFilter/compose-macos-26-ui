@@ -1,13 +1,11 @@
 package io.github.kdroidfilter.nucleus.ui.apple.macos.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -34,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
@@ -91,6 +88,8 @@ fun SaveDialog(
     onLocationChange: ((Int, String) -> Unit)? = null,
     onDelete: (() -> Unit)? = null,
     size: DialogSize = DialogSize.Large,
+    enter: EnterTransition = DialogDefaults.Enter,
+    exit: ExitTransition = DialogDefaults.Exit,
 ) {
     var showPopup by remember { mutableStateOf(false) }
     var animateIn by remember { mutableStateOf(false) }
@@ -143,26 +142,8 @@ fun SaveDialog(
             ) {
                 AnimatedVisibility(
                     visible = animateIn,
-                    enter = fadeIn(tween(MacosDuration.Slow.millis)) +
-                            scaleIn(
-                                initialScale = 0.95f,
-                                transformOrigin = TransformOrigin.Center,
-                                animationSpec = tween(MacosDuration.Slow.millis),
-                            ) +
-                            slideInVertically(
-                                initialOffsetY = { 10 },
-                                animationSpec = tween(MacosDuration.Slow.millis),
-                            ),
-                    exit = fadeOut(tween(MacosDuration.Slow.millis)) +
-                            scaleOut(
-                                targetScale = 0.95f,
-                                transformOrigin = TransformOrigin.Center,
-                                animationSpec = tween(MacosDuration.Slow.millis),
-                            ) +
-                            slideOutVertically(
-                                targetOffsetY = { 10 },
-                                animationSpec = tween(MacosDuration.Slow.millis),
-                            ),
+                    enter = enter,
+                    exit = exit,
                 ) {
                     SaveDialogContent(
                         title = title,

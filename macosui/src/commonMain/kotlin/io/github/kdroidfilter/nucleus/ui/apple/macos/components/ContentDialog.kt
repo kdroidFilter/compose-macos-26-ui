@@ -1,6 +1,8 @@
 package io.github.kdroidfilter.nucleus.ui.apple.macos.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -59,6 +61,36 @@ enum class DialogSize(val maxWidth: Dp) {
 }
 
 // ===========================================================================
+// DialogDefaults — default enter/exit transitions for content dialogs
+// ===========================================================================
+
+object DialogDefaults {
+    val Enter: EnterTransition =
+        fadeIn(tween(MacosDuration.Slow.millis)) +
+            scaleIn(
+                initialScale = 0.95f,
+                transformOrigin = TransformOrigin.Center,
+                animationSpec = tween(MacosDuration.Slow.millis),
+            ) +
+            slideInVertically(
+                initialOffsetY = { 10 },
+                animationSpec = tween(MacosDuration.Slow.millis),
+            )
+
+    val Exit: ExitTransition =
+        fadeOut(tween(MacosDuration.Slow.millis)) +
+            scaleOut(
+                targetScale = 0.95f,
+                transformOrigin = TransformOrigin.Center,
+                animationSpec = tween(MacosDuration.Slow.millis),
+            ) +
+            slideOutVertically(
+                targetOffsetY = { 10 },
+                animationSpec = tween(MacosDuration.Slow.millis),
+            )
+}
+
+// ===========================================================================
 // SmallDialog — macOS-native sheet-style dialog with horizontal button footer
 // ===========================================================================
 
@@ -96,6 +128,8 @@ fun SmallDialog(
     destructiveText: String? = null,
     onDestructive: (() -> Unit)? = null,
     size: DialogSize = DialogSize.Small,
+    enter: EnterTransition = DialogDefaults.Enter,
+    exit: ExitTransition = DialogDefaults.Exit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     var showPopup by remember { mutableStateOf(false) }
@@ -149,26 +183,8 @@ fun SmallDialog(
             ) {
                 AnimatedVisibility(
                     visible = animateIn,
-                    enter = fadeIn(tween(MacosDuration.Slow.millis)) +
-                            scaleIn(
-                                initialScale = 0.95f,
-                                transformOrigin = TransformOrigin.Center,
-                                animationSpec = tween(MacosDuration.Slow.millis),
-                            ) +
-                            slideInVertically(
-                                initialOffsetY = { 10 },
-                                animationSpec = tween(MacosDuration.Slow.millis),
-                            ),
-                    exit = fadeOut(tween(MacosDuration.Slow.millis)) +
-                            scaleOut(
-                                targetScale = 0.95f,
-                                transformOrigin = TransformOrigin.Center,
-                                animationSpec = tween(MacosDuration.Slow.millis),
-                            ) +
-                            slideOutVertically(
-                                targetOffsetY = { 10 },
-                                animationSpec = tween(MacosDuration.Slow.millis),
-                            ),
+                    enter = enter,
+                    exit = exit,
                 ) {
                     val shape = RoundedCornerShape(16.dp)
                     val fallbackBg = if (isDark) Color(0xFF262626).copy(alpha = 0.92f)
