@@ -31,6 +31,46 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.*
+import androidx.compose.runtime.Immutable
+
+// ===========================================================================
+// TextFieldColors — public customizable colors (shared by TextField & TextArea)
+// ===========================================================================
+
+@Immutable
+class TextFieldColors(
+    val backgroundColor: Color,
+    val textColor: Color,
+    val placeholderColor: Color,
+    val iconColor: Color,
+    val borderColor: Color,
+    val labelColor: Color,
+    val cursorColor: Color,
+) {
+    fun copy(
+        backgroundColor: Color = this.backgroundColor,
+        textColor: Color = this.textColor,
+        placeholderColor: Color = this.placeholderColor,
+        iconColor: Color = this.iconColor,
+        borderColor: Color = this.borderColor,
+        labelColor: Color = this.labelColor,
+        cursorColor: Color = this.cursorColor,
+    ) = TextFieldColors(backgroundColor, textColor, placeholderColor, iconColor, borderColor, labelColor, cursorColor)
+}
+
+object TextFieldDefaults {
+
+    @Composable
+    fun colors(
+        backgroundColor: Color = Color.Unspecified,
+        textColor: Color = Color.Unspecified,
+        placeholderColor: Color = Color.Unspecified,
+        iconColor: Color = Color.Unspecified,
+        borderColor: Color = Color.Unspecified,
+        labelColor: Color = Color.Unspecified,
+        cursorColor: Color = Color.Unspecified,
+    ) = TextFieldColors(backgroundColor, textColor, placeholderColor, iconColor, borderColor, labelColor, cursorColor)
+}
 
 // ===========================================================================
 // TextField — macOS-style text field matching Sketch specs
@@ -76,8 +116,9 @@ fun TextField(
     minLines: Int = 1,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     focusRequester: FocusRequester = remember { FocusRequester() },
+    colors: TextFieldColors? = null,
 ) {
-    val colors = MacosTheme.componentStyling.textField.colors
+    val themeColors = MacosTheme.componentStyling.textField.colors
     val metrics = MacosTheme.componentStyling.textField.metrics
     val typography = MacosTheme.typography
     val accent = MacosTheme.colorScheme.accent
@@ -100,32 +141,59 @@ fun TextField(
 
     var isFocused by remember { mutableStateOf(false) }
 
-    // Resolve background per surface variant
+    // Resolve background per surface variant — custom colors take priority
     val backgroundColor by animateColorAsState(
-        targetValue = when {
-            !enabled -> if (isOverGlass) colors.overGlassDisabledBackground else colors.backgroundDisabled
-            isFocused && isOverGlass -> colors.overGlassFocusedBackground
-            isOverGlass -> colors.overGlassBackground
-            else -> colors.background
+        targetValue = if (colors?.backgroundColor != null && colors.backgroundColor != Color.Unspecified) {
+            colors.backgroundColor
+        } else when {
+            !enabled -> if (isOverGlass) themeColors.overGlassDisabledBackground else themeColors.backgroundDisabled
+            isFocused && isOverGlass -> themeColors.overGlassFocusedBackground
+            isOverGlass -> themeColors.overGlassBackground
+            else -> themeColors.background
         },
         animationSpec = macosTween(MacosDuration.Fast),
         label = "tf_bg",
     )
 
-    // Border (Content Area only; Over-glass has no border when idle)
+    // Border — custom colors take priority
     val borderColor by animateColorAsState(
-        targetValue = when {
-            isError -> colors.errorBorder
-            !enabled -> if (isOverGlass) Color.Transparent else colors.borderDisabled
+        targetValue = if (colors?.borderColor != null && colors.borderColor != Color.Unspecified) {
+            colors.borderColor
+        } else when {
+            isError -> themeColors.errorBorder
+            !enabled -> if (isOverGlass) Color.Transparent else themeColors.borderDisabled
             isOverGlass -> Color.Transparent
-            else -> colors.border
+            else -> themeColors.border
         },
         animationSpec = macosTween(MacosDuration.Fast),
         label = "tf_border",
     )
 
-    val textColor = if (enabled) colors.text else colors.textDisabled
-    val cursorBrush = SolidColor(if (isError) colors.errorBorder else colors.cursor)
+    val textColor = if (colors?.textColor != null && colors.textColor != Color.Unspecified) {
+        colors.textColor
+    } else {
+        if (enabled) themeColors.text else themeColors.textDisabled
+    }
+    val placeholderColor = if (colors?.placeholderColor != null && colors.placeholderColor != Color.Unspecified) {
+        colors.placeholderColor
+    } else {
+        themeColors.placeholder
+    }
+    val iconColor = if (colors?.iconColor != null && colors.iconColor != Color.Unspecified) {
+        colors.iconColor
+    } else {
+        if (enabled) themeColors.icon else themeColors.iconDisabled
+    }
+    val labelColor = if (colors?.labelColor != null && colors.labelColor != Color.Unspecified) {
+        colors.labelColor
+    } else {
+        if (enabled) themeColors.label else themeColors.labelDisabled
+    }
+    val cursorBrush = SolidColor(
+        if (isError) themeColors.errorBorder
+        else if (colors?.cursorColor != null && colors.cursorColor != Color.Unspecified) colors.cursorColor
+        else themeColors.cursor
+    )
 
     // Focus ring colors — Sketch: 3.5dp accent@25%, 1dp accent@15%
     val focusRingOuterColor = accent.copy(alpha = 0.25f)
@@ -148,10 +216,8 @@ fun TextField(
         if (label != null) {
             Box(modifier = Modifier.padding(bottom = metrics.labelBottomPadding, start = 2.dp)) {
                 CompositionLocalProvider(
-                    LocalContentColor provides (if (enabled) colors.label else colors.labelDisabled),
-                    LocalTextStyle provides typography.caption1.copy(
-                        color = if (enabled) colors.label else colors.labelDisabled,
-                    ),
+                    LocalContentColor provides labelColor,
+                    LocalTextStyle provides typography.caption1.copy(color = labelColor),
                 ) { label() }
             }
         }
@@ -189,8 +255,8 @@ fun TextField(
                             } else if (isError) {
                                 Modifier.macOsFocusRing(
                                     cornerRadius = cornerRadius,
-                                    outerColor = colors.errorBorder.copy(alpha = 0.25f),
-                                    innerColor = colors.errorBorder.copy(alpha = 0.15f),
+                                    outerColor = themeColors.errorBorder.copy(alpha = 0.25f),
+                                    innerColor = themeColors.errorBorder.copy(alpha = 0.15f),
                                 )
                             } else {
                                 Modifier
@@ -227,15 +293,15 @@ fun TextField(
                         if (leadingIcon != null) {
                             Box(modifier = Modifier.padding(end = 4.dp), contentAlignment = Alignment.Center) {
                                 CompositionLocalProvider(
-                                    LocalContentColor provides (if (enabled) colors.icon else colors.iconDisabled),
+                                    LocalContentColor provides iconColor,
                                 ) { leadingIcon() }
                             }
                         }
                         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
                             if (value.isEmpty() && placeholder != null) {
                                 CompositionLocalProvider(
-                                    LocalContentColor provides colors.placeholder,
-                                    LocalTextStyle provides resolvedTextStyle.copy(color = colors.placeholder),
+                                    LocalContentColor provides placeholderColor,
+                                    LocalTextStyle provides resolvedTextStyle.copy(color = placeholderColor),
                                 ) { placeholder() }
                             }
                             innerTextField()
@@ -243,7 +309,7 @@ fun TextField(
                         if (trailingIcon != null) {
                             Box(modifier = Modifier.padding(start = 4.dp), contentAlignment = Alignment.Center) {
                                 CompositionLocalProvider(
-                                    LocalContentColor provides (if (enabled) colors.icon else colors.iconDisabled),
+                                    LocalContentColor provides iconColor,
                                 ) { trailingIcon() }
                             }
                         }
@@ -254,7 +320,7 @@ fun TextField(
 
         // Supporting text
         if (supportingText != null) {
-            val supportingColor = if (isError) colors.errorBorder else colors.placeholder
+            val supportingColor = if (isError) themeColors.errorBorder else placeholderColor
             Box(modifier = Modifier.padding(top = metrics.supportingTextTopPadding, start = 2.dp)) {
                 CompositionLocalProvider(
                     LocalContentColor provides supportingColor,

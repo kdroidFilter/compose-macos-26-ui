@@ -13,8 +13,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TextArea
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TextFieldDefaults
 import io.github.kdroidfilter.nucleus.ui.apple.macos.gallery.GalleryExample
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.ExampleCard
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.GalleryPage
@@ -171,6 +173,45 @@ fun TextAreaSurfaceVariantsExample() {
     }
 }
 
+@GalleryExample("TextArea", "Custom Colors")
+@Composable
+fun TextAreaCustomColorsExample() {
+    val accent = MacosTheme.colorScheme.accent
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+        var t1 by remember { mutableStateOf("") }
+        TextArea(
+            value = t1,
+            onValueChange = { t1 = it },
+            placeholder = { Text("Accent-tinted textarea") },
+            label = { Text("Accent") },
+            minLines = 2,
+            maxLines = 4,
+            colors = TextFieldDefaults.colors(
+                backgroundColor = accent.copy(alpha = 0.10f),
+                borderColor = accent.copy(alpha = 0.30f),
+                cursorColor = accent,
+                labelColor = accent,
+            ),
+        )
+        var t2 by remember { mutableStateOf("") }
+        TextArea(
+            value = t2,
+            onValueChange = { t2 = it },
+            placeholder = { Text("Green textarea") },
+            label = { Text("Green") },
+            minLines = 2,
+            maxLines = 4,
+            colors = TextFieldDefaults.colors(
+                backgroundColor = Color(0xFF34C759).copy(alpha = 0.10f),
+                borderColor = Color(0xFF34C759).copy(alpha = 0.30f),
+                textColor = Color(0xFF34C759),
+                labelColor = Color(0xFF34C759),
+                cursorColor = Color(0xFF34C759),
+            ),
+        )
+    }
+}
+
 @Composable
 internal fun TextAreaPage() {
     GalleryPage("Textarea", "A multi-line text input for longer form content.") {
@@ -195,6 +236,13 @@ internal fun TextAreaPage() {
             description = "Disabled text areas with and without value",
             sourceCode = GallerySources.TextAreaDisabledExample,
         ) { TextAreaDisabledExample() }
+
+        SectionHeader("Custom Colors")
+        ExampleCard(
+            title = "Custom Colors",
+            description = "Text areas with custom background, border, text and label colors",
+            sourceCode = GallerySources.TextAreaCustomColorsExample,
+        ) { TextAreaCustomColorsExample() }
 
         SectionHeader("Surface Variants")
         ExampleCard(

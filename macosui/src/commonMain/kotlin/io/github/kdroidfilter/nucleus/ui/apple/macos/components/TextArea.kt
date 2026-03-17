@@ -64,8 +64,9 @@ fun TextArea(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     focusRequester: FocusRequester = remember { FocusRequester() },
+    colors: TextFieldColors? = null,
 ) {
-    val colors = MacosTheme.componentStyling.textField.colors
+    val themeColors = MacosTheme.componentStyling.textField.colors
     val metrics = MacosTheme.componentStyling.textField.metrics
     val typography = MacosTheme.typography
     val accent = MacosTheme.colorScheme.accent
@@ -87,32 +88,54 @@ fun TextArea(
 
     var isFocused by remember { mutableStateOf(false) }
 
-    // Background per surface variant — same logic as TextField
+    // Background per surface variant — custom colors take priority
     val backgroundColor by animateColorAsState(
-        targetValue = when {
-            !enabled -> if (isOverGlass) colors.overGlassDisabledBackground else colors.backgroundDisabled
-            isFocused && isOverGlass -> colors.overGlassFocusedBackground
-            isOverGlass -> colors.overGlassBackground
-            else -> colors.background
+        targetValue = if (colors?.backgroundColor != null && colors.backgroundColor != Color.Unspecified) {
+            colors.backgroundColor
+        } else when {
+            !enabled -> if (isOverGlass) themeColors.overGlassDisabledBackground else themeColors.backgroundDisabled
+            isFocused && isOverGlass -> themeColors.overGlassFocusedBackground
+            isOverGlass -> themeColors.overGlassBackground
+            else -> themeColors.background
         },
         animationSpec = macosTween(MacosDuration.Fast),
         label = "ta_bg",
     )
 
-    // Border — same logic as TextField
+    // Border — custom colors take priority
     val borderColor by animateColorAsState(
-        targetValue = when {
-            isError -> colors.errorBorder
-            !enabled -> if (isOverGlass) Color.Transparent else colors.borderDisabled
+        targetValue = if (colors?.borderColor != null && colors.borderColor != Color.Unspecified) {
+            colors.borderColor
+        } else when {
+            isError -> themeColors.errorBorder
+            !enabled -> if (isOverGlass) Color.Transparent else themeColors.borderDisabled
             isOverGlass -> Color.Transparent
-            else -> colors.border
+            else -> themeColors.border
         },
         animationSpec = macosTween(MacosDuration.Fast),
         label = "ta_border",
     )
 
-    val textColor = if (enabled) colors.text else colors.textDisabled
-    val cursorBrush = SolidColor(if (isError) colors.errorBorder else colors.cursor)
+    val textColor = if (colors?.textColor != null && colors.textColor != Color.Unspecified) {
+        colors.textColor
+    } else {
+        if (enabled) themeColors.text else themeColors.textDisabled
+    }
+    val placeholderColor = if (colors?.placeholderColor != null && colors.placeholderColor != Color.Unspecified) {
+        colors.placeholderColor
+    } else {
+        themeColors.placeholder
+    }
+    val labelColor = if (colors?.labelColor != null && colors.labelColor != Color.Unspecified) {
+        colors.labelColor
+    } else {
+        if (enabled) themeColors.label else themeColors.labelDisabled
+    }
+    val cursorBrush = SolidColor(
+        if (isError) themeColors.errorBorder
+        else if (colors?.cursorColor != null && colors.cursorColor != Color.Unspecified) colors.cursorColor
+        else themeColors.cursor
+    )
 
     // Focus ring colors — same as TextField
     val focusRingOuterColor = accent.copy(alpha = 0.25f)
@@ -135,10 +158,8 @@ fun TextArea(
         if (label != null) {
             Box(modifier = Modifier.padding(bottom = metrics.labelBottomPadding, start = 2.dp)) {
                 CompositionLocalProvider(
-                    LocalContentColor provides (if (enabled) colors.label else colors.labelDisabled),
-                    LocalTextStyle provides typography.caption1.copy(
-                        color = if (enabled) colors.label else colors.labelDisabled,
-                    ),
+                    LocalContentColor provides labelColor,
+                    LocalTextStyle provides typography.caption1.copy(color = labelColor),
                 ) { label() }
             }
         }
@@ -169,8 +190,8 @@ fun TextArea(
                             } else if (isError) {
                                 Modifier.textFieldFocusRing(
                                     cornerRadius,
-                                    colors.errorBorder.copy(alpha = 0.25f),
-                                    colors.errorBorder.copy(alpha = 0.15f),
+                                    themeColors.errorBorder.copy(alpha = 0.25f),
+                                    themeColors.errorBorder.copy(alpha = 0.15f),
                                 )
                             } else {
                                 Modifier
@@ -198,8 +219,8 @@ fun TextArea(
                 ) {
                     if (value.isEmpty() && placeholder != null) {
                         CompositionLocalProvider(
-                            LocalContentColor provides colors.placeholder,
-                            LocalTextStyle provides resolvedTextStyle.copy(color = colors.placeholder),
+                            LocalContentColor provides placeholderColor,
+                            LocalTextStyle provides resolvedTextStyle.copy(color = placeholderColor),
                         ) { placeholder() }
                     }
                     innerTextField()
@@ -209,7 +230,7 @@ fun TextArea(
 
         // Supporting text
         if (supportingText != null) {
-            val supportingColor = if (isError) colors.errorBorder else colors.placeholder
+            val supportingColor = if (isError) themeColors.errorBorder else placeholderColor
             Box(modifier = Modifier.padding(top = metrics.supportingTextTopPadding, start = 2.dp)) {
                 CompositionLocalProvider(
                     LocalContentColor provides supportingColor,
