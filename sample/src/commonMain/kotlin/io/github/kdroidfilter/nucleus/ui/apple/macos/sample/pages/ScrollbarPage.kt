@@ -29,6 +29,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.ExampleCard
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.GalleryPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.SectionHeader
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.generated.GallerySources
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.ControlSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 
 @GalleryExample("Scrollbar", "Vertical (ScrollState)")
@@ -248,6 +249,69 @@ fun ScrollbarHorizontalExample() {
     }
 }
 
+@GalleryExample("Scrollbar", "Control Sizes")
+@Composable
+fun ScrollbarControlSizesExample() {
+    Row(
+        modifier = Modifier.fillMaxWidth().height(180.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        ControlSize.entries.forEach { size ->
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(
+                    text = size.name,
+                    style = MacosTheme.typography.caption1,
+                    color = MacosTheme.colorScheme.textSecondary,
+                    modifier = Modifier.padding(bottom = 6.dp),
+                )
+
+                val scrollState = rememberScrollState()
+                val scrollbarState = rememberScrollbarState(scrollState)
+
+                Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth()
+                            .verticalScroll(scrollState)
+                            .padding(horizontal = 4.dp, vertical = 4.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                    ) {
+                        repeat(20) { i ->
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(24.dp)
+                                    .background(
+                                        MacosTheme.colorScheme.textPrimary.copy(alpha = 0.04f),
+                                        MacosTheme.shapes.small,
+                                    ),
+                                contentAlignment = Alignment.CenterStart,
+                            ) {
+                                Text(
+                                    text = "${i + 1}",
+                                    style = MacosTheme.typography.caption2,
+                                    color = MacosTheme.colorScheme.textPrimary,
+                                    modifier = Modifier.padding(horizontal = 6.dp),
+                                )
+                            }
+                        }
+                    }
+
+                    VerticalScrollbar(
+                        state = scrollbarState,
+                        controlSize = size,
+                        modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Composable
 internal fun ScrollbarPage() {
     GalleryPage("Scrollbar", "macOS-style overlay scrollbars — appear on scroll, fade after idle.") {
@@ -262,6 +326,13 @@ internal fun ScrollbarPage() {
             description = "Overlay vertical scrollbar with LazyListState",
             sourceCode = GallerySources.ScrollbarLazyVerticalExample,
         ) { ScrollbarLazyVerticalExample() }
+
+        SectionHeader("Control Sizes")
+        ExampleCard(
+            title = "All Sizes",
+            description = "Mini, Small, Regular, Large, ExtraLarge side by side",
+            sourceCode = GallerySources.ScrollbarControlSizesExample,
+        ) { ScrollbarControlSizesExample() }
 
         SectionHeader("Track Click Behavior")
         ExampleCard(

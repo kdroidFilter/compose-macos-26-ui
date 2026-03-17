@@ -46,6 +46,7 @@ data class ComponentStyling(
     val stepper: StepperStyle,
     val progress: ProgressStyle = ProgressStyle(),
     val sidebar: SidebarStyle = SidebarStyle(),
+    val scrollbar: ScrollbarStyle,
     val timePicker: TimePickerStyle = TimePickerStyle(),
     val datePicker: DatePickerStyle = DatePickerStyle(),
 )
@@ -79,6 +80,7 @@ fun defaultComponentStyling(colorScheme: ColorScheme): ComponentStyling {
         stepper = defaultStepperStyle(colorScheme),
         tooltip = defaultTooltipStyle(colorScheme),
         card = defaultCardStyle(colorScheme),
+        scrollbar = defaultScrollbarStyle(colorScheme),
     )
 }
 
@@ -355,6 +357,16 @@ private fun defaultTooltipStyle(cs: ColorScheme) = TooltipStyle(
         border = cs.border,
     ),
 )
+
+private fun defaultScrollbarStyle(cs: ColorScheme): ScrollbarStyle {
+    val base = if (cs.isDark) Color.White else Color.Black
+    return ScrollbarStyle(
+        colors = ScrollbarStyle.Colors(
+            thumbIdle = base.copy(alpha = if (cs.isDark) 0.40f else 0.15f),
+            thumbHovered = base.copy(alpha = if (cs.isDark) 0.55f else 0.35f),
+        ),
+    )
+}
 
 private fun defaultCardStyle(cs: ColorScheme) = CardStyle(
     colors = CardStyle.Colors(

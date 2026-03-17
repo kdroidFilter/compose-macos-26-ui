@@ -1,7 +1,6 @@
 package io.github.kdroidfilter.nucleus.ui.apple.macos.components
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -32,38 +31,14 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.ControlSize
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalControlSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.ScrollbarStyle
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
-
-// ============================================================
-// Design tokens — pixel-perfect from SVG specification
-//
-// <svg width="64" height="12">
-//   <rect x="3" y="3" width="29" height="6" rx="3"
-//         fill="black" fill-opacity="0.15"/>
-// </svg>
-//
-// Container breadth : 12dp  (SVG height)
-// Thumb breadth     : 6dp   (rect height)
-// Padding           : 3dp   (rect x/y offset)
-// Corner radius     : 3dp   (rx = breadth/2 → capsule)
-// Alpha idle        : 0.15  (fill-opacity)
-// ============================================================
-
-internal val TRACK_BREADTH = 12.dp
-private val THUMB_BREADTH_IDLE = 6.dp
-private val THUMB_BREADTH_HOVER = 8.dp   // expands toward content on hover
-private val THUMB_TRAILING_PAD = 3.dp    // fixed gap from window edge (right/bottom)
-private val THUMB_CORNER_RADIUS = 3.dp   // rx = breadth/2 = full capsule
-private val THUMB_MIN_LENGTH = 30.dp
-private const val THUMB_ALPHA_IDLE_LIGHT = 0.15f
-private const val THUMB_ALPHA_IDLE_DARK = 0.40f
-private const val THUMB_ALPHA_HOVER_LIGHT = 0.35f
-private const val THUMB_ALPHA_HOVER_DARK = 0.55f
-private const val HIDE_DELAY_MS = 1500L
 
 // ============================================================
 // TrackClickBehavior — what happens on a click outside the thumb
@@ -149,27 +124,34 @@ fun rememberScrollbarState(lazyListState: LazyListState): ScrollbarState =
  * macOS-style overlay vertical scrollbar.
  *
  * @param state           Scroll state, created via [rememberScrollbarState].
- * @param modifier        Applied to the 12dp-wide track container.
+ * @param modifier        Applied to the track container.
+ * @param controlSize     Overrides the ambient [ControlSize] to change track breadth,
+ *                        thumb thickness, and trailing padding.
  * @param showOnEdgeHover When true, the scrollbar appears as soon as the pointer
- *                        enters the 12dp track area — even before scrolling starts.
+ *                        enters the track area — even before scrolling starts.
  * @param trackClickBehavior What happens when the user clicks on the track outside
  *                        the thumb. [TrackClickBehavior.Jump] scrolls one viewport;
  *                        [TrackClickBehavior.Seek] seeks to the click position.
  *                        Use [TrackClickBehavior.None] on touch-only platforms.
+ * @param style           Optional style override; defaults to [MacosTheme.componentStyling.scrollbar].
  */
 @Composable
 fun VerticalScrollbar(
     state: ScrollbarState,
     modifier: Modifier = Modifier,
+    controlSize: ControlSize = LocalControlSize.current,
     showOnEdgeHover: Boolean = true,
     trackClickBehavior: TrackClickBehavior = TrackClickBehavior.Jump,
+    style: ScrollbarStyle = MacosTheme.componentStyling.scrollbar,
 ) {
     ScrollbarImpl(
         state = state,
         isVertical = true,
         modifier = modifier,
+        controlSize = controlSize,
         showOnEdgeHover = showOnEdgeHover,
         trackClickBehavior = trackClickBehavior,
+        style = style,
     )
 }
 
@@ -177,24 +159,31 @@ fun VerticalScrollbar(
  * macOS-style overlay horizontal scrollbar.
  *
  * @param state           Scroll state, created via [rememberScrollbarState].
- * @param modifier        Applied to the 12dp-tall track container.
+ * @param modifier        Applied to the track container.
+ * @param controlSize     Overrides the ambient [ControlSize] to change track breadth,
+ *                        thumb thickness, and trailing padding.
  * @param showOnEdgeHover When true, the scrollbar appears as soon as the pointer
- *                        enters the 12dp track area.
+ *                        enters the track area.
  * @param trackClickBehavior See [VerticalScrollbar].
+ * @param style           Optional style override; defaults to [MacosTheme.componentStyling.scrollbar].
  */
 @Composable
 fun HorizontalScrollbar(
     state: ScrollbarState,
     modifier: Modifier = Modifier,
+    controlSize: ControlSize = LocalControlSize.current,
     showOnEdgeHover: Boolean = true,
     trackClickBehavior: TrackClickBehavior = TrackClickBehavior.Jump,
+    style: ScrollbarStyle = MacosTheme.componentStyling.scrollbar,
 ) {
     ScrollbarImpl(
         state = state,
         isVertical = false,
         modifier = modifier,
+        controlSize = controlSize,
         showOnEdgeHover = showOnEdgeHover,
         trackClickBehavior = trackClickBehavior,
+        style = style,
     )
 }
 
@@ -207,11 +196,21 @@ private fun ScrollbarImpl(
     state: ScrollbarState,
     isVertical: Boolean,
     modifier: Modifier,
+    controlSize: ControlSize,
     showOnEdgeHover: Boolean,
     trackClickBehavior: TrackClickBehavior,
+    style: ScrollbarStyle,
 ) {
-    val isDark = MacosTheme.colorScheme.isDark
+    val metrics = style.metrics
+    val colors = style.colors
     val scope = rememberCoroutineScope()
+
+    // ---- Resolved metrics for current size ----
+    val trackBreadth: Dp = metrics.trackBreadthFor(controlSize)
+    val thumbBreadthIdle: Dp = metrics.thumbBreadthIdleFor(controlSize)
+    val trailingPad: Dp = metrics.trailingPadFor(controlSize)
+    val cornerRadius: Dp = metrics.cornerRadiusFor(controlSize)
+    val thumbMinLength: Dp = metrics.thumbMinLengthFor(controlSize)
 
     // Track length in px along the scroll axis — updated in the Layout measure pass
     var trackSizePx by remember { mutableStateOf(0) }
@@ -224,7 +223,7 @@ private fun ScrollbarImpl(
     fun scheduleHide() {
         hideJob?.cancel()
         hideJob = scope.launch {
-            delay(HIDE_DELAY_MS)
+            delay(metrics.hideDelayMs)
             showThumb = false
         }
     }
@@ -264,24 +263,17 @@ private fun ScrollbarImpl(
         }
     }
 
-    // ---- Thumb breadth (expands toward content on hover) ----
-    val thumbBreadthDp: Dp by animateDpAsState(
-        targetValue = if (isThumbHovered || isTrackHovered) THUMB_BREADTH_HOVER else THUMB_BREADTH_IDLE,
-        animationSpec = tween(150),
-        label = "scrollbar_breadth",
-    )
+    // ---- Thumb breadth (fixed — no expansion on hover) ----
+    val thumbBreadthDp: Dp = thumbBreadthIdle
 
-    // ---- Color / alpha (single animation covers show/hide + hover) ----
-    val baseColor = if (isDark) Color.White else Color.Black
-    val isHovered = isThumbHovered || isTrackHovered
-    val targetAlpha = when {
-        !showThumb || trackSizePx == 0 || state.maxScrollPx <= 0f -> 0f
-        isHovered -> if (isDark) THUMB_ALPHA_HOVER_DARK else THUMB_ALPHA_HOVER_LIGHT
-        else -> if (isDark) THUMB_ALPHA_IDLE_DARK else THUMB_ALPHA_IDLE_LIGHT
+    // ---- Color / alpha (show/hide only, no hover color change) ----
+    val targetColor = when {
+        !showThumb || trackSizePx == 0 || state.maxScrollPx <= 0f -> Color.Transparent
+        else -> colors.thumbIdle
     }
     val thumbColor by animateColorAsState(
-        targetValue = baseColor.copy(alpha = targetAlpha),
-        animationSpec = tween(if (targetAlpha > 0f) 150 else 300),
+        targetValue = targetColor,
+        animationSpec = tween(if (targetColor != Color.Transparent) 150 else 300),
         label = "scrollbar_color",
     )
 
@@ -289,7 +281,7 @@ private fun ScrollbarImpl(
     Layout(
         modifier = modifier
             .then(
-                if (isVertical) Modifier.width(TRACK_BREADTH) else Modifier.height(TRACK_BREADTH),
+                if (isVertical) Modifier.width(trackBreadth) else Modifier.height(trackBreadth),
             )
             .hoverable(trackInteraction)
             .pointerInput(state, isVertical, trackClickBehavior) {
@@ -300,7 +292,7 @@ private fun ScrollbarImpl(
                         if (event.type != PointerEventType.Press) continue
                         val down = event.changes.firstOrNull() ?: continue
                         val clickPos = if (isVertical) down.position.y else down.position.x
-                        val minPx = THUMB_MIN_LENGTH.toPx()
+                        val minPx = thumbMinLength.toPx()
                         val (thumbLen, thumbOff) = computeThumb(
                             trackSizePx = trackSizePx.toFloat(),
                             scrollOffset = state.scrollOffsetPx,
@@ -333,7 +325,7 @@ private fun ScrollbarImpl(
             // Single child: the thumb
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(THUMB_CORNER_RADIUS))
+                    .clip(RoundedCornerShape(cornerRadius))
                     .background(thumbColor)
                     .hoverable(thumbInteraction)
                     .pointerInput(state, isVertical) {
@@ -344,7 +336,7 @@ private fun ScrollbarImpl(
 
                             // Capture geometry at drag start for a stable px↔scroll mapping
                             val startScroll = state.scrollOffsetPx
-                            val minPx = THUMB_MIN_LENGTH.toPx()
+                            val minPx = thumbMinLength.toPx()
                             val (startThumbLength, _) = computeThumb(
                                 trackSizePx = trackSizePx.toFloat(),
                                 scrollOffset = startScroll,
@@ -373,7 +365,7 @@ private fun ScrollbarImpl(
         val trackLength = if (isVertical) constraints.maxHeight else constraints.maxWidth
         trackSizePx = trackLength
 
-        val minPx = THUMB_MIN_LENGTH.toPx()
+        val minPx = thumbMinLength.toPx()
         val thumbBreadthPx = thumbBreadthDp.roundToPx()
         val (thumbLen, thumbOff) = computeThumb(
             trackSizePx = trackLength.toFloat(),
@@ -382,8 +374,8 @@ private fun ScrollbarImpl(
             minLength = minPx,
         )
         val thumbLenPx = thumbLen.roundToInt().coerceAtLeast(0)
-        val trailPadPx = THUMB_TRAILING_PAD.roundToPx()
-        val trackBreadthPx = TRACK_BREADTH.roundToPx()
+        val trailPadPx = trailingPad.roundToPx()
+        val trackBreadthPx = trackBreadth.roundToPx()
 
         val placeable = if (state.maxScrollPx > 0f && trackLength > 0) {
             measurables.firstOrNull()?.measure(
@@ -401,7 +393,7 @@ private fun ScrollbarImpl(
             if (placeable != null) {
                 val posAlong = thumbOff.roundToInt()
                     .coerceIn(0, (trackLength - thumbLenPx).coerceAtLeast(0))
-                // Trailing edge stays THUMB_TRAILING_PAD from the window edge;
+                // Trailing edge stays trailingPad from the container edge;
                 // leading edge expands toward content on hover.
                 val posAcross = (trackBreadthPx - trailPadPx - thumbBreadthPx).coerceAtLeast(0)
 

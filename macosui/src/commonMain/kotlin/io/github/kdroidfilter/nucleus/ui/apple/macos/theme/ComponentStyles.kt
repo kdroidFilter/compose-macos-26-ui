@@ -1099,6 +1099,90 @@ data class TimePickerStyle(
     }
 }
 
+// ---------------------------------------------------------------------------
+// ScrollbarStyle
+// ---------------------------------------------------------------------------
+
+@Immutable
+data class ScrollbarStyle(
+    val colors: Colors,
+    val metrics: Metrics = Metrics(),
+) {
+    @Immutable
+    data class Colors(
+        /** Thumb color at rest (visible, not hovered). */
+        val thumbIdle: Color,
+        /** Thumb color when the track or thumb is hovered. */
+        val thumbHovered: Color,
+    )
+
+    @Immutable
+    data class Metrics(
+        val hideDelayMs: Long = 1500L,
+        val thumbMinLength: Dp = 30.dp,
+    ) {
+        /** Total cross-axis breadth of the scrollbar track. */
+        fun trackBreadthFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 12.dp
+            ControlSize.Small -> 16.dp
+            ControlSize.Regular -> 20.dp
+            ControlSize.Large -> 24.dp
+            ControlSize.ExtraLarge -> 28.dp
+        }
+
+        /** Thumb cross-axis thickness at rest. */
+        fun thumbBreadthIdleFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 6.dp
+            ControlSize.Small -> 8.dp
+            ControlSize.Regular -> 10.dp
+            ControlSize.Large -> 12.dp
+            ControlSize.ExtraLarge -> 14.dp
+        }
+
+        /** Thumb cross-axis thickness when hovered (expands toward content). */
+        fun thumbBreadthHoverFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 8.dp
+            ControlSize.Small -> 11.dp
+            ControlSize.Regular -> 14.dp
+            ControlSize.Large -> 17.dp
+            ControlSize.ExtraLarge -> 20.dp
+        }
+
+        /**
+         * Fixed gap between the thumb's trailing edge and the container edge
+         * (right for vertical, bottom for horizontal).
+         *
+         * Scales with size so the thumb never clips or overflows.
+         */
+        fun trailingPadFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 3.dp
+            ControlSize.Small -> 3.dp
+            ControlSize.Regular -> 3.dp
+            ControlSize.Large -> 4.dp
+            ControlSize.ExtraLarge -> 4.dp
+        }
+
+        /** Corner radius — half the hover breadth for a full capsule shape. */
+        fun cornerRadiusFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 4.dp
+            ControlSize.Small -> 5.5.dp
+            ControlSize.Regular -> 7.dp
+            ControlSize.Large -> 8.5.dp
+            ControlSize.ExtraLarge -> 10.dp
+        }
+
+        /** Minimum thumb length along the scroll axis. */
+        fun thumbMinLengthFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 20.dp
+            ControlSize.Small -> 24.dp
+            ControlSize.Regular -> thumbMinLength
+            ControlSize.Large -> 36.dp
+            ControlSize.ExtraLarge -> 42.dp
+        }
+    }
+}
+
+
 // ===========================================================================
 // DatePickerStyle — calendar date picker sizing
 // ===========================================================================
