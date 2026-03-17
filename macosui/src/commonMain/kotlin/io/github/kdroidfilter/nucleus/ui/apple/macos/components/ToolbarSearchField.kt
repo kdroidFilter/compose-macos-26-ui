@@ -37,7 +37,11 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -80,6 +84,10 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosTween
 internal class SearchKeyboardState {
     var focusedIndex by mutableStateOf(-1)
     private val items = mutableListOf<() -> Unit>()
+
+    /** Called by the parent to allow suggestion clicks to cancel a pending focus-loss close. */
+    var onInteraction: (() -> Unit)? = null
+
     fun register(onClick: () -> Unit): Int {
         val index = items.size
         items.add(onClick)
@@ -149,6 +157,27 @@ fun ToolbarSearchField(
     val keyboardState = remember(value) { SearchKeyboardState() }
     val style = LocalTitleBarStyle.current
 
+    // Delay focus-loss collapse so that mouse clicks on suggestions can be
+    // processed before the popup disappears.
+    val scope = rememberCoroutineScope()
+    var focusLostJob by remember { mutableStateOf<Job?>(null) }
+
+    fun cancelPendingClose() {
+        focusLostJob?.cancel()
+        focusLostJob = null
+    }
+
+    fun closeSearch() {
+        cancelPendingClose()
+        onValueChange("")
+        onExpandedChange(false)
+    }
+
+    // Let suggestion clicks cancel the pending close
+    LaunchedEffect(keyboardState) {
+        keyboardState.onInteraction = { cancelPendingClose() }
+    }
+
     LaunchedEffect(expanded) {
         if (expanded) focusRequester.requestFocus()
     }
@@ -188,13 +217,19 @@ fun ToolbarSearchField(
                 expandedWidth = expandedWidth,
                 focusRequester = focusRequester,
                 onSearch = onSearch,
-                onClose = {
-                    onValueChange("")
-                    onExpandedChange(false)
-                },
+                onClose = { closeSearch() },
                 onFocusLost = {
-                    onValueChange("")
-                    onExpandedChange(false)
+                    if (showSuggestions) {
+                        // Delay closing to let click events on suggestions propagate
+                        focusLostJob = scope.launch {
+                            delay(200)
+                            onValueChange("")
+                            onExpandedChange(false)
+                        }
+                    } else {
+                        onValueChange("")
+                        onExpandedChange(false)
+                    }
                 },
                 keyboardState = if (showSuggestions) keyboardState else null,
                 colors = colors,
@@ -564,7 +599,10 @@ fun SearchSuggestionItem(
                         .clickable(
                             interactionSource = interactionSource,
                             indication = null,
-                            onClick = onClick,
+                            onClick = {
+                                keyboardState?.onInteraction?.invoke()
+                                onClick()
+                            },
                         )
                 } else Modifier
             )
