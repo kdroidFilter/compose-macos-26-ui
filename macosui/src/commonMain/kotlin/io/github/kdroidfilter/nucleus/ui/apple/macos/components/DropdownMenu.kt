@@ -72,6 +72,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icons
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icon
 import kotlinx.coroutines.delay
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalContentColor
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalTextStyle
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosGlass
@@ -359,17 +360,18 @@ fun DropdownMenuItem(
             Spacer(modifier = Modifier.width(8.dp))
         }
 
-        Box(modifier = Modifier.weight(1f)) {
-            CompositionLocalProvider(
-                LocalTextStyle provides contentStyle,
-            ) {
+        CompositionLocalProvider(
+            LocalTextStyle provides contentStyle,
+            LocalContentColor provides textColor,
+        ) {
+            Box(modifier = Modifier.weight(1f)) {
                 content()
             }
-        }
 
-        if (trailingContent != null) {
-            Spacer(modifier = Modifier.width(8.dp))
-            trailingContent()
+            if (trailingContent != null) {
+                Spacer(modifier = Modifier.width(8.dp))
+                trailingContent()
+            }
         }
     }
 }
@@ -497,20 +499,21 @@ fun DropdownMenuSubMenu(
                 Spacer(modifier = Modifier.width(8.dp))
             }
 
-            Box(modifier = Modifier.weight(1f)) {
-                CompositionLocalProvider(
-                    LocalTextStyle provides contentStyle,
-                ) {
+            CompositionLocalProvider(
+                LocalTextStyle provides contentStyle,
+                LocalContentColor provides textColor,
+            ) {
+                Box(modifier = Modifier.weight(1f)) {
                     content()
                 }
-            }
 
-            Spacer(modifier = Modifier.width(8.dp))
-            Icon(
-                icon = Icons.ChevronRight,
-                modifier = Modifier.size(12.dp),
-                tint = chevronColor,
-            )
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(
+                    icon = Icons.ChevronRight,
+                    modifier = Modifier.size(12.dp),
+                    tint = chevronColor,
+                )
+            }
         }
 
         if (submenuExpanded) {

@@ -247,11 +247,20 @@ fun WindowTitle(
 private val TitleBarGroupShape = RoundedCornerShape(percent = 50)
 
 /**
+ * Tracks the number of [TitleBarGroupButton] children in a [TitleBarButtonGroup].
+ * When > 1, buttons automatically use circular highlight instead of classic.
+ */
+internal val LocalTitleBarGroupButtonCount = compositionLocalOf { mutableIntStateOf(0) }
+
+/**
  * A pill-shaped container grouping toolbar buttons with a liquid glass background,
  * matching the macOS Toolbar button-group style (e.g. Safari's back/forward or action clusters).
  *
  * Adapts its height to the current [TitleBarStyle] via [LocalTitleBarStyle].
  * Place [TitleBarGroupButton] composables inside.
+ *
+ * Buttons automatically use circular highlight when the group contains more than one button,
+ * and classic (full-width) highlight when the group contains a single button.
  */
 @Composable
 fun TitleBarButtonGroup(
@@ -260,22 +269,29 @@ fun TitleBarButtonGroup(
 ) {
     val isDark = MacosTheme.colorScheme.isDark
     val style = LocalTitleBarStyle.current
+    val buttonCount = remember { mutableIntStateOf(0) }
 
     val pillBg = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.06f)
 
-    Row(
-        modifier = modifier
-            .height(style.buttonHeight)
-            .clip(TitleBarGroupShape)
-            .background(pillBg, TitleBarGroupShape),
-        verticalAlignment = Alignment.CenterVertically,
-        content = content,
-    )
+    CompositionLocalProvider(LocalTitleBarGroupButtonCount provides buttonCount) {
+        Row(
+            modifier = modifier
+                .height(style.buttonHeight)
+                .clip(TitleBarGroupShape)
+                .background(pillBg, TitleBarGroupShape),
+            verticalAlignment = Alignment.CenterVertically,
+            content = content,
+        )
+    }
 }
 
 /**
  * A single button slot inside a [TitleBarButtonGroup].
  * Provides hover/press feedback without its own pill shape — the group provides it.
+ *
+ * The highlight style is determined automatically by the group:
+ * - Single button in group → classic (full-width) highlight
+ * - Multiple buttons in group → circular highlight
  */
 @Composable
 fun TitleBarGroupButton(
@@ -283,7 +299,6 @@ fun TitleBarGroupButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     iconScale: Float = 1.2f,
-    circularHighlight: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val isDark = MacosTheme.colorScheme.isDark
@@ -291,6 +306,14 @@ fun TitleBarGroupButton(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val isHovered by interactionSource.collectIsHoveredAsState()
+
+    // Register in the group counter for automatic highlight style detection
+    val groupButtonCount = LocalTitleBarGroupButtonCount.current
+    DisposableEffect(Unit) {
+        groupButtonCount.intValue++
+        onDispose { groupButtonCount.intValue-- }
+    }
+    val circularHighlight = groupButtonCount.intValue > 1
 
     val bgOverlay by animateColorAsState(
         targetValue = when {
@@ -403,7 +426,6 @@ fun NavigationButtons(
             onClick = onBack,
             enabled = backEnabled,
             iconScale = 1f,
-            circularHighlight = true,
         ) {
             Icon(icon = Icons.ChevronLeft, modifier = Modifier.size(style.iconSize + 4.dp))
         }
@@ -412,7 +434,6 @@ fun NavigationButtons(
             onClick = onForward,
             enabled = forwardEnabled,
             iconScale = 1f,
-            circularHighlight = true,
         ) {
             Icon(icon = Icons.ChevronRight, modifier = Modifier.size(style.iconSize + 4.dp))
         }
@@ -459,7 +480,6 @@ fun SidebarButton(
             TitleBarGroupButton(
                 onClick = onClick,
                 enabled = enabled,
-                circularHighlight = true,
             ) {
                 icon()
             }
@@ -468,7 +488,6 @@ fun SidebarButton(
                 TitleBarGroupButton(
                     onClick = { menuExpanded = true },
                     enabled = enabled,
-                    circularHighlight = true,
                 ) {
                     Icon(icon = Icons.ChevronDown, modifier = Modifier.size(12.dp))
                 }
