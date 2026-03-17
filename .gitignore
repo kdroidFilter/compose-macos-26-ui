@@ -20,3 +20,5 @@ node_modules/
 
 # Compiled native JNI dylibs (built locally by build.sh)
 decorated-window/src/main/resources/macosui/native/
+wallpaper-color/src/main/resources/macosui/native/
+macosui-icons/src/jvmMain/resources/macosui/native/

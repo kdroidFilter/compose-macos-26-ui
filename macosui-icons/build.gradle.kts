@@ -1,3 +1,4 @@
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -92,10 +93,25 @@ kotlin {
             implementation(libs.compose.foundation)
             implementation(libs.compose.ui)
         }
-        jvmMain.dependencies {
-            implementation(libs.jna)
-        }
     }
+}
+
+// Native build task for macOS JNI bridge (SF Symbol loading)
+val buildNativeMacOs by tasks.registering(Exec::class) {
+    description = "Compiles the Objective-C JNI bridge for SF Symbol loading (arm64 + x64)"
+    group = "build"
+    val nativeDir = file("src/jvmMain/native/macos")
+    val outputDir = file("src/jvmMain/resources/macosui/native")
+    val checkFile = File(outputDir, "darwin-aarch64/libmacosui_icons_jni.dylib")
+    onlyIf { Os.isFamily(Os.FAMILY_MAC) && !checkFile.exists() }
+    inputs.dir(nativeDir)
+    outputs.dir(outputDir)
+    workingDir(nativeDir)
+    commandLine("bash", "build.sh")
+}
+
+tasks.named("jvmProcessResources") {
+    dependsOn(buildNativeMacOs)
 }
 
 android {
