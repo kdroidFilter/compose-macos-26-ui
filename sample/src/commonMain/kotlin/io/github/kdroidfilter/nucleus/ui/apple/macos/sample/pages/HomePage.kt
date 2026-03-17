@@ -2,9 +2,14 @@ package io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,6 +35,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icon
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.NucleusAtom
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun HomePage(onNavigate: (String) -> Unit) {
     val uriHandler = LocalUriHandler.current
@@ -56,15 +63,16 @@ internal fun HomePage(onNavigate: (String) -> Unit) {
                 text = "Native Design System for Compose Multiplatform",
                 style = MacosTheme.typography.title3,
                 color = MacosTheme.colorScheme.textSecondary,
+                textAlign = TextAlign.Center,
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
                 Badge(variant = BadgeVariant.Success) { Text("macOS") }
                 Badge(variant = BadgeVariant.Default) { Text("GTK — Coming Soon") }
                 Badge(variant = BadgeVariant.Default) { Text("iOS — Coming Soon") }
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Badge(variant = BadgeVariant.Info) { Text("Kotlin Multiplatform") }
                 Badge(variant = BadgeVariant.Published) { Text("Compose") }
             }
@@ -93,25 +101,51 @@ internal fun HomePage(onNavigate: (String) -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
 
         // Feature cards
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
-        ) {
-            FeatureCard(
-                title = "50+ Components",
-                description = "Buttons, inputs, dialogs, navigation, data display and more — all following macOS HIG.",
-                modifier = Modifier.weight(1f),
-            )
-            FeatureCard(
-                title = "Native Feel",
-                description = "Vibrancy, glass effects, accent colors and smooth spring animations out of the box.",
-                modifier = Modifier.weight(1f),
-            )
-            FeatureCard(
-                title = "Multiplatform",
-                description = "Targets Android, iOS, Desktop JVM, and Web (JS + WASM) from a single codebase.",
-                modifier = Modifier.weight(1f),
-            )
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            val isCompact = maxWidth < 600.dp
+            if (isCompact) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    FeatureCard(
+                        title = "50+ Components",
+                        description = "Buttons, inputs, dialogs, navigation, data display and more — all following macOS HIG.",
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    FeatureCard(
+                        title = "Native Feel",
+                        description = "Vibrancy, glass effects, accent colors and smooth spring animations out of the box.",
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    FeatureCard(
+                        title = "Multiplatform",
+                        description = "Targets Android, iOS, Desktop JVM, and Web (JS + WASM) from a single codebase.",
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
+                ) {
+                    FeatureCard(
+                        title = "50+ Components",
+                        description = "Buttons, inputs, dialogs, navigation, data display and more — all following macOS HIG.",
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                    )
+                    FeatureCard(
+                        title = "Native Feel",
+                        description = "Vibrancy, glass effects, accent colors and smooth spring animations out of the box.",
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                    )
+                    FeatureCard(
+                        title = "Multiplatform",
+                        description = "Targets Android, iOS, Desktop JVM, and Web (JS + WASM) from a single codebase.",
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                    )
+                }
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -148,8 +182,8 @@ private fun FeatureCard(
     Card(modifier = modifier) {
         CardContent {
             Column(
-                modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxHeight().padding(20.dp),
+                verticalArrangement = Arrangement.Center,
             ) {
                 Text(
                     text = title,
@@ -157,6 +191,7 @@ private fun FeatureCard(
                     fontWeight = FontWeight.SemiBold,
                     color = MacosTheme.colorScheme.textPrimary,
                 )
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = description,
                     style = MacosTheme.typography.subheadline,

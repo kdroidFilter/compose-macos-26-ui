@@ -265,7 +265,6 @@ fun App() {
         var searchQuery by remember { mutableStateOf("") }
         var searchExpanded by remember { mutableStateOf(false) }
         var columnVisibility by remember { mutableStateOf(ColumnVisibility.All) }
-        var sidebarCollapsed by remember { mutableStateOf(false) }
         var settingsExpanded by remember { mutableStateOf(false) }
 
         // Navigation helpers
@@ -291,9 +290,6 @@ fun App() {
                             items = sidebarItems,
                             activeItem = nav.currentPageId,
                             showBorder = false,
-                            collapsed = sidebarCollapsed,
-                            onCollapsedChange = { sidebarCollapsed = it },
-                            collapsible = true,
                         )
                     }
                 },
@@ -486,11 +482,13 @@ private fun ScrollablePageContent(
             content()
             Spacer(modifier = Modifier.height(48.dp))
         }
+        // topInset keeps the scrollbar thumb below the title bar glass overlay
         VerticalScrollbar(
             state = rememberScrollbarState(contentScrollState),
             modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
             showOnEdgeHover = true,
             trackClickBehavior = TrackClickBehavior.Jump,
+            topInset = contentPadding.calculateTopPadding(),
         )
     }
 }

@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import io.github.fletchmckee.liquid.liquefiable
 import io.github.fletchmckee.liquid.liquid
 import io.github.fletchmckee.liquid.rememberLiquidState
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.liquidGlassFade
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosDuration
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SpringPreset
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
@@ -159,6 +160,7 @@ fun Scaffold(
         Color.Transparent
     }
 
+    CompositionLocalProvider(LocalTitleBarHeight provides topPadding) {
     Row(
         modifier = modifier
             .fillMaxSize()
@@ -370,12 +372,11 @@ fun Scaffold(
 
             // ---- Title bar overlay (over content area only) ----
             if (titleBar != null || managedToggle) {
-                val titleBarGlassModifier = Modifier.liquid(titleBarGlassState) {
-                    frost = 16.dp
-                    shape = RectangleShape
-                    tint = glassTint
-                    saturation = 1.05f
-                }
+                val titleBarGlassModifier = Modifier.liquidGlassFade(
+                    state = titleBarGlassState,
+                    shape = RectangleShape,
+                    tint = glassTint,
+                )
 
                 CompositionLocalProvider(LocalToolbarGlassState provides rootLiquidState) {
                     Row(
@@ -412,5 +413,6 @@ fun Scaffold(
                 }
             }
         }
+    }
     }
 }

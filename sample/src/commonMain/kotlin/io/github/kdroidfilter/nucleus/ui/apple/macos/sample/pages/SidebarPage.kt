@@ -246,7 +246,9 @@ internal fun SidebarPage() {
         ExampleCard(title = "Preview", sourceCode = GallerySources.SidebarPreviewExample) { SidebarPreviewExample() }
         ExampleCard(
             title = "Collapsible",
-            description = "Sidebar with collapse toggle",
+            description = "Icon-only collapse mode — useful for web layouts and secondary panels. " +
+                "Do not use in a primary macOS sidebar inside a Scaffold: the collapsed rendering " +
+                "breaks the glass material highlight alignment. Use Scaffold's columnVisibility to hide/show the sidebar instead.",
             sourceCode = GallerySources.SidebarCollapsibleExample,
         ) { SidebarCollapsibleExample() }
         ExampleCard(

@@ -204,6 +204,66 @@ fun ScrollbarTrackSeekExample() {
     }
 }
 
+@GalleryExample("Scrollbar", "Top Inset (Title Bar)")
+@Composable
+fun ScrollbarTopInsetExample() {
+    val scrollState = rememberScrollState()
+    val scrollbarState = rememberScrollbarState(scrollState)
+    val titleBarHeight = 38.dp
+
+    Box(modifier = Modifier.height(180.dp).fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth()
+                .verticalScroll(scrollState)
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            repeat(20) { i ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(28.dp)
+                        .background(
+                            MacosTheme.colorScheme.textPrimary.copy(alpha = 0.04f),
+                            MacosTheme.shapes.small,
+                        ),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    Text(
+                        text = "Item ${i + 1}",
+                        style = MacosTheme.typography.subheadline,
+                        color = MacosTheme.colorScheme.textPrimary,
+                        modifier = Modifier.padding(horizontal = 10.dp),
+                    )
+                }
+            }
+        }
+
+        // Simulated title bar overlay
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(titleBarHeight)
+                .background(MacosTheme.colorScheme.accent.copy(alpha = 0.08f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = "Title Bar Area",
+                style = MacosTheme.typography.caption1,
+                color = MacosTheme.colorScheme.textSecondary,
+            )
+        }
+
+        VerticalScrollbar(
+            state = scrollbarState,
+            modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+            topInset = titleBarHeight,
+        )
+    }
+}
+
 @GalleryExample("Scrollbar", "Horizontal")
 @Composable
 fun ScrollbarHorizontalExample() {
@@ -345,6 +405,14 @@ internal fun ScrollbarPage() {
             description = "Click on track seeks directly to the clicked position",
             sourceCode = GallerySources.ScrollbarTrackSeekExample,
         ) { ScrollbarTrackSeekExample() }
+
+        SectionHeader("Top Inset")
+        ExampleCard(
+            title = "Title Bar Inset",
+            description = "topInset shifts the scrollbar thumb below a fixed overlay (e.g. title bar). " +
+                "Use contentPadding.calculateTopPadding() from Scaffold for page-level scrollbars.",
+            sourceCode = GallerySources.ScrollbarTopInsetExample,
+        ) { ScrollbarTopInsetExample() }
 
         SectionHeader("Horizontal")
         ExampleCard(

@@ -134,6 +134,11 @@ fun rememberScrollbarState(lazyListState: LazyListState): ScrollbarState =
  *                        [TrackClickBehavior.Seek] seeks to the click position.
  *                        Use [TrackClickBehavior.None] on touch-only platforms.
  * @param style           Optional style override; defaults to [MacosTheme.componentStyling.scrollbar].
+ * @param topInset        Inset from the top edge before the thumb track starts.
+ *                        Use this to keep the scrollbar below a fixed title bar or glass
+ *                        overlay. Pass `contentPadding.calculateTopPadding()` from
+ *                        [Scaffold][io.github.kdroidfilter.nucleus.ui.apple.macos.components.Scaffold]
+ *                        for page-level scrollbars. Defaults to 0.dp.
  */
 @Composable
 fun VerticalScrollbar(
@@ -143,6 +148,7 @@ fun VerticalScrollbar(
     showOnEdgeHover: Boolean = true,
     trackClickBehavior: TrackClickBehavior = TrackClickBehavior.Jump,
     style: ScrollbarStyle = MacosTheme.componentStyling.scrollbar,
+    topInset: Dp = 0.dp,
 ) {
     ScrollbarImpl(
         state = state,
@@ -152,6 +158,7 @@ fun VerticalScrollbar(
         showOnEdgeHover = showOnEdgeHover,
         trackClickBehavior = trackClickBehavior,
         style = style,
+        topInset = topInset,
     )
 }
 
@@ -200,6 +207,7 @@ private fun ScrollbarImpl(
     showOnEdgeHover: Boolean,
     trackClickBehavior: TrackClickBehavior,
     style: ScrollbarStyle,
+    topInset: Dp = 0.dp,
 ) {
     val metrics = style.metrics
     val colors = style.colors
@@ -361,8 +369,10 @@ private fun ScrollbarImpl(
             )
         },
     ) { measurables, constraints ->
-        // Track length: fill all available space on the scroll axis
-        val trackLength = if (isVertical) constraints.maxHeight else constraints.maxWidth
+        // Track length: fill all available space on the scroll axis, minus top inset
+        val totalLength = if (isVertical) constraints.maxHeight else constraints.maxWidth
+        val topInsetPx = if (isVertical) topInset.roundToPx() else 0
+        val trackLength = (totalLength - topInsetPx).coerceAtLeast(0)
         trackSizePx = trackLength
 
         val minPx = thumbMinLength.toPx()
@@ -386,15 +396,13 @@ private fun ScrollbarImpl(
             null
         }
 
-        val layoutW = if (isVertical) trackBreadthPx else trackLength
-        val layoutH = if (isVertical) trackLength else trackBreadthPx
+        val layoutW = if (isVertical) trackBreadthPx else totalLength
+        val layoutH = if (isVertical) totalLength else trackBreadthPx
 
         layout(layoutW, layoutH) {
             if (placeable != null) {
-                val posAlong = thumbOff.roundToInt()
-                    .coerceIn(0, (trackLength - thumbLenPx).coerceAtLeast(0))
-                // Trailing edge stays trailingPad from the container edge;
-                // leading edge expands toward content on hover.
+                val posAlong = (thumbOff.roundToInt() + topInsetPx)
+                    .coerceIn(topInsetPx, (totalLength - thumbLenPx).coerceAtLeast(topInsetPx))
                 val posAcross = (trackBreadthPx - trailPadPx - thumbBreadthPx).coerceAtLeast(0)
 
                 if (isVertical) placeable.place(posAcross, posAlong)

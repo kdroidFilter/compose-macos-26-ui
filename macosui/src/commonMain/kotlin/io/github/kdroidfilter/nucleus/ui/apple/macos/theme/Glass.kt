@@ -6,9 +6,14 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.fletchmckee.liquid.LiquidState
@@ -316,3 +321,42 @@ fun Modifier.macosGlassMaterial(
     }
     return result
 }
+
+/**
+ * Applies a liquid glass effect with a progressive bottom-edge fade.
+ *
+ * The frost is full-strength over most of the surface and fades out
+ * over the bottom 15%, giving a smooth transition instead of a hard line.
+ *
+ * Must be used together with a [liquefiable][io.github.fletchmckee.liquid.liquefiable]
+ * sibling that captures the content underneath.
+ */
+fun Modifier.liquidGlassFade(
+    state: LiquidState,
+    shape: Shape,
+    frost: Dp = 16.dp,
+    tint: Color = Color.Transparent,
+    saturation: Float = 1.05f,
+): Modifier = this
+    .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+    .drawWithContent {
+        drawContent()
+        drawRect(
+            brush = Brush.verticalGradient(
+                colorStops = arrayOf(
+                    0.0f to Color.Transparent,
+                    0.5f to Color.Black.copy(alpha = 0.4f),
+                    1.0f to Color.Black,
+                ),
+                startY = size.height * 0.85f,
+                endY = size.height,
+            ),
+            blendMode = BlendMode.DstOut,
+        )
+    }
+    .liquid(state) {
+        this.frost = frost
+        this.shape = shape
+        this.tint = tint
+        this.saturation = saturation
+    }

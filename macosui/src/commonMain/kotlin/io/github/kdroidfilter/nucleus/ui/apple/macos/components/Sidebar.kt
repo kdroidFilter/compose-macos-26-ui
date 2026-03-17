@@ -33,6 +33,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -53,8 +57,15 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.ControlSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SpringPreset
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.GlassMaterialSize
+import io.github.fletchmckee.liquid.liquid
+import io.github.fletchmckee.liquid.liquefiable
+import io.github.fletchmckee.liquid.rememberLiquidState
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalControlSize
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.GlassType
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalGlassType
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarResize
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.LocalTitleBarDoubleClick
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalTitleBarHeight
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalWindowActive
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SidebarStyle
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarHide
@@ -73,6 +84,8 @@ import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layout
@@ -203,6 +216,11 @@ class SidebarItem(
  * @param collapsed Whether the sidebar is in collapsed (icon-only) mode.
  * @param onCollapsedChange Called when the collapse toggle is clicked.
  * @param collapsible Whether the collapse toggle is shown.
+ *   **Note:** Collapse mode is designed for secondary panels and web layouts
+ *   where an icon-only sidebar is useful. Do not use it for the primary macOS
+ *   app sidebar inside a [Scaffold] — the collapsed rendering breaks the
+ *   glass material highlight alignment. Use [Scaffold]'s
+ *   [onColumnVisibilityChange][Scaffold] to hide/show the sidebar instead.
  * @param showBorder Whether to show a right border on the sidebar.
  * @param scrollbarTrackClickBehavior Scrollbar track click behavior.
  * @param header Optional composable header above the items.
@@ -234,6 +252,7 @@ fun Sidebar(
     val sidebarMetrics = MacosTheme.componentStyling.sidebar.metrics
     val colors = MacosTheme.colorScheme
     val isDark = colors.isDark
+    val glassType = LocalGlassType.current
 
     // Resolve hide callback: explicit parameter takes precedence, then CompositionLocal
     val scaffoldHide = LocalSidebarHide.current
@@ -288,6 +307,13 @@ fun Sidebar(
         if (isDark) Color(0xFF282828) else Color(0xFFF4F4F4)
     }
 
+    // Tinted glass darkens the entire sidebar content background
+    val tintedOverlay = if (glassType == GlassType.Tinted && isWindowActive) {
+        if (isDark) Color.Black.copy(alpha = 0.25f) else Color.Black.copy(alpha = 0.08f)
+    } else {
+        Color.Transparent
+    }
+
     Box(
         modifier = modifier
             .width(animatedWidth)
@@ -307,77 +333,102 @@ fun Sidebar(
                 .background(inactiveOverlay, sidebarContentShape)
                 .border(1.dp, sidebarBorderColor, sidebarContentShape),
         ) {
-            // ---- Hide button (matches title bar height, aligned to end) ----
-            if (effectiveHide != null) {
-                val sidebarVisible = LocalSidebarVisible.current
-                val hideFraction by animateFloatAsState(
-                    targetValue = if (collapsed) 0f else 1f,
-                    animationSpec = sidebarSpring(),
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clipToBounds()
-                        .graphicsLayer {
-                            // Instant hide when sidebar is animating out
-                            alpha = if (sidebarVisible) hideFraction else 0f
-                        }
-                        .layout { measurable, constraints ->
-                            val placeable = measurable.measure(constraints)
-                            val h = (placeable.height * hideFraction).toInt()
-                            layout(placeable.width, h) {
-                                placeable.placeRelative(0, 0)
-                            }
-                        },
-                    contentAlignment = Alignment.CenterEnd,
-                ) {
-                    SidebarHideButton(onClick = effectiveHide)
-                }
-            }
-
-            // ---- Pinned header (height fraction + alpha, stays in tree) ----
-            if (header != null) {
-                val headerFraction by animateFloatAsState(
-                    targetValue = if (collapsed) 0f else 1f,
-                    animationSpec = sidebarSpring(),
-                )
-
-                // layout{} reads headerFraction during the layout phase, which is
-                // acceptable here: it is an animated State so Compose only re-lays
-                // this subtree (not the whole sidebar) on each animation frame.
-                // graphicsLayer confines the alpha read to the draw phase.
-                Box(
-                    modifier = Modifier
-                        .clipToBounds()
-                        .graphicsLayer { alpha = headerFraction }
-                        .layout { measurable, constraints ->
-                            val placeable = measurable.measure(constraints)
-                            val h = (placeable.height * headerFraction).toInt()
-                            layout(placeable.width, h) {
-                                placeable.placeRelative(0, 0)
-                            }
-                        },
-                ) {
-                    header()
-                }
-            }
-
-            // ---- Scrollable items ----
+            // ---- Scrollable content ----
             val itemsScrollState = rememberScrollState()
+            val titleBarHeight = LocalTitleBarHeight.current
+            val glassHeight = if (effectiveHide != null) {
+                (titleBarHeight - animatedPadding).coerceAtLeast(0.dp)
+            } else 0.dp
+            val sidebarGlassState = rememberLiquidState()
             Box(modifier = Modifier.weight(1f)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .liquefiable(sidebarGlassState)
+                        .background(if (isWindowActive) MacosTheme.colorScheme.background else inactiveOverlay)
+                        .background(tintedOverlay),
+                ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .verticalScroll(itemsScrollState)
-                        .padding(start = animatedTrackStartPadding, end = animatedTrackEndPadding, top = 6.dp, bottom = 2.dp),
-                    verticalArrangement = Arrangement.spacedBy(sidebarMetrics.itemSpacingFor(controlSize)),
+                        .then(if (effectiveHide != null) {
+                            Modifier
+                                .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                                .drawWithContent {
+                                    drawContent()
+                                    val fadeEndPx = glassHeight.toPx()
+                                    if (fadeEndPx > 0f) {
+                                        drawRect(
+                                            brush = Brush.verticalGradient(
+                                                colorStops = arrayOf(
+                                                    0.0f to Color.Transparent,
+                                                    0.4f to Color.Black.copy(alpha = 0.1f),
+                                                    0.7f to Color.Black.copy(alpha = 0.5f),
+                                                    1.0f to Color.Black,
+                                                ),
+                                                startY = 0f,
+                                                endY = fadeEndPx,
+                                            ),
+                                            blendMode = BlendMode.DstIn,
+                                        )
+                                    }
+                                }
+                        } else Modifier)
+                        .verticalScroll(itemsScrollState),
                 ) {
-                    if (hasGroups && groupedItems != null) {
-                        for ((group, groupItems) in groupedItems) {
-                            if (group != null) {
-                                GroupHeader(text = group, isCollapsed = collapsed, controlSize = controlSize, sidebarMetrics = sidebarMetrics)
+                    // Spacer matching the title bar height minus the sidebar padding
+                    if (effectiveHide != null) {
+                        Spacer(Modifier.height((titleBarHeight - animatedPadding).coerceAtLeast(0.dp)))
+                    }
+
+                    // ---- Header (scrolls with content) ----
+                    if (header != null) {
+                        val headerFraction by animateFloatAsState(
+                            targetValue = if (collapsed) 0f else 1f,
+                            animationSpec = sidebarSpring(),
+                        )
+                        Box(
+                            modifier = Modifier
+                                .clipToBounds()
+                                .graphicsLayer { alpha = headerFraction }
+                                .layout { measurable, constraints ->
+                                    val placeable = measurable.measure(constraints)
+                                    val h = (placeable.height * headerFraction).toInt()
+                                    layout(placeable.width, h) {
+                                        placeable.placeRelative(0, 0)
+                                    }
+                                },
+                        ) {
+                            header()
+                        }
+                    }
+
+                    // ---- Items ----
+                    Column(
+                        modifier = Modifier
+                            .padding(start = animatedTrackStartPadding, end = animatedTrackEndPadding, top = 6.dp, bottom = 2.dp),
+                        verticalArrangement = Arrangement.spacedBy(sidebarMetrics.itemSpacingFor(controlSize)),
+                    ) {
+                        if (hasGroups && groupedItems != null) {
+                            for ((group, groupItems) in groupedItems) {
+                                if (group != null) {
+                                    GroupHeader(text = group, isCollapsed = collapsed, controlSize = controlSize, sidebarMetrics = sidebarMetrics)
+                                }
+                                groupItems.forEach { item ->
+                                    key(item.id) {
+                                        SidebarItemWithVisibility(
+                                            item = item,
+                                            activeItem = activeItem,
+                                            collapsed = collapsed,
+                                            controlSize = controlSize,
+                                            sidebarMetrics = sidebarMetrics,
+                                            itemColors = itemColors,
+                                        )
+                                    }
+                                }
                             }
-                            groupItems.forEach { item ->
+                        } else {
+                            items.forEach { item ->
                                 key(item.id) {
                                     SidebarItemWithVisibility(
                                         item = item,
@@ -390,35 +441,120 @@ fun Sidebar(
                                 }
                             }
                         }
-                    } else {
-                        items.forEach { item ->
-                            key(item.id) {
-                                SidebarItemWithVisibility(
-                                    item = item,
-                                    activeItem = activeItem,
-                                    collapsed = collapsed,
-                                    controlSize = controlSize,
-                                    sidebarMetrics = sidebarMetrics,
-                                    itemColors = itemColors,
-                                )
-                            }
-                        }
                     }
+                }
                 }
 
                 if (!collapsed) {
+                    val scrollbarInset = if (effectiveHide != null) {
+                        (titleBarHeight - animatedPadding).coerceAtLeast(0.dp)
+                    } else 0.dp
                     VerticalScrollbar(
                         state = rememberScrollbarState(itemsScrollState),
                         modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
                         trackClickBehavior = scrollbarTrackClickBehavior,
+                        topInset = scrollbarInset,
                     )
+                }
+
+                // ---- Fixed liquid glass overlay at top (items scroll under it) ----
+                if (effectiveHide != null) {
+                    val glassHeight = (titleBarHeight - animatedPadding).coerceAtLeast(0.dp)
+                    // Liquid glass with progressive fade (no content inside)
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .fillMaxWidth()
+                            .height(glassHeight)
+                            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                            .drawWithContent {
+                                drawContent()
+                                drawRect(
+                                    brush = Brush.verticalGradient(
+                                        colorStops = arrayOf(
+                                            0.0f to Color.Transparent,
+                                            0.5f to Color.Black.copy(alpha = 0.4f),
+                                            1.0f to Color.Black,
+                                        ),
+                                        startY = size.height * 0.85f,
+                                        endY = size.height,
+                                    ),
+                                    blendMode = BlendMode.DstOut,
+                                )
+                            }
+                            .liquid(sidebarGlassState) {
+                                frost = 2.dp
+                                shape = RoundedCornerShape(
+                                    topStart = 20.dp, topEnd = 20.dp,
+                                    bottomStart = 0.dp, bottomEnd = 0.dp,
+                                )
+                                tint = Color.Transparent
+                                saturation = 1.05f
+                                edge = 0f
+                                refraction = 0f
+                                curve = 0f
+                            },
+                    )
+                    // ---- Pointer interceptor: block item clicks, forward double-click to window ----
+                    val onTitleBarDoubleClick = LocalTitleBarDoubleClick.current
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .fillMaxWidth()
+                            .height(glassHeight)
+                            .pointerInput(onTitleBarDoubleClick) {
+                                awaitPointerEventScope {
+                                    var lastPressTime = 0L
+                                    while (true) {
+                                        val event = awaitPointerEvent(PointerEventPass.Main)
+                                        if (event.type == PointerEventType.Press) {
+                                            if (event.changes.none { it.isConsumed }) {
+                                                val now = event.changes.first().uptimeMillis
+                                                if (now - lastPressTime < viewConfiguration.doubleTapTimeoutMillis) {
+                                                    onTitleBarDoubleClick?.invoke()
+                                                    lastPressTime = 0L
+                                                } else {
+                                                    lastPressTime = now
+                                                }
+                                            }
+                                            event.changes.forEach { it.consume() }
+                                        }
+                                    }
+                                }
+                            },
+                    )
+                    // Hide button (separate, not affected by the fade mask)
+                    val hideFraction by animateFloatAsState(
+                        targetValue = if (collapsed) 0f else 1f,
+                        animationSpec = sidebarSpring(),
+                    )
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .height(glassHeight)
+                            .clipToBounds()
+                            .graphicsLayer { alpha = hideFraction }
+                            .layout { measurable, constraints ->
+                                val placeable = measurable.measure(constraints)
+                                val h = (placeable.height * hideFraction).toInt()
+                                layout(placeable.width, h) {
+                                    placeable.placeRelative(0, 0)
+                                }
+                            },
+                        contentAlignment = Alignment.CenterEnd,
+                    ) {
+                        SidebarHideButton(onClick = effectiveHide)
+                    }
                 }
             }
 
             // ---- Bottom section ----
             if (hasBottomSection) {
                 Column(
-                    modifier = Modifier.padding(top = 6.dp, start = 4.dp, end = 4.dp),
+                    modifier = Modifier
+                        .background(if (isWindowActive) MacosTheme.colorScheme.background else inactiveOverlay)
+                        .background(tintedOverlay)
+                        .padding(top = 6.dp, start = 4.dp, end = 4.dp),
                     verticalArrangement = Arrangement.spacedBy(sidebarMetrics.itemSpacingFor(controlSize)),
                 ) {
                     if (collapsible) {
