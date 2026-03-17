@@ -119,8 +119,8 @@ private fun DrawScope.drawDeterminateBar(
         drawRoundRect(color = accentColor.copy(alpha = 0.50f), cornerRadius = cr, size = barSize)
         drawRoundRect(color = accentColor.copy(alpha = 0.50f), cornerRadius = cr, size = barSize)
     } else {
-        drawRoundRect(color = Color.Black.copy(alpha = 0.06f), cornerRadius = cr, size = barSize)
-        drawRoundRect(color = Color.Black.copy(alpha = 0.05f), cornerRadius = cr, size = barSize)
+        drawRoundRect(color = Color.Gray.copy(alpha = 0.3f), cornerRadius = cr, size = barSize)
+        drawRoundRect(color = Color.Gray.copy(alpha = 0.2f), cornerRadius = cr, size = barSize)
     }
 }
 
@@ -148,7 +148,7 @@ private fun DrawScope.drawIndeterminateBar(
         )
     }
 
-    val baseColor = if (enabled) accentColor else Color.Black.copy(alpha = 0.08f)
+    val baseColor = if (enabled) accentColor else Color.Gray.copy(alpha = 0.3f)
 
     // Gradient: transparent on trailing (left) edge, solid on leading (right) edge
     val colorStops = arrayOf(
