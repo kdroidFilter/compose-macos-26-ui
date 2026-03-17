@@ -231,10 +231,19 @@ private fun ToastItem(
     var visible by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    // Animated dismiss helper
+    // Animated dismiss with onDismiss callback (close button, auto-expiration)
     fun animatedDismiss() {
         scope.launch {
             toast.onDismiss?.invoke()
+            visible = false
+            delay(300)
+            onDismiss()
+        }
+    }
+
+    // Silent dismiss without onDismiss callback (tap with onClick)
+    fun silentDismiss() {
+        scope.launch {
             visible = false
             delay(300)
             onDismiss()
@@ -286,7 +295,7 @@ private fun ToastItem(
                         indication = null,
                         onClick = {
                             toast.onClick?.invoke()
-                            animatedDismiss()
+                            if (toast.onClick != null) silentDismiss() else animatedDismiss()
                         },
                     ),
             ) {
