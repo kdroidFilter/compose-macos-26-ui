@@ -14,7 +14,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.CheckBox
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.CheckboxDefaults
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
 import io.github.kdroidfilter.nucleus.ui.apple.macos.gallery.GalleryExample
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.ControlSize
@@ -157,6 +159,42 @@ fun CheckboxSelectAllExample() {
     }
 }
 
+@GalleryExample("Checkbox", "Custom Colors")
+@Composable
+fun CheckboxCustomColorsExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        var c1 by remember { mutableStateOf(true) }
+        CheckBox(
+            checked = c1,
+            onCheckedChange = { c1 = it },
+            label = "Green checkbox",
+            colors = CheckboxDefaults.colors(
+                checkedFillColor = Color(0xFF34C759),
+                checkmarkColor = Color.White,
+            ),
+        )
+        var c2 by remember { mutableStateOf(true) }
+        CheckBox(
+            checked = c2,
+            onCheckedChange = { c2 = it },
+            label = "Orange checkbox",
+            colors = CheckboxDefaults.colors(
+                checkedFillColor = Color(0xFFFF9500),
+                checkmarkColor = Color.White,
+            ),
+        )
+        var c3 by remember { mutableStateOf(false) }
+        CheckBox(
+            checked = c3,
+            onCheckedChange = { c3 = it },
+            label = "Custom unchecked",
+            colors = CheckboxDefaults.colors(
+                uncheckedFillColor = Color(0xFFFF3B30).copy(alpha = 0.15f),
+            ),
+        )
+    }
+}
+
 @Composable
 internal fun CheckboxPage() {
     GalleryPage("Checkbox", "A control that allows the user to toggle between checked and unchecked.") {
@@ -183,5 +221,12 @@ internal fun CheckboxPage() {
             description = "Parent checkbox with indeterminate state",
             sourceCode = GallerySources.CheckboxSelectAllExample,
         ) { CheckboxSelectAllExample() }
+
+        SectionHeader("Custom Colors")
+        ExampleCard(
+            title = "Custom Colors",
+            description = "Checkboxes with custom fill and checkmark colors",
+            sourceCode = GallerySources.CheckboxCustomColorsExample,
+        ) { CheckboxCustomColorsExample() }
     }
 }

@@ -21,7 +21,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Switch
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SwitchDefaults
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Switcher
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.ControlSize
@@ -169,6 +171,40 @@ fun SwitchSurfaceExample() {
     }
 }
 
+@GalleryExample("Switch", "Custom Colors")
+@Composable
+fun SwitchCustomColorsExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        var s1 by remember { mutableStateOf(true) }
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Switch(
+                checked = s1,
+                onCheckedChange = { s1 = it },
+                colors = SwitchDefaults.colors(onTrackColor = Color(0xFF34C759)),
+            )
+            Text("Green track", style = MacosTheme.typography.caption1, color = MacosTheme.colorScheme.textSecondary)
+        }
+        var s2 by remember { mutableStateOf(true) }
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Switch(
+                checked = s2,
+                onCheckedChange = { s2 = it },
+                colors = SwitchDefaults.colors(onTrackColor = Color(0xFFFF9500)),
+            )
+            Text("Orange track", style = MacosTheme.typography.caption1, color = MacosTheme.colorScheme.textSecondary)
+        }
+        var s3 by remember { mutableStateOf(false) }
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Switch(
+                checked = s3,
+                onCheckedChange = { s3 = it },
+                colors = SwitchDefaults.colors(offTrackColor = Color(0xFFFF3B30).copy(alpha = 0.20f)),
+            )
+            Text("Red off-track", style = MacosTheme.typography.caption1, color = MacosTheme.colorScheme.textSecondary)
+        }
+    }
+}
+
 @Composable
 internal fun SwitchPage() {
     GalleryPage("Switch", "A control that toggles between on and off states.") {
@@ -187,5 +223,12 @@ internal fun SwitchPage() {
             description = "Switch without on/off state indicators",
             sourceCode = GallerySources.SwitchNoIndicatorsExample,
         ) { SwitchNoIndicatorsExample() }
+
+        SectionHeader("Custom Colors")
+        ExampleCard(
+            title = "Custom Colors",
+            description = "Switches with custom track colors",
+            sourceCode = GallerySources.SwitchCustomColorsExample,
+        ) { SwitchCustomColorsExample() }
     }
 }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -35,6 +36,26 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.RadioButtonStyle
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosSpring
 
 // ===========================================================================
+// RadioButtonColors — customizable color overrides
+// ===========================================================================
+
+@Immutable
+class RadioButtonColors(
+    val selectedFillColor: Color,
+    val unselectedFillColor: Color,
+    val dotColor: Color,
+)
+
+object RadioButtonDefaults {
+    @Composable
+    fun colors(
+        selectedFillColor: Color = Color.Unspecified,
+        unselectedFillColor: Color = Color.Unspecified,
+        dotColor: Color = Color.Unspecified,
+    ) = RadioButtonColors(selectedFillColor, unselectedFillColor, dotColor)
+}
+
+// ===========================================================================
 // RadioButton — macOS 26 style (no borders, translucent fills)
 // ===========================================================================
 
@@ -44,22 +65,30 @@ fun RadioButton(
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    colors: RadioButtonColors? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val controlSize = LocalControlSize.current
     val isWindowActive = LocalWindowActive.current
     val surface = LocalSurface.current
     val style = MacosTheme.componentStyling.radioButton
-    val colors = style.colors
+    val themeColors = style.colors
     val metrics = style.metrics
 
     val isPressed by interactionSource.collectIsPressedAsState()
 
     // Resolve fill color based on state + surface
-    val fillTarget = resolveFillColor(selected, enabled, isPressed, isWindowActive, surface, colors)
+    val fillTarget = resolveFillColor(selected, enabled, isPressed, isWindowActive, surface, themeColors)
+
+    // Apply custom color overrides
+    val customFillTarget = when {
+        colors?.selectedFillColor != null && colors.selectedFillColor != Color.Unspecified && selected && isWindowActive && enabled -> colors.selectedFillColor
+        colors?.unselectedFillColor != null && colors.unselectedFillColor != Color.Unspecified && !selected -> colors.unselectedFillColor
+        else -> fillTarget
+    }
 
     val radioFill by animateColorAsState(
-        targetValue = fillTarget,
+        targetValue = customFillTarget,
         animationSpec = macosSpring(SpringPreset.Snappy),
         label = "radioButtonFill",
     )
@@ -84,15 +113,19 @@ fun RadioButton(
     )
 
     // Dot color
-    val dotColor = when {
-        !isWindowActive && !enabled -> colors.inactiveDisabledDot
-        !isWindowActive -> colors.inactiveDot
-        else -> colors.dot
+    val resolvedDotColor = if (colors?.dotColor != null && colors.dotColor != Color.Unspecified) {
+        colors.dotColor
+    } else {
+        when {
+            !isWindowActive && !enabled -> themeColors.inactiveDisabledDot
+            !isWindowActive -> themeColors.inactiveDot
+            else -> themeColors.dot
+        }
     }
 
     // Disabled alpha
     val contentAlpha = when {
-        !enabled && selected -> colors.disabledAlpha
+        !enabled && selected -> themeColors.disabledAlpha
         !enabled -> 1f
         else -> 1f
     }
@@ -135,7 +168,7 @@ fun RadioButton(
                         scaleY = dotAnimationProgress
                         alpha = dotAnimationProgress
                     }
-                    .background(dotColor, CircleShape),
+                    .background(resolvedDotColor, CircleShape),
             )
         }
     }
@@ -183,6 +216,7 @@ fun RadioButton(
     modifier: Modifier = Modifier,
     label: String? = null,
     enabled: Boolean = true,
+    colors: RadioButtonColors? = null,
 ) {
     if (label != null) {
         val interactionSource = remember { MutableInteractionSource() }
@@ -201,6 +235,7 @@ fun RadioButton(
                 selected = selected,
                 onClick = null,
                 enabled = enabled,
+                colors = colors,
                 interactionSource = interactionSource,
             )
             Spacer(modifier = Modifier.width(MacosTheme.componentStyling.radioButton.metrics.labelSpacingFor(LocalControlSize.current)))
@@ -217,6 +252,7 @@ fun RadioButton(
             onClick = onClick as (() -> Unit)?,
             modifier = modifier,
             enabled = enabled,
+            colors = colors,
         )
     }
 }

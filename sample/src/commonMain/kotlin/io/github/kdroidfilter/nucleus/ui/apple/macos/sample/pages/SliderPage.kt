@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Slider
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SliderDefaults
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
 import io.github.kdroidfilter.nucleus.ui.apple.macos.gallery.GalleryExample
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.ExampleCard
@@ -149,6 +150,37 @@ fun SliderSurfaceExample() {
     }
 }
 
+@GalleryExample("Slider", "Custom Colors")
+@Composable
+fun SliderCustomColorsExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+        var v1 by remember { mutableStateOf(50f) }
+        Text("Green track", style = MacosTheme.typography.caption1, color = MacosTheme.colorScheme.textSecondary)
+        Slider(
+            value = v1,
+            onValueChange = { v1 = it },
+            valueRange = 0f..100f,
+            colors = SliderDefaults.colors(activeTrackColor = Color(0xFF34C759)),
+        )
+        var v2 by remember { mutableStateOf(50f) }
+        Text("Orange track", style = MacosTheme.typography.caption1, color = MacosTheme.colorScheme.textSecondary)
+        Slider(
+            value = v2,
+            onValueChange = { v2 = it },
+            valueRange = 0f..100f,
+            colors = SliderDefaults.colors(activeTrackColor = Color(0xFFFF9500)),
+        )
+        var v3 by remember { mutableStateOf(50f) }
+        Text("Purple track", style = MacosTheme.typography.caption1, color = MacosTheme.colorScheme.textSecondary)
+        Slider(
+            value = v3,
+            onValueChange = { v3 = it },
+            valueRange = 0f..100f,
+            colors = SliderDefaults.colors(activeTrackColor = Color(0xFFAF52DE)),
+        )
+    }
+}
+
 @Composable
 internal fun SliderPage() {
     GalleryPage("Slider", "An input where the user selects a value from within a given range.") {
@@ -159,5 +191,12 @@ internal fun SliderPage() {
         SectionHeader("Examples")
         ExampleCard(title = "Volume", sourceCode = GallerySources.SliderVolumeExample) { SliderVolumeExample() }
         ExampleCard(title = "With Value Display", sourceCode = GallerySources.SliderWithValueExample) { SliderWithValueExample() }
+
+        SectionHeader("Custom Colors")
+        ExampleCard(
+            title = "Custom Colors",
+            description = "Sliders with custom track colors",
+            sourceCode = GallerySources.SliderCustomColorsExample,
+        ) { SliderCustomColorsExample() }
     }
 }

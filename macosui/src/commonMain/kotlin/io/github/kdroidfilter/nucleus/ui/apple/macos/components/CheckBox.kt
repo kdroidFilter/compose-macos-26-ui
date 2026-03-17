@@ -16,6 +16,7 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -43,6 +44,26 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalWindowActive
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosSpring
 
 // ===========================================================================
+// CheckboxColors — customizable color overrides
+// ===========================================================================
+
+@Immutable
+class CheckboxColors(
+    val checkedFillColor: Color,
+    val uncheckedFillColor: Color,
+    val checkmarkColor: Color,
+)
+
+object CheckboxDefaults {
+    @Composable
+    fun colors(
+        checkedFillColor: Color = Color.Unspecified,
+        uncheckedFillColor: Color = Color.Unspecified,
+        checkmarkColor: Color = Color.Unspecified,
+    ) = CheckboxColors(checkedFillColor, uncheckedFillColor, checkmarkColor)
+}
+
+// ===========================================================================
 // Checkbox — macOS 26 style (no borders, translucent fills)
 // ===========================================================================
 
@@ -52,6 +73,7 @@ fun Checkbox(
     onCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    colors: CheckboxColors? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     TriStateCheckbox(
@@ -61,6 +83,7 @@ fun Checkbox(
         } else null,
         modifier = modifier,
         enabled = enabled,
+        colors = colors,
         interactionSource = interactionSource,
     )
 }
@@ -75,23 +98,31 @@ fun TriStateCheckbox(
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    colors: CheckboxColors? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val controlSize = LocalControlSize.current
     val isWindowActive = LocalWindowActive.current
     val surface = LocalSurface.current
     val style = MacosTheme.componentStyling.checkbox
-    val colors = style.colors
+    val themeColors = style.colors
     val metrics = style.metrics
 
     val isPressed by interactionSource.collectIsPressedAsState()
     val isActive = state != ToggleableState.Off
 
     // Resolve fill color
-    val fillTarget = resolveCheckboxFillColor(isActive, enabled, isPressed, isWindowActive, surface, colors)
+    val fillTarget = resolveCheckboxFillColor(isActive, enabled, isPressed, isWindowActive, surface, themeColors)
+
+    // Apply custom color overrides
+    val customFillTarget = when {
+        colors?.checkedFillColor != null && colors.checkedFillColor != Color.Unspecified && isActive && isWindowActive && enabled -> colors.checkedFillColor
+        colors?.uncheckedFillColor != null && colors.uncheckedFillColor != Color.Unspecified && !isActive -> colors.uncheckedFillColor
+        else -> fillTarget
+    }
 
     val boxFill by animateColorAsState(
-        targetValue = fillTarget,
+        targetValue = customFillTarget,
         animationSpec = macosSpring(SpringPreset.Snappy),
         label = "checkboxFill",
     )
@@ -115,15 +146,19 @@ fun TriStateCheckbox(
     )
 
     // Checkmark color
-    val checkmarkColor = when {
-        !isWindowActive && !enabled -> colors.inactiveDisabledCheckmark
-        !isWindowActive -> colors.inactiveCheckmark
-        else -> colors.checkmark
+    val resolvedCheckmarkColor = if (colors?.checkmarkColor != null && colors.checkmarkColor != Color.Unspecified) {
+        colors.checkmarkColor
+    } else {
+        when {
+            !isWindowActive && !enabled -> themeColors.inactiveDisabledCheckmark
+            !isWindowActive -> themeColors.inactiveCheckmark
+            else -> themeColors.checkmark
+        }
     }
 
     // Disabled alpha
     val contentAlpha = when {
-        !enabled && isActive -> colors.disabledAlpha
+        !enabled && isActive -> themeColors.disabledAlpha
         !enabled -> 1f
         else -> 1f
     }
@@ -170,9 +205,9 @@ fun TriStateCheckbox(
                     },
             ) {
                 if (state == ToggleableState.Indeterminate) {
-                    drawIndeterminateDash(checkmarkColor)
+                    drawIndeterminateDash(resolvedCheckmarkColor)
                 } else {
-                    drawCheckmark(checkmarkColor)
+                    drawCheckmark(resolvedCheckmarkColor)
                 }
             }
         }
@@ -222,6 +257,7 @@ fun CheckBox(
     indeterminate: Boolean = false,
     label: String? = null,
     enabled: Boolean = true,
+    colors: CheckboxColors? = null,
 ) {
     if (indeterminate || label != null) {
         val interactionSource = remember { MutableInteractionSource() }
@@ -241,6 +277,7 @@ fun CheckBox(
                     state = ToggleableState.Indeterminate,
                     onClick = null,
                     enabled = enabled,
+                    colors = colors,
                     interactionSource = interactionSource,
                 )
             } else {
@@ -248,6 +285,7 @@ fun CheckBox(
                     checked = checked,
                     onCheckedChange = null,
                     enabled = enabled,
+                    colors = colors,
                     interactionSource = interactionSource,
                 )
             }
@@ -262,7 +300,7 @@ fun CheckBox(
             }
         }
     } else {
-        Checkbox(checked = checked, onCheckedChange = onCheckedChange, modifier = modifier, enabled = enabled)
+        Checkbox(checked = checked, onCheckedChange = onCheckedChange, modifier = modifier, enabled = enabled, colors = colors)
     }
 }
 

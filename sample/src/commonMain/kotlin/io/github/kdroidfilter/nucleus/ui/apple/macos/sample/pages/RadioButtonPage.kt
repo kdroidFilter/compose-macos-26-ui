@@ -13,7 +13,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.RadioButton
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.RadioButtonDefaults
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.ControlSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.Surface
@@ -120,6 +122,41 @@ fun RadioButtonSurfaceExample() {
     }
 }
 
+@GalleryExample("RadioButton", "Custom Colors")
+@Composable
+fun RadioButtonCustomColorsExample() {
+    var selected by remember { mutableStateOf(1) }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        RadioButton(
+            selected = selected == 1,
+            onClick = { selected = 1 },
+            label = "Green radio",
+            colors = RadioButtonDefaults.colors(
+                selectedFillColor = Color(0xFF34C759),
+                dotColor = Color.White,
+            ),
+        )
+        RadioButton(
+            selected = selected == 2,
+            onClick = { selected = 2 },
+            label = "Orange radio",
+            colors = RadioButtonDefaults.colors(
+                selectedFillColor = Color(0xFFFF9500),
+                dotColor = Color.White,
+            ),
+        )
+        RadioButton(
+            selected = selected == 3,
+            onClick = { selected = 3 },
+            label = "Purple radio",
+            colors = RadioButtonDefaults.colors(
+                selectedFillColor = Color(0xFFAF52DE),
+                dotColor = Color.White,
+            ),
+        )
+    }
+}
+
 @Composable
 internal fun RadioButtonPage() {
     GalleryPage("RadioButton", "A control that allows the user to select a single option from a set.") {
@@ -141,5 +178,12 @@ internal fun RadioButtonPage() {
             description = "Selected, unselected, and disabled states",
             sourceCode = GallerySources.RadioButtonBasicExample,
         ) { RadioButtonBasicExample() }
+
+        SectionHeader("Custom Colors")
+        ExampleCard(
+            title = "Custom Colors",
+            description = "Radio buttons with custom fill and dot colors",
+            sourceCode = GallerySources.RadioButtonCustomColorsExample,
+        ) { RadioButtonCustomColorsExample() }
     }
 }
