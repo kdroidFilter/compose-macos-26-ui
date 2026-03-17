@@ -3,6 +3,7 @@ package io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -11,8 +12,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.ComboBox
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.ComboBoxDefaults
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.MenuPlacement
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
 import io.github.kdroidfilter.nucleus.ui.apple.macos.gallery.GalleryExample
@@ -126,6 +129,36 @@ fun ComboBoxPlacementExample() {
     }
 }
 
+@GalleryExample("ComboBox", "Custom Colors")
+@Composable
+fun ComboBoxCustomColorsExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+        var s1 by remember { mutableStateOf<Int?>(null) }
+        ComboBox(
+            items = listOf("Apple", "Banana", "Cherry"),
+            selected = s1,
+            onSelectionChange = { i, _ -> s1 = i },
+            header = "Green accent",
+            colors = ComboBoxDefaults.colors(
+                selectedItemColor = Color(0xFF34C759),
+                selectedItemTextColor = Color.White,
+            ),
+        )
+        var s2 by remember { mutableStateOf<Int?>(null) }
+        ComboBox(
+            items = listOf("Small", "Medium", "Large"),
+            selected = s2,
+            onSelectionChange = { i, _ -> s2 = i },
+            header = "Custom border & background",
+            colors = ComboBoxDefaults.colors(
+                backgroundColor = Color(0xFFAF52DE).copy(alpha = 0.08f),
+                borderColor = Color(0xFFAF52DE).copy(alpha = 0.30f),
+                chevronColor = Color(0xFFAF52DE),
+            ),
+        )
+    }
+}
+
 @Composable
 internal fun ComboBoxPage() {
     GalleryPage("Combo Box", "A dropdown combo box for selecting from a list of options.") {
@@ -151,6 +184,12 @@ internal fun ComboBoxPage() {
             description = "Combo box in disabled state",
             sourceCode = GallerySources.ComboBoxDisabledExample,
         ) { ComboBoxDisabledExample() }
+        SectionHeader("Custom Colors")
+        ExampleCard(
+            title = "Custom Colors",
+            description = "ComboBox with custom selection and border colors",
+            sourceCode = GallerySources.ComboBoxCustomColorsExample,
+        ) { ComboBoxCustomColorsExample() }
         SectionHeader("Placement")
         ExampleCard(
             title = "Menu Placement",

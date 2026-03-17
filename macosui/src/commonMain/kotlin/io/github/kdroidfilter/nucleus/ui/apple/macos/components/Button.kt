@@ -2,7 +2,9 @@ package io.github.kdroidfilter.nucleus.ui.apple.macos.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -33,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
@@ -148,6 +151,8 @@ fun PushButton(
     style: PushButtonStyle = PushButtonStyle.Default,
     selected: Boolean = false,
     enabled: Boolean = true,
+    shape: Shape? = null,
+    border: BorderStroke? = null,
     colors: PushButtonColors? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit,
@@ -200,7 +205,7 @@ fun PushButton(
         label = "push_overlay",
     )
 
-    val shape = RoundedCornerShape(metrics.cornerSizeFor(controlSize))
+    val resolvedShape = shape ?: RoundedCornerShape(metrics.cornerSizeFor(controlSize))
 
     CompositionLocalProvider(
         LocalContentColor provides contentColor,
@@ -210,9 +215,10 @@ fun PushButton(
             modifier = modifier
                 .scale(scale)
                 .height(metrics.minHeightFor(controlSize))
-                .clip(shape)
-                .background(bgColor, shape)
-                .background(overlayColor, shape)
+                .clip(resolvedShape)
+                .background(bgColor, resolvedShape)
+                .background(overlayColor, resolvedShape)
+                .then(if (border != null) Modifier.border(border, resolvedShape) else Modifier)
                 .hoverable(interactionSource = interactionSource, enabled = enabled)
                 .clickable(
                     interactionSource = interactionSource,
@@ -243,10 +249,12 @@ fun PushButton(
     style: PushButtonStyle = PushButtonStyle.Default,
     selected: Boolean = false,
     enabled: Boolean = true,
+    shape: Shape? = null,
+    border: BorderStroke? = null,
     colors: PushButtonColors? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    PushButton(onClick, modifier, style, selected, enabled, colors, interactionSource) {
+    PushButton(onClick, modifier, style, selected, enabled, shape, border, colors, interactionSource) {
         if (icon != null) {
             val controlSize = LocalControlSize.current
             Icon(
@@ -269,10 +277,12 @@ fun PushButton(
     style: PushButtonStyle = PushButtonStyle.Default,
     selected: Boolean = false,
     enabled: Boolean = true,
+    shape: Shape? = null,
+    border: BorderStroke? = null,
     colors: PushButtonColors? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    PushButton(onClick, modifier, style, selected, enabled, colors, interactionSource) {
+    PushButton(onClick, modifier, style, selected, enabled, shape, border, colors, interactionSource) {
         val controlSize = LocalControlSize.current
         Icon(
             imageVector = icon,

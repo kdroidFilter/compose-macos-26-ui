@@ -29,6 +29,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,6 +61,34 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.Outline
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosGlass
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.focusOrValidationOutline
 
+@Immutable
+class MultiSelectComboBoxColors(
+    val backgroundColor: Color,
+    val borderColor: Color,
+    val textColor: Color,
+    val placeholderColor: Color,
+    val chevronColor: Color,
+    val highlightedItemColor: Color,
+    val checkmarkColor: Color,
+    val tagBackgroundColor: Color,
+    val tagTextColor: Color,
+)
+
+object MultiSelectComboBoxDefaults {
+    @Composable
+    fun colors(
+        backgroundColor: Color = Color.Unspecified,
+        borderColor: Color = Color.Unspecified,
+        textColor: Color = Color.Unspecified,
+        placeholderColor: Color = Color.Unspecified,
+        chevronColor: Color = Color.Unspecified,
+        highlightedItemColor: Color = Color.Unspecified,
+        checkmarkColor: Color = Color.Unspecified,
+        tagBackgroundColor: Color = Color.Unspecified,
+        tagTextColor: Color = Color.Unspecified,
+    ) = MultiSelectComboBoxColors(backgroundColor, borderColor, textColor, placeholderColor, chevronColor, highlightedItemColor, checkmarkColor, tagBackgroundColor, tagTextColor)
+}
+
 /**
  * A multi-select combo box with index-based selection.
  *
@@ -86,10 +115,11 @@ fun MultiSelectComboBox(
     outline: Outline = Outline.None,
     showTags: Boolean = true,
     placement: MenuPlacement = MenuPlacement.Below,
+    colors: MultiSelectComboBoxColors? = null,
 ) {
     val controlSize = LocalControlSize.current
     val comboMetrics = MacosTheme.componentStyling.comboBox.metrics
-    val colors = MacosTheme.colorScheme
+    val scheme = MacosTheme.colorScheme
     val shapes = MacosTheme.shapes
     val typography = MacosTheme.typography
     val outlines = MacosTheme.globalColors.outlines
@@ -104,14 +134,18 @@ fun MultiSelectComboBox(
     val isFocused by interactionSource.collectIsFocusedAsState()
     val focusRequester = remember { FocusRequester() }
 
-    val isDark = colors.isDark
-    val backgroundColor = when {
+    val isDark = scheme.isDark
+    val backgroundColor = if (colors?.backgroundColor != null && colors.backgroundColor != Color.Unspecified) {
+        colors.backgroundColor
+    } else when {
         !enabled -> if (isDark) Color.White.copy(alpha = 0.04f) else Color.White.copy(alpha = 0.50f)
         else -> if (isDark) Color.White.copy(alpha = 0.08f) else Color.White
     }
-    val borderColor = when {
+    val borderColor = if (colors?.borderColor != null && colors.borderColor != Color.Unspecified) {
+        colors.borderColor
+    } else when {
         !enabled -> if (isDark) Color.White.copy(alpha = 0.04f) else Color.Black.copy(alpha = 0.04f)
-        isFocused || expanded -> colors.inputFocusBorder
+        isFocused || expanded -> scheme.inputFocusBorder
         else -> if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.08f)
     }
     val borderWidth = if (enabled && (isFocused || expanded)) 2.dp else 1.dp
@@ -122,7 +156,11 @@ fun MultiSelectComboBox(
     }
     val chevronBg = if (isDark) Color.White.copy(alpha = chevronAlpha) else Color.Black.copy(alpha = chevronAlpha)
     val chevronTintAlpha = if (enabled) 0.85f else 0.25f
-    val chevronTint = if (isDark) Color.White.copy(alpha = chevronTintAlpha) else Color.Black.copy(alpha = chevronTintAlpha)
+    val chevronTint = if (colors?.chevronColor != null && colors.chevronColor != Color.Unspecified) {
+        colors.chevronColor
+    } else {
+        if (isDark) Color.White.copy(alpha = chevronTintAlpha) else Color.Black.copy(alpha = chevronTintAlpha)
+    }
 
     val comboFontSize = when (controlSize) {
         ControlSize.Mini -> 10.sp
@@ -160,7 +198,7 @@ fun MultiSelectComboBox(
             Text(
                 text = header,
                 style = typography.caption1,
-                color = colors.textPrimary,
+                color = scheme.textPrimary,
                 modifier = Modifier.padding(bottom = 6.dp),
             )
         }
@@ -240,7 +278,11 @@ fun MultiSelectComboBox(
                         text = displayText ?: placeholder ?: "Select...",
                         style = typography.subheadline,
                         fontSize = comboFontSize,
-                        color = if (displayText != null) colors.textPrimary else colors.textTertiary,
+                        color = if (displayText != null) {
+                            if (colors?.textColor != null && colors.textColor != Color.Unspecified) colors.textColor else scheme.textPrimary
+                        } else {
+                            if (colors?.placeholderColor != null && colors.placeholderColor != Color.Unspecified) colors.placeholderColor else scheme.textTertiary
+                        },
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f).padding(start = 12.dp),
@@ -299,9 +341,7 @@ fun MultiSelectComboBox(
                         val isItemHovered by itemInteractionSource.collectIsHoveredAsState()
 
                         val itemBackgroundColor = when {
-                            isHighlighted || isItemHovered ->
-                                if (isDark) Color.White.copy(alpha = 0.08f)
-                                else Color.Black.copy(alpha = 0.05f)
+                            isHighlighted || isItemHovered -> if (colors?.highlightedItemColor != null && colors.highlightedItemColor != Color.Unspecified) colors.highlightedItemColor else if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.05f)
                             else -> Color.Transparent
                         }
 
@@ -329,7 +369,7 @@ fun MultiSelectComboBox(
                             if (isSelected) {
                                 Icon(
                                     icon = Icons.Check,
-                                    tint = colors.accent,
+                                    tint = if (colors?.checkmarkColor != null && colors.checkmarkColor != Color.Unspecified) colors.checkmarkColor else scheme.accent,
                                     modifier = Modifier
                                         .align(Alignment.CenterStart)
                                         .padding(start = 8.dp)
@@ -340,7 +380,7 @@ fun MultiSelectComboBox(
                                 text = label,
                                 style = typography.subheadline,
                                 fontSize = comboFontSize,
-                                color = colors.textPrimary,
+                                color = if (colors?.textColor != null && colors.textColor != Color.Unspecified) colors.textColor else scheme.textPrimary,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier
@@ -365,7 +405,8 @@ fun MultiSelectComboBox(
                         modifier = Modifier
                             .clip(shapes.medium)
                             .background(
-                                if (isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f),
+                                if (colors?.tagBackgroundColor != null && colors.tagBackgroundColor != Color.Unspecified) colors.tagBackgroundColor
+                                else if (isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f),
                             )
                             .border(
                                 1.dp,
@@ -378,7 +419,8 @@ fun MultiSelectComboBox(
                         Text(
                             text = label,
                             style = typography.caption1.copy(fontSize = 12.sp),
-                            color = if (isDark) Color(0xFFD4D4D8) else Color(0xFF3F3F46),
+                            color = if (colors?.tagTextColor != null && colors.tagTextColor != Color.Unspecified) colors.tagTextColor
+                                else if (isDark) Color(0xFFD4D4D8) else Color(0xFF3F3F46),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )

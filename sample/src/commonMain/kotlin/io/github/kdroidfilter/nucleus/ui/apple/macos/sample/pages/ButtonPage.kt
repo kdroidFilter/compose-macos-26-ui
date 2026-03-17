@@ -14,7 +14,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.ArrowButton
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.PushButton
@@ -499,6 +506,97 @@ fun ButtonCustomColorsExample() {
 }
 
 // ===========================================================================
+// Custom Shape & Border
+// ===========================================================================
+
+@OptIn(ExperimentalLayoutApi::class)
+@GalleryExample("Button", "Custom Shape & Border")
+@Composable
+fun ButtonCustomShapeBorderExample() {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        PushButton(
+            text = "Pill",
+            onClick = {},
+            shape = CircleShape,
+            style = PushButtonStyle.Secondary,
+        )
+        PushButton(
+            text = "Rounded 2dp",
+            onClick = {},
+            shape = RoundedCornerShape(2.dp),
+        )
+        PushButton(
+            text = "Outlined",
+            onClick = {},
+            shape = RoundedCornerShape(8.dp),
+            border = BorderStroke(1.dp, MacosTheme.colorScheme.accent),
+            style = PushButtonStyle.Borderless,
+        )
+        PushButton(
+            text = "Bold Border",
+            onClick = {},
+            border = BorderStroke(2.dp, Color(0xFFFF9500)),
+            colors = PushButtonDefaults.colors(
+                backgroundColor = Color.Transparent,
+                contentColor = Color(0xFFFF9500),
+            ),
+        )
+    }
+}
+
+// ===========================================================================
+// Custom Text Content
+// ===========================================================================
+
+@OptIn(ExperimentalLayoutApi::class)
+@GalleryExample("Button", "Custom Text Content")
+@Composable
+fun ButtonCustomTextContentExample() {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        PushButton(onClick = {}) {
+            Text(
+                "Bold",
+                fontWeight = FontWeight.Black,
+            )
+        }
+        PushButton(onClick = {}, style = PushButtonStyle.Secondary) {
+            Text(
+                "Small Caps",
+                fontSize = 10.sp,
+                letterSpacing = 2.sp,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+        PushButton(onClick = {}, style = PushButtonStyle.Neutral) {
+            Text("🎨", fontSize = 14.sp)
+            Spacer(Modifier.width(4.dp))
+            Text("With Emoji")
+        }
+        PushButton(
+            onClick = {},
+            shape = CircleShape,
+            border = BorderStroke(1.dp, Color(0xFF34C759)),
+            colors = PushButtonDefaults.colors(
+                backgroundColor = Color.Transparent,
+                contentColor = Color(0xFF34C759),
+            ),
+        ) {
+            Text(
+                "Fully Custom",
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp,
+            )
+        }
+    }
+}
+
+// ===========================================================================
 // ButtonPage — organized exactly like Sketch Buttons page
 // ===========================================================================
 
@@ -576,6 +674,20 @@ internal fun ButtonPage() {
             description = "Buttons with fully custom background and content colors",
             sourceCode = GallerySources.ButtonCustomColorsExample,
         ) { ButtonCustomColorsExample() }
+
+        SectionHeader("Custom Shape & Border")
+        ExampleCard(
+            title = "Custom Shape & Border",
+            description = "Override the button shape and add a border stroke",
+            sourceCode = GallerySources.ButtonCustomShapeBorderExample,
+        ) { ButtonCustomShapeBorderExample() }
+
+        SectionHeader("Custom Text Content")
+        ExampleCard(
+            title = "Custom Text Content",
+            description = "Use the composable content overload for full text customization",
+            sourceCode = GallerySources.ButtonCustomTextContentExample,
+        ) { ButtonCustomTextContentExample() }
 
         SectionHeader("Surface Appearance")
         ExampleCard(

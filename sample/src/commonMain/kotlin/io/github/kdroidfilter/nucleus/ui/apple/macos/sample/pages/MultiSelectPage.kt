@@ -12,9 +12,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.MenuPlacement
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.MultiSelectComboBox
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.MultiSelectComboBoxDefaults
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
 import io.github.kdroidfilter.nucleus.ui.apple.macos.gallery.GalleryExample
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.ExampleCard
@@ -122,6 +124,38 @@ fun MultiSelectPlacementExample() {
     }
 }
 
+@GalleryExample("MultiSelectComboBox", "Custom Colors")
+@Composable
+fun MultiSelectCustomColorsExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+        var sel1 by remember { mutableStateOf(listOf(0)) }
+        MultiSelectComboBox(
+            items = listOf("Red", "Green", "Blue"),
+            selectedIndices = sel1,
+            onSelectionChange = { sel1 = it },
+            header = "Green checkmarks",
+            colors = MultiSelectComboBoxDefaults.colors(
+                checkmarkColor = Color(0xFF34C759),
+                tagBackgroundColor = Color(0xFF34C759).copy(alpha = 0.10f),
+                tagTextColor = Color(0xFF34C759),
+            ),
+        )
+        var sel2 by remember { mutableStateOf(emptyList<Int>()) }
+        MultiSelectComboBox(
+            items = listOf("Small", "Medium", "Large"),
+            selectedIndices = sel2,
+            onSelectionChange = { sel2 = it },
+            header = "Purple style",
+            colors = MultiSelectComboBoxDefaults.colors(
+                backgroundColor = Color(0xFFAF52DE).copy(alpha = 0.08f),
+                borderColor = Color(0xFFAF52DE).copy(alpha = 0.30f),
+                chevronColor = Color(0xFFAF52DE),
+                checkmarkColor = Color(0xFFAF52DE),
+            ),
+        )
+    }
+}
+
 @Composable
 internal fun MultiSelectPage() {
     GalleryPage("Multi Select", "Allows selecting multiple options from a list.") {
@@ -135,6 +169,12 @@ internal fun MultiSelectPage() {
         ExampleCard(title = "Default", sourceCode = GallerySources.MultiSelectDefaultExample) { MultiSelectDefaultExample() }
         ExampleCard(title = "Pre-selected", sourceCode = GallerySources.MultiSelectPreselectedExample) { MultiSelectPreselectedExample() }
         ExampleCard(title = "Disabled", sourceCode = GallerySources.MultiSelectDisabledExample) { MultiSelectDisabledExample() }
+        SectionHeader("Custom Colors")
+        ExampleCard(
+            title = "Custom Colors",
+            description = "MultiSelectComboBox with custom checkmark and tag colors",
+            sourceCode = GallerySources.MultiSelectCustomColorsExample,
+        ) { MultiSelectCustomColorsExample() }
         SectionHeader("Placement")
         ExampleCard(
             title = "Menu Placement",

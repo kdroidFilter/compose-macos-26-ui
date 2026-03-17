@@ -26,6 +26,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,6 +59,32 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.Outline
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosGlass
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.focusOrValidationOutline
 
+@Immutable
+class ComboBoxColors(
+    val backgroundColor: Color,
+    val borderColor: Color,
+    val textColor: Color,
+    val placeholderColor: Color,
+    val chevronColor: Color,
+    val selectedItemColor: Color,
+    val selectedItemTextColor: Color,
+    val highlightedItemColor: Color,
+)
+
+object ComboBoxDefaults {
+    @Composable
+    fun colors(
+        backgroundColor: Color = Color.Unspecified,
+        borderColor: Color = Color.Unspecified,
+        textColor: Color = Color.Unspecified,
+        placeholderColor: Color = Color.Unspecified,
+        chevronColor: Color = Color.Unspecified,
+        selectedItemColor: Color = Color.Unspecified,
+        selectedItemTextColor: Color = Color.Unspecified,
+        highlightedItemColor: Color = Color.Unspecified,
+    ) = ComboBoxColors(backgroundColor, borderColor, textColor, placeholderColor, chevronColor, selectedItemColor, selectedItemTextColor, highlightedItemColor)
+}
+
 /**
  * A combo box / select component with index-based selection.
  *
@@ -80,10 +107,11 @@ fun ComboBox(
     disabled: Boolean = false,
     outline: Outline = Outline.None,
     placement: MenuPlacement = MenuPlacement.Below,
+    colors: ComboBoxColors? = null,
 ) {
     val controlSize = LocalControlSize.current
     val comboMetrics = MacosTheme.componentStyling.comboBox.metrics
-    val colors = MacosTheme.colorScheme
+    val scheme = MacosTheme.colorScheme
     val shapes = MacosTheme.shapes
     val typography = MacosTheme.typography
     val outlines = MacosTheme.globalColors.outlines
@@ -101,14 +129,18 @@ fun ComboBox(
 
     val selectedLabel = selected?.let { items.getOrNull(it) }
 
-    val isDark = colors.isDark
-    val backgroundColor = when {
+    val isDark = scheme.isDark
+    val backgroundColor = if (colors?.backgroundColor != null && colors.backgroundColor != Color.Unspecified) {
+        colors.backgroundColor
+    } else when {
         !enabled -> if (isDark) Color.White.copy(alpha = 0.04f) else Color.White.copy(alpha = 0.50f)
         else -> if (isDark) Color.White.copy(alpha = 0.08f) else Color.White
     }
-    val borderColor = when {
+    val borderColor = if (colors?.borderColor != null && colors.borderColor != Color.Unspecified) {
+        colors.borderColor
+    } else when {
         !enabled -> if (isDark) Color.White.copy(alpha = 0.04f) else Color.Black.copy(alpha = 0.04f)
-        isFocused || expanded -> colors.inputFocusBorder
+        isFocused || expanded -> scheme.inputFocusBorder
         else -> if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.08f)
     }
     val borderWidth = if (enabled && (isFocused || expanded)) 2.dp else 1.dp
@@ -119,7 +151,11 @@ fun ComboBox(
     }
     val chevronBg = if (isDark) Color.White.copy(alpha = chevronAlpha) else Color.Black.copy(alpha = chevronAlpha)
     val chevronTintAlpha = if (enabled) 0.85f else 0.25f
-    val chevronTint = if (isDark) Color.White.copy(alpha = chevronTintAlpha) else Color.Black.copy(alpha = chevronTintAlpha)
+    val chevronTint = if (colors?.chevronColor != null && colors.chevronColor != Color.Unspecified) {
+        colors.chevronColor
+    } else {
+        if (isDark) Color.White.copy(alpha = chevronTintAlpha) else Color.Black.copy(alpha = chevronTintAlpha)
+    }
 
     val comboFontSize = when (controlSize) {
         ControlSize.Mini -> 10.sp
@@ -142,7 +178,7 @@ fun ComboBox(
             Text(
                 text = header,
                 style = typography.caption1,
-                color = colors.textPrimary,
+                color = scheme.textPrimary,
                 modifier = Modifier.padding(bottom = 6.dp),
             )
         }
@@ -230,7 +266,11 @@ fun ComboBox(
                     text = selectedLabel ?: placeholder ?: "Select...",
                     style = typography.subheadline,
                     fontSize = comboFontSize,
-                    color = if (selectedLabel != null) colors.textPrimary else colors.textTertiary,
+                    color = if (selectedLabel != null) {
+                        if (colors?.textColor != null && colors.textColor != Color.Unspecified) colors.textColor else scheme.textPrimary
+                    } else {
+                        if (colors?.placeholderColor != null && colors.placeholderColor != Color.Unspecified) colors.placeholderColor else scheme.textTertiary
+                    },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f).padding(start = 12.dp),
@@ -266,11 +306,11 @@ fun ComboBox(
                 modifier = Modifier
                     .macosGlass(
                         shape = shapes.large,
-                        fallbackColor = if (colors.isDark) Color(0xFF171717) else Color.White,
+                        fallbackColor = if (scheme.isDark) Color(0xFF171717) else Color.White,
                     )
                     .border(
                         1.dp,
-                        if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
+                        if (scheme.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
                         shapes.large,
                     )
                     .heightIn(max = 280.dp),
@@ -289,10 +329,8 @@ fun ComboBox(
                         val isItemHovered by itemInteractionSource.collectIsHoveredAsState()
 
                         val itemBackgroundColor = when {
-                            isSelected -> colors.accent
-                            isHighlighted || isItemHovered ->
-                                if (colors.isDark) Color.White.copy(alpha = 0.08f)
-                                else Color.Black.copy(alpha = 0.05f)
+                            isSelected -> if (colors?.selectedItemColor != null && colors.selectedItemColor != Color.Unspecified) colors.selectedItemColor else scheme.accent
+                            isHighlighted || isItemHovered -> if (colors?.highlightedItemColor != null && colors.highlightedItemColor != Color.Unspecified) colors.highlightedItemColor else if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.05f)
                             else -> Color.Transparent
                         }
 
@@ -323,8 +361,8 @@ fun ComboBox(
                                 style = typography.subheadline,
                                 fontSize = comboFontSize,
                                 color = when {
-                                    isSelected -> colors.onAccent
-                                    else -> colors.textPrimary
+                                    isSelected -> if (colors?.selectedItemTextColor != null && colors.selectedItemTextColor != Color.Unspecified) colors.selectedItemTextColor else scheme.onAccent
+                                    else -> if (colors?.textColor != null && colors.textColor != Color.Unspecified) colors.textColor else scheme.textPrimary
                                 },
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
