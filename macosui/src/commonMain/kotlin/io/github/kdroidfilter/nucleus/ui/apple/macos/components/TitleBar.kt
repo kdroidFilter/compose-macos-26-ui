@@ -18,6 +18,9 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
@@ -167,6 +170,8 @@ private fun TitleBarContent(
         else -> MacosTheme.typography.body
     }
 
+    val onTitleBarDoubleClick = LocalTitleBarDoubleClick.current
+
     CompositionLocalProvider(
         LocalTitleBarStyle provides style,
         LocalTextStyle provides titleTextStyle,
@@ -175,6 +180,31 @@ private fun TitleBarContent(
             modifier = modifier
                 .fillMaxWidth()
                 .height(height.dp)
+                .then(
+                    if (onTitleBarDoubleClick != null) {
+                        Modifier.pointerInput(onTitleBarDoubleClick) {
+                            awaitPointerEventScope {
+                                var lastPressTime = 0L
+                                while (true) {
+                                    val event = awaitPointerEvent(PointerEventPass.Final)
+                                    if (event.type == PointerEventType.Press &&
+                                        event.changes.none { it.isConsumed }
+                                    ) {
+                                        val now = event.changes.first().uptimeMillis
+                                        if (now - lastPressTime < viewConfiguration.doubleTapTimeoutMillis) {
+                                            onTitleBarDoubleClick()
+                                            lastPressTime = 0L
+                                        } else {
+                                            lastPressTime = now
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        Modifier
+                    },
+                )
                 .then(bgModifier)
                 .then(
                     if (showBorder) {

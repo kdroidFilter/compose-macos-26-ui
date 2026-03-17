@@ -25,3 +25,12 @@ val LocalWindowControlInset = compositionLocalOf { Dp.Unspecified }
  * Defaults to `null` (no-op on non-macOS platforms or when JNI is unavailable).
  */
 val LocalTitleBarRevalidate = compositionLocalOf<(() -> Unit)?> { null }
+
+/**
+ * Callback to perform the native title bar double-click action (zoom or minimize,
+ * based on the macOS system preference "Double-click a window's title bar to").
+ *
+ * Provided by `MacosWindow` when the JNI bridge is available.
+ * Defaults to `null` (no-op on non-macOS platforms or when JNI is unavailable).
+ */
+val LocalTitleBarDoubleClick = compositionLocalOf<(() -> Unit)?> { null }

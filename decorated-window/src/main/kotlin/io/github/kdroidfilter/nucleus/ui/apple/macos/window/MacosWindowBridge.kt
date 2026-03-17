@@ -27,6 +27,9 @@ object MacosWindowBridge {
     @JvmStatic
     external fun nativeRevalidateTitleBar(nsWindowPtr: Long)
 
+    @JvmStatic
+    external fun nativePerformTitleBarDoubleClick(nsWindowPtr: Long)
+
     @Suppress("TooGenericExceptionCaught")
     private fun loadLibrary(): Boolean {
         try {

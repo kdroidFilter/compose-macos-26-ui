@@ -774,6 +774,34 @@ Java_io_github_kdroidfilter_nucleus_ui_apple_macos_window_MacosWindowBridge_nati
     });
 }
 
+JNIEXPORT void JNICALL
+Java_io_github_kdroidfilter_nucleus_ui_apple_macos_window_MacosWindowBridge_nativePerformTitleBarDoubleClick(
+    JNIEnv *env, jclass clazz, jlong nsWindowPtr) {
+
+    if (nsWindowPtr == 0) return;
+    void *rawPtr = (void *)nsWindowPtr;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (atomic_load(&sShutdownInProgress)) return;
+        @autoreleasepool {
+            NSWindow *w = nil;
+            for (NSWindow *win in [NSApp windows]) {
+                if ((__bridge void *)win == rawPtr) { w = win; break; }
+            }
+            if (!w) return;
+
+            NSString *action = [[NSUserDefaults standardUserDefaults]
+                                stringForKey:@"AppleActionOnDoubleClick"];
+            // Default macOS behavior is zoom when no preference is set
+            if (!action || [action isEqualToString:@"Maximize"]) {
+                [w zoom:nil];
+            } else if ([action isEqualToString:@"Minimize"]) {
+                [w miniaturize:nil];
+            }
+            // "None" — do nothing
+        }
+    });
+}
+
 // Shutdown hook — prevent dispatch_async blocks from accessing deallocated windows
 __attribute__((destructor))
 static void onUnload(void) {

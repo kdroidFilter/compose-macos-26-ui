@@ -17,6 +17,7 @@ import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.rememberWindowState
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.LocalTitleBarDoubleClick
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.LocalTitleBarRevalidate
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.LocalWindowControlInset
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalColorScheme
@@ -74,6 +75,7 @@ fun MacosWindow(
     ) {
         var trafficLightInset: Dp by remember { mutableStateOf(0.dp) }
         var revalidateCallback: (() -> Unit)? by remember { mutableStateOf(null) }
+        var doubleClickCallback: (() -> Unit)? by remember { mutableStateOf(null) }
 
         // Track window focus for inactive appearance (grayed-out controls, etc.)
         var isWindowActive by remember { mutableStateOf(window.isFocused) }
@@ -98,9 +100,11 @@ fun MacosWindow(
                     val inset = MacosWindowBridge.nativeApplyTitleBar(ptr, DEFAULT_TITLE_BAR_HEIGHT)
                     trafficLightInset = inset.dp
                     revalidateCallback = { MacosWindowBridge.nativeRevalidateTitleBar(ptr) }
+                    doubleClickCallback = { MacosWindowBridge.nativePerformTitleBarDoubleClick(ptr) }
                 }
                 onDispose {
                     revalidateCallback = null
+                    doubleClickCallback = null
                     if (ptr != 0L) {
                         MacosWindowBridge.nativeResetTitleBar(ptr)
                     }
@@ -132,6 +136,7 @@ fun MacosWindow(
         CompositionLocalProvider(
             LocalWindowControlInset provides if (isApplePlatform) trafficLightInset else 0.dp,
             LocalTitleBarRevalidate provides revalidateCallback,
+            LocalTitleBarDoubleClick provides doubleClickCallback,
             LocalWindowActive provides isWindowActive,
         ) {
             content()
