@@ -333,6 +333,9 @@ fun Sidebar(
             // ---- Scrollable content ----
             val itemsScrollState = rememberScrollState()
             val titleBarHeight = LocalTitleBarHeight.current
+            val glassHeight = if (effectiveHide != null) {
+                (titleBarHeight - animatedPadding).coerceAtLeast(0.dp)
+            } else 0.dp
             val sidebarGlassState = rememberLiquidState()
             Box(modifier = Modifier.weight(1f)) {
                 Box(
@@ -345,6 +348,29 @@ fun Sidebar(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
+                        .then(if (effectiveHide != null) {
+                            Modifier
+                                .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                                .drawWithContent {
+                                    drawContent()
+                                    val fadeEndPx = glassHeight.toPx()
+                                    if (fadeEndPx > 0f) {
+                                        drawRect(
+                                            brush = Brush.verticalGradient(
+                                                colorStops = arrayOf(
+                                                    0.0f to Color.Transparent,
+                                                    0.4f to Color.Black.copy(alpha = 0.1f),
+                                                    0.7f to Color.Black.copy(alpha = 0.5f),
+                                                    1.0f to Color.Black,
+                                                ),
+                                                startY = 0f,
+                                                endY = fadeEndPx,
+                                            ),
+                                            blendMode = BlendMode.DstIn,
+                                        )
+                                    }
+                                }
+                        } else Modifier)
                         .verticalScroll(itemsScrollState),
                 ) {
                     // Spacer matching the title bar height minus the sidebar padding
