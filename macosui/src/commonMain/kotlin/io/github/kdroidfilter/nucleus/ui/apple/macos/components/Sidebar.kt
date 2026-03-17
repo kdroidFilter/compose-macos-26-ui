@@ -406,11 +406,6 @@ fun Sidebar(
 
                 // ---- Fixed liquid glass overlay at top (items scroll under it) ----
                 if (effectiveHide != null) {
-                    val sidebarVisible = LocalSidebarVisible.current
-                    val hideFraction by animateFloatAsState(
-                        targetValue = if (collapsed) 0f else 1f,
-                        animationSpec = sidebarSpring(),
-                    )
                     val glassHeight = (titleBarHeight - animatedPadding).coerceAtLeast(0.dp)
                     // Liquid glass with progressive fade (no content inside)
                     Box(
@@ -418,9 +413,6 @@ fun Sidebar(
                             .align(Alignment.TopCenter)
                             .fillMaxWidth()
                             .height(glassHeight)
-                            .graphicsLayer {
-                                alpha = if (sidebarVisible) hideFraction else 0f
-                            }
                             .liquidGlassFade(
                                 state = sidebarGlassState,
                                 shape = RoundedCornerShape(
@@ -429,14 +421,17 @@ fun Sidebar(
                                 ),
                             ),
                     )
-                    // Hide button (separate, not affected by the DstIn mask)
+                    // Hide button (separate, not affected by the fade mask)
+                    val hideFraction by animateFloatAsState(
+                        targetValue = if (collapsed) 0f else 1f,
+                        animationSpec = sidebarSpring(),
+                    )
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             .height(glassHeight)
-                            .graphicsLayer {
-                                alpha = if (sidebarVisible) hideFraction else 0f
-                            }
+                            .clipToBounds()
+                            .graphicsLayer { alpha = hideFraction }
                             .layout { measurable, constraints ->
                                 val placeable = measurable.measure(constraints)
                                 val h = (placeable.height * hideFraction).toInt()
