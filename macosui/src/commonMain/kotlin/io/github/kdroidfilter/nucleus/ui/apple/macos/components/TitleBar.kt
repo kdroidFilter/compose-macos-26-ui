@@ -364,7 +364,7 @@ fun TitleBarGroupButton(
  * A vertical separator placed between toolbar items (button groups, search fields, etc.)
  * inside a [TitleBar] actions slot. Equivalent to SwiftUI's `Divider()` in a `.toolbar`.
  *
- * Sketch: `_Separator` — 1px wide, 16px tall, #f2f2f2 (light) / white 18% (dark).
+ * Sketch: `_Separator` — 1px wide, 16px tall.
  */
 @Composable
 fun ToolbarSeparator(modifier: Modifier = Modifier) {
@@ -373,7 +373,7 @@ fun ToolbarSeparator(modifier: Modifier = Modifier) {
         modifier = modifier
             .width(1.dp)
             .height(16.dp)
-            .background(if (isDark) Color.White.copy(alpha = 0.18f) else Color(0xFFF2F2F2)),
+            .background(if (isDark) Color.White.copy(alpha = 0.18f) else Color.Black.copy(alpha = 0.15f)),
     )
 }
 
