@@ -1,7 +1,6 @@
 package io.github.kdroidfilter.nucleus.ui.apple.macos.components
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -209,7 +208,6 @@ private fun ScrollbarImpl(
     // ---- Resolved metrics for current size ----
     val trackBreadth: Dp = metrics.trackBreadthFor(controlSize)
     val thumbBreadthIdle: Dp = metrics.thumbBreadthIdleFor(controlSize)
-    val thumbBreadthHover: Dp = metrics.thumbBreadthHoverFor(controlSize)
     val trailingPad: Dp = metrics.trailingPadFor(controlSize)
     val cornerRadius: Dp = metrics.cornerRadiusFor(controlSize)
     val thumbMinLength: Dp = metrics.thumbMinLengthFor(controlSize)
@@ -265,18 +263,12 @@ private fun ScrollbarImpl(
         }
     }
 
-    // ---- Thumb breadth (expands toward content on hover) ----
-    val thumbBreadthDp: Dp by animateDpAsState(
-        targetValue = if (isThumbHovered || isTrackHovered) thumbBreadthHover else thumbBreadthIdle,
-        animationSpec = tween(150),
-        label = "scrollbar_breadth",
-    )
+    // ---- Thumb breadth (fixed — no expansion on hover) ----
+    val thumbBreadthDp: Dp = thumbBreadthIdle
 
-    // ---- Color / alpha (single animation covers show/hide + hover) ----
-    val isHovered = isThumbHovered || isTrackHovered
+    // ---- Color / alpha (show/hide only, no hover color change) ----
     val targetColor = when {
         !showThumb || trackSizePx == 0 || state.maxScrollPx <= 0f -> Color.Transparent
-        isHovered -> colors.thumbHovered
         else -> colors.thumbIdle
     }
     val thumbColor by animateColorAsState(
