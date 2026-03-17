@@ -160,6 +160,7 @@ fun Scaffold(
         Color.Transparent
     }
 
+    CompositionLocalProvider(LocalTitleBarHeight provides topPadding) {
     Row(
         modifier = modifier
             .fillMaxSize()
@@ -205,7 +206,6 @@ fun Scaffold(
                     LocalSidebarResize provides sidebarResizeCallbacks,
                     LocalSidebarHide provides hideCallback,
                     LocalSidebarVisible provides showSidebar,
-                    LocalTitleBarHeight provides topPadding,
                 ) {
                     sidebar()
                 }
@@ -413,5 +413,6 @@ fun Scaffold(
                 }
             }
         }
+    }
     }
 }

@@ -397,10 +397,14 @@ fun Sidebar(
                 }
 
                 if (!collapsed) {
+                    val scrollbarInset = if (effectiveHide != null) {
+                        (titleBarHeight - animatedPadding).coerceAtLeast(0.dp)
+                    } else 0.dp
                     VerticalScrollbar(
                         state = rememberScrollbarState(itemsScrollState),
                         modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
                         trackClickBehavior = scrollbarTrackClickBehavior,
+                        topInset = scrollbarInset,
                     )
                 }
 

@@ -486,11 +486,13 @@ private fun ScrollablePageContent(
             content()
             Spacer(modifier = Modifier.height(48.dp))
         }
+        // topInset keeps the scrollbar thumb below the title bar glass overlay
         VerticalScrollbar(
             state = rememberScrollbarState(contentScrollState),
             modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
             showOnEdgeHover = true,
             trackClickBehavior = TrackClickBehavior.Jump,
+            topInset = contentPadding.calculateTopPadding(),
         )
     }
 }
