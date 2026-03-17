@@ -315,85 +315,83 @@ fun App() {
                         },
                         title = { Text(currentPageLabel) },
                         actions = {
-                            Popover(
-                                expanded = settingsExpanded,
-                                onDismissRequest = { settingsExpanded = false },
-                                placement = PopoverPlacement.Bottom,
-                                trigger = {
-                                    TitleBarButtonGroup {
-                                        TitleBarGroupButton(onClick = { settingsExpanded = !settingsExpanded }) {
-                                            Icon(LucideSettings, modifier = Modifier.size(14.dp))
-                                        }
-                                    }
-                                },
-                            ) {
-                                Column(
-                                    modifier = Modifier.padding(16.dp).width(220.dp),
-                                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                                ) {
-                                    Text(
-                                        text = "Accent Color",
-                                        style = MacosTheme.typography.caption1,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = MacosTheme.colorScheme.textSecondary,
-                                    )
-                                    AccentColorPicker(
-                                        selected = accentColor,
-                                        onSelect = { overriddenAccent = it },
-                                    )
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        Text(
-                                            text = "Vibrant",
-                                            style = MacosTheme.typography.caption1,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = MacosTheme.colorScheme.textSecondary,
-                                        )
-                                        ControlSize(ControlSize.Mini) {
-                                            Switch(
-                                                checked = isVibrant,
-                                                onCheckedChange = { isVibrant = it },
-                                            )
-                                        }
-                                    }
-                                    Text(
-                                        text = "Glass Type",
-                                        style = MacosTheme.typography.caption1,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = MacosTheme.colorScheme.textSecondary,
-                                    )
-                                    ControlSize(ControlSize.Small) {
-                                        SegmentedControl(
-                                            options = listOf("Regular", "Tinted"),
-                                            selectedIndex = GlassType.entries.indexOf(glassType),
-                                            onSelectedIndexChange = { glassType = GlassType.entries[it] },
-                                        )
-                                    }
-                                    Text(
-                                        text = "Sidebar Icon Size",
-                                        style = MacosTheme.typography.caption1,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = MacosTheme.colorScheme.textSecondary,
-                                    )
-                                    val sizeOptions = listOf(ControlSize.Small, ControlSize.Regular, ControlSize.Large)
-                                    ControlSize(ControlSize.Small) {
-                                        SegmentedControl(
-                                            options = listOf("S", "M", "L"),
-                                            selectedIndex = sizeOptions.indexOf(sidebarControlSize),
-                                            onSelectedIndexChange = { sidebarControlSize = sizeOptions[it] },
-                                        )
-                                    }
-                                }
-                            }
                             val uriHandler = LocalUriHandler.current
                             TitleBarButtonGroup {
                                 TitleBarGroupButton(onClick = {
                                     uriHandler.openUri("https://github.com/kdroidFilter/compose-macos-26-ui")
                                 }) {
                                     Icon(Lucide.Github, modifier = Modifier.size(14.dp))
+                                }
+                                Popover(
+                                    expanded = settingsExpanded,
+                                    onDismissRequest = { settingsExpanded = false },
+                                    placement = PopoverPlacement.Bottom,
+                                    trigger = {
+                                        TitleBarGroupButton(onClick = { settingsExpanded = !settingsExpanded }) {
+                                            Icon(LucideSettings, modifier = Modifier.size(14.dp))
+                                        }
+                                    },
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(16.dp).width(220.dp),
+                                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                                    ) {
+                                        Text(
+                                            text = "Accent Color",
+                                            style = MacosTheme.typography.caption1,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = MacosTheme.colorScheme.textSecondary,
+                                        )
+                                        AccentColorPicker(
+                                            selected = accentColor,
+                                            onSelect = { overriddenAccent = it },
+                                        )
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically,
+                                        ) {
+                                            Text(
+                                                text = "Vibrant",
+                                                style = MacosTheme.typography.caption1,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = MacosTheme.colorScheme.textSecondary,
+                                            )
+                                            ControlSize(ControlSize.Mini) {
+                                                Switch(
+                                                    checked = isVibrant,
+                                                    onCheckedChange = { isVibrant = it },
+                                                )
+                                            }
+                                        }
+                                        Text(
+                                            text = "Glass Type",
+                                            style = MacosTheme.typography.caption1,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = MacosTheme.colorScheme.textSecondary,
+                                        )
+                                        ControlSize(ControlSize.Small) {
+                                            SegmentedControl(
+                                                options = listOf("Regular", "Tinted"),
+                                                selectedIndex = GlassType.entries.indexOf(glassType),
+                                                onSelectedIndexChange = { glassType = GlassType.entries[it] },
+                                            )
+                                        }
+                                        Text(
+                                            text = "Sidebar Icon Size",
+                                            style = MacosTheme.typography.caption1,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = MacosTheme.colorScheme.textSecondary,
+                                        )
+                                        val sizeOptions = listOf(ControlSize.Small, ControlSize.Regular, ControlSize.Large)
+                                        ControlSize(ControlSize.Small) {
+                                            SegmentedControl(
+                                                options = listOf("S", "M", "L"),
+                                                selectedIndex = sizeOptions.indexOf(sidebarControlSize),
+                                                onSelectedIndexChange = { sidebarControlSize = sizeOptions[it] },
+                                            )
+                                        }
+                                    }
                                 }
                             }
                             TitleBarButtonGroup {
