@@ -25,6 +25,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icons
@@ -109,6 +110,7 @@ fun TitleBar(
     showBottomBorder: Boolean = false,
     glass: Boolean = false,
     height: Int = style.height,
+    navigationActionsMinWidth: Dp = style.navMinWidth,
 ) {
     val content = @Composable {
         TitleBarContent(
@@ -123,6 +125,7 @@ fun TitleBar(
             showBottomBorder = showBottomBorder,
             glass = glass,
             height = height,
+            navigationActionsMinWidth = navigationActionsMinWidth,
         )
     }
 
@@ -148,6 +151,7 @@ private fun TitleBarContent(
     showBottomBorder: Boolean,
     glass: Boolean,
     height: Int,
+    navigationActionsMinWidth: Dp = style.navMinWidth,
 ) {
     val isDark = MacosTheme.colorScheme.isDark
     val borderColor = if (isDark) Color.Black.copy(alpha = 0.5f) else Color.Black.copy(alpha = 0.1f)
@@ -226,7 +230,7 @@ private fun TitleBarContent(
             // Left section: Nav Actions
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(end = 8.dp).widthIn(min = style.navMinWidth),
+                modifier = Modifier.padding(end = 8.dp).widthIn(min = navigationActionsMinWidth),
             ) {
                 navigationActions()
             }

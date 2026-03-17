@@ -1,14 +1,18 @@
 package io.github.kdroidfilter.nucleus.ui.apple.macos.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -17,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -107,6 +112,7 @@ fun Scaffold(
     showDividers: Boolean = false,
     bottomBar: (@Composable () -> Unit)? = null,
     bottomBarHeight: Int = 38,
+    pushContent: Boolean = false,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     // --- Resolve effective column visibility ---
@@ -131,9 +137,9 @@ fun Scaffold(
     }
 
     // --- Column width states ---
-    var currentSidebarWidth by remember { mutableStateOf(sidebarWidth.idealOrFixed()) }
-    var currentContentListWidth by remember { mutableStateOf(contentListWidth.idealOrFixed()) }
-    var currentInspectorWidth by remember { mutableStateOf(inspectorWidth.idealOrFixed()) }
+    var currentSidebarWidth by remember(sidebarWidth) { mutableStateOf(sidebarWidth.idealOrFixed()) }
+    var currentContentListWidth by remember(contentListWidth) { mutableStateOf(contentListWidth.idealOrFixed()) }
+    var currentInspectorWidth by remember(inspectorWidth) { mutableStateOf(inspectorWidth.idealOrFixed()) }
 
     // --- Content padding ---
     val topPadding = if (titleBar != null) titleBarHeight.dp else 0.dp
@@ -161,62 +167,59 @@ fun Scaffold(
     }
 
     CompositionLocalProvider(LocalTitleBarHeight provides topPadding) {
-    Row(
-        modifier = modifier
-            .fillMaxSize()
-            .background(containerColor),
-    ) {
-        // ---- Sidebar (full height, side-by-side with the title bar) ----
-        if (sidebar != null) {
-            val sidebarSizeTween = tween<IntSize>(durationMillis = 250, easing = FastOutSlowInEasing)
-            val sidebarOffsetTween = tween<IntOffset>(durationMillis = 250, easing = FastOutSlowInEasing)
-            AnimatedVisibility(
-                visible = showSidebar,
-                enter = slideInHorizontally(
-                    animationSpec = sidebarOffsetTween,
-                    initialOffsetX = { -it },
-                ) + expandHorizontally(
-                    animationSpec = sidebarSizeTween,
-                    expandFrom = Alignment.Start,
-                ),
-                exit = slideOutHorizontally(
-                    animationSpec = sidebarOffsetTween,
-                    targetOffsetX = { -it },
-                ) + shrinkHorizontally(
-                    animationSpec = sidebarSizeTween,
-                    shrinkTowards = Alignment.Start,
-                ),
-            ) {
-                val sidebarResizeCallbacks = if (sidebarWidth is ColumnWidth.Flexible) {
-                    val flex = sidebarWidth
-                    SidebarResizeCallbacks(
-                        onDrag = { delta ->
-                            currentSidebarWidth = (currentSidebarWidth + delta)
-                                .coerceIn(flex.min, flex.max)
-                        },
-                        onReset = { currentSidebarWidth = flex.ideal },
-                    )
-                } else {
-                    null
-                }
 
-                val hideCallback: (() -> Unit)? = if (managedToggle) toggleSidebar else null
-                CompositionLocalProvider(
-                    LocalSidebarWidth provides currentSidebarWidth,
-                    LocalSidebarResize provides sidebarResizeCallbacks,
-                    LocalSidebarHide provides hideCallback,
-                    LocalSidebarVisible provides showSidebar,
+        @Composable
+        fun SidebarBlock(slideOnly: Boolean) {
+            if (sidebar != null) {
+                val sidebarSizeTween = tween<IntSize>(durationMillis = 250, easing = FastOutSlowInEasing)
+                val sidebarOffsetTween = tween<IntOffset>(durationMillis = 250, easing = FastOutSlowInEasing)
+                AnimatedVisibility(
+                    visible = showSidebar,
+                    enter = slideInHorizontally(
+                        animationSpec = sidebarOffsetTween,
+                        initialOffsetX = { -it },
+                    ) + if (!slideOnly) expandHorizontally(
+                        animationSpec = sidebarSizeTween,
+                        expandFrom = Alignment.Start,
+                    ) else EnterTransition.None,
+                    exit = slideOutHorizontally(
+                        animationSpec = sidebarOffsetTween,
+                        targetOffsetX = { -it },
+                    ) + if (!slideOnly) shrinkHorizontally(
+                        animationSpec = sidebarSizeTween,
+                        shrinkTowards = Alignment.Start,
+                    ) else ExitTransition.None,
                 ) {
-                    sidebar()
+                    val sidebarResizeCallbacks = if (sidebarWidth is ColumnWidth.Flexible) {
+                        val flex = sidebarWidth
+                        SidebarResizeCallbacks(
+                            onDrag = { delta ->
+                                currentSidebarWidth = (currentSidebarWidth + delta)
+                                    .coerceIn(flex.min, flex.max)
+                            },
+                            onReset = { currentSidebarWidth = flex.ideal },
+                        )
+                    } else {
+                        null
+                    }
+
+                    val hideCallback: (() -> Unit)? = if (managedToggle) toggleSidebar else null
+                    CompositionLocalProvider(
+                        LocalSidebarWidth provides currentSidebarWidth,
+                        LocalSidebarResize provides sidebarResizeCallbacks,
+                        LocalSidebarHide provides hideCallback,
+                        LocalSidebarVisible provides showSidebar,
+                    ) {
+                        sidebar()
+                    }
                 }
             }
         }
 
-        // ---- Content area (title bar + columns) ----
+        @Composable
+        fun ContentArea(contentModifier: Modifier) {
         Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
+            modifier = contentModifier,
         ) {
             // Content layer captured for title bar glass
             Box(
@@ -413,6 +416,57 @@ fun Scaffold(
                 }
             }
         }
-    }
+        }
+
+        if (pushContent && sidebar != null) {
+            BoxWithConstraints(
+                modifier = modifier.fillMaxSize().background(containerColor).clipToBounds(),
+            ) {
+                val parentWidth = maxWidth
+                val sidebarOffset by animateDpAsState(
+                    targetValue = if (showSidebar) 0.dp else -currentSidebarWidth,
+                    animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing),
+                )
+                // Content: full width, pushed right when sidebar is shown
+                ContentArea(
+                    Modifier
+                        .width(parentWidth)
+                        .fillMaxHeight()
+                        .offset { IntOffset((sidebarOffset + currentSidebarWidth).roundToPx(), 0) },
+                )
+                // Sidebar: slides in from the left, driven by same sidebarOffset
+                val sidebarResizeCallbacks = if (sidebarWidth is ColumnWidth.Flexible) {
+                    SidebarResizeCallbacks(
+                        onDrag = { delta ->
+                            currentSidebarWidth = (currentSidebarWidth + delta)
+                                .coerceIn(sidebarWidth.min, sidebarWidth.max)
+                        },
+                        onReset = { currentSidebarWidth = sidebarWidth.ideal },
+                    )
+                } else {
+                    null
+                }
+                Box(
+                    modifier = Modifier
+                        .width(currentSidebarWidth)
+                        .fillMaxHeight()
+                        .offset { IntOffset(sidebarOffset.roundToPx(), 0) },
+                ) {
+                    CompositionLocalProvider(
+                        LocalSidebarWidth provides currentSidebarWidth,
+                        LocalSidebarResize provides sidebarResizeCallbacks,
+                        LocalSidebarHide provides if (managedToggle) toggleSidebar else null,
+                        LocalSidebarVisible provides showSidebar,
+                    ) {
+                        sidebar()
+                    }
+                }
+            }
+        } else {
+            Row(modifier = modifier.fillMaxSize().background(containerColor)) {
+                SidebarBlock(slideOnly = false)
+                ContentArea(Modifier.weight(1f).fillMaxHeight())
+            }
+        }
     }
 }

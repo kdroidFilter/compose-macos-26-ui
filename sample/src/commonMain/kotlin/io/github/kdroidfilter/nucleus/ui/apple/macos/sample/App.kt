@@ -3,10 +3,10 @@ package io.github.kdroidfilter.nucleus.ui.apple.macos.sample
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.clickable
 import com.composables.icons.lucide.Monitor
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -23,7 +23,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
+import kotlinx.coroutines.flow.drop
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,7 +38,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.composables.icons.lucide.Bell
 import com.composables.icons.lucide.Calendar
 import com.composables.icons.lucide.ChevronsUpDown
@@ -68,6 +70,7 @@ import com.composables.icons.lucide.TextCursorInput
 import com.composables.icons.lucide.ToggleLeft
 import com.composables.icons.lucide.TriangleAlert
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.ColumnVisibility
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.ColumnWidth
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.NavigationButtons
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Popover
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.PopoverPlacement
@@ -78,6 +81,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SearchSuggestion
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SegmentedControl
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Sidebar
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SidebarItem
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Surface
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Switch
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TitleBar
@@ -90,14 +94,11 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.components.VerticalScrollba
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.rememberScrollbarState
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.rememberToastState
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icon
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icons
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideHome
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideMoon
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSettings
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSun
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.RadixPanelLeft
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.extended.ExternalLink
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.extended.IconsExtended
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AccordionPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AddressBarPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AlertPage
@@ -264,7 +265,6 @@ fun App() {
 
         var searchQuery by remember { mutableStateOf("") }
         var searchExpanded by remember { mutableStateOf(false) }
-        var columnVisibility by remember { mutableStateOf(ColumnVisibility.All) }
         var settingsExpanded by remember { mutableStateOf(false) }
 
         // Navigation helpers
@@ -280,186 +280,221 @@ fun App() {
             )
         }
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            Scaffold(
-                columnVisibility = columnVisibility,
-                onColumnVisibilityChange = { columnVisibility = it },
-                sidebar = {
-                    ControlSize(sidebarControlSize) {
-                        Sidebar(
-                            items = sidebarItems,
-                            activeItem = nav.currentPageId,
-                            showBorder = false,
-                        )
-                    }
-                },
-                titleBar = {
-                    TitleBar(
-                        glass = true,
-                        navigationActions = {
-                            NavigationButtons(
-                                onBack = { nav.goBack() },
-                                onForward = { nav.goForward() },
-                                backEnabled = nav.canGoBack,
-                                forwardEnabled = nav.canGoForward,
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            val isCompact = maxWidth < 600.dp
+            var columnVisibility by remember {
+                mutableStateOf(if (isCompact) ColumnVisibility.DoubleColumn else ColumnVisibility.All)
+            }
+
+            LaunchedEffect(isCompact) {
+                if (isCompact) {
+                    snapshotFlow { nav.currentKey }
+                        .drop(1)
+                        .collect { columnVisibility = ColumnVisibility.DoubleColumn }
+                }
+            }
+
+            Box(modifier = Modifier.fillMaxSize()) {
+                Scaffold(
+                    columnVisibility = columnVisibility,
+                    onColumnVisibilityChange = { columnVisibility = it },
+                    sidebarWidth = ColumnWidth.Fixed(240.dp),
+                    pushContent = isCompact,
+                    sidebar = {
+                        ControlSize(sidebarControlSize) {
+                            Sidebar(
+                                items = sidebarItems,
+                                activeItem = nav.currentPageId,
+                                showBorder = false,
                             )
-                        },
-                        title = { Text(currentPageLabel) },
-                        actions = {
-                            val uriHandler = LocalUriHandler.current
-                            TitleBarButtonGroup {
-                                TitleBarGroupButton(onClick = {
-                                    uriHandler.openUri("https://github.com/kdroidFilter/compose-macos-26-ui")
-                                }) {
-                                    Icon(Lucide.Github, modifier = Modifier.size(14.dp))
-                                }
-                            }
-                            TitleBarButtonGroup {
-                                TitleBarGroupButton(onClick = {
-                                    themeMode = when (themeMode) {
-                                        ThemeMode.System -> ThemeMode.Light
-                                        ThemeMode.Light -> ThemeMode.Dark
-                                        ThemeMode.Dark -> ThemeMode.System
-                                    }
-                                }) {
-                                    Icon(
-                                        when (themeMode) {
-                                            ThemeMode.System -> Lucide.Monitor
-                                            ThemeMode.Light -> LucideSun
-                                            ThemeMode.Dark -> LucideMoon
-                                        },
-                                        modifier = Modifier.size(14.dp),
+                        }
+                    },
+                    titleBar = {
+                        TitleBar(
+                            glass = true,
+                            navigationActionsMinWidth = if (isCompact) 0.dp else 80.dp,
+                            navigationActions = if (!isCompact) {
+                                {
+                                    NavigationButtons(
+                                        onBack = { nav.goBack() },
+                                        onForward = { nav.goForward() },
+                                        backEnabled = nav.canGoBack,
+                                        forwardEnabled = nav.canGoForward,
                                     )
                                 }
-                                Popover(
-                                    expanded = settingsExpanded,
-                                    onDismissRequest = { settingsExpanded = false },
-                                    placement = PopoverPlacement.Bottom,
-                                    trigger = {
-                                        TitleBarGroupButton(onClick = { settingsExpanded = !settingsExpanded }) {
-                                            Icon(LucideSettings, modifier = Modifier.size(14.dp))
+                            } else ({}),
+                            title = { Text(currentPageLabel) },
+                            actions = {
+                                val uriHandler = LocalUriHandler.current
+                                TitleBarButtonGroup {
+                                    TitleBarGroupButton(onClick = {
+                                        uriHandler.openUri("https://github.com/kdroidFilter/compose-macos-26-ui")
+                                    }) {
+                                        Icon(Lucide.Github, modifier = Modifier.size(14.dp))
+                                    }
+                                }
+                                TitleBarButtonGroup {
+                                    TitleBarGroupButton(onClick = {
+                                        themeMode = when (themeMode) {
+                                            ThemeMode.System -> ThemeMode.Light
+                                            ThemeMode.Light -> ThemeMode.Dark
+                                            ThemeMode.Dark -> ThemeMode.System
                                         }
-                                    },
-                                ) {
-                                    Column(
-                                        modifier = Modifier.padding(16.dp).width(220.dp),
-                                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                                    }) {
+                                        Icon(
+                                            when (themeMode) {
+                                                ThemeMode.System -> Lucide.Monitor
+                                                ThemeMode.Light -> LucideSun
+                                                ThemeMode.Dark -> LucideMoon
+                                            },
+                                            modifier = Modifier.size(14.dp),
+                                        )
+                                    }
+                                    Popover(
+                                        expanded = settingsExpanded,
+                                        onDismissRequest = { settingsExpanded = false },
+                                        placement = PopoverPlacement.Bottom,
+                                        trigger = {
+                                            TitleBarGroupButton(onClick = { settingsExpanded = !settingsExpanded }) {
+                                                Icon(LucideSettings, modifier = Modifier.size(14.dp))
+                                            }
+                                        },
                                     ) {
-                                        Text(
-                                            text = "Accent Color",
-                                            style = MacosTheme.typography.caption1,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = MacosTheme.colorScheme.textSecondary,
-                                        )
-                                        AccentColorPicker(
-                                            selected = accentColor,
-                                            onSelect = { overriddenAccent = it },
-                                        )
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically,
+                                        Column(
+                                            modifier = Modifier.padding(16.dp).width(220.dp),
+                                            verticalArrangement = Arrangement.spacedBy(12.dp),
                                         ) {
                                             Text(
-                                                text = "Vibrant",
+                                                text = "Accent Color",
                                                 style = MacosTheme.typography.caption1,
                                                 fontWeight = FontWeight.SemiBold,
                                                 color = MacosTheme.colorScheme.textSecondary,
                                             )
-                                            ControlSize(ControlSize.Mini) {
-                                                Switch(
-                                                    checked = isVibrant,
-                                                    onCheckedChange = { isVibrant = it },
+                                            AccentColorPicker(
+                                                selected = accentColor,
+                                                onSelect = { overriddenAccent = it },
+                                            )
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically,
+                                            ) {
+                                                Text(
+                                                    text = "Vibrant",
+                                                    style = MacosTheme.typography.caption1,
+                                                    fontWeight = FontWeight.SemiBold,
+                                                    color = MacosTheme.colorScheme.textSecondary,
+                                                )
+                                                ControlSize(ControlSize.Mini) {
+                                                    Switch(
+                                                        checked = isVibrant,
+                                                        onCheckedChange = { isVibrant = it },
+                                                    )
+                                                }
+                                            }
+                                            Text(
+                                                text = "Glass Type",
+                                                style = MacosTheme.typography.caption1,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = MacosTheme.colorScheme.textSecondary,
+                                            )
+                                            ControlSize(ControlSize.Small) {
+                                                SegmentedControl(
+                                                    options = listOf("Regular", "Tinted"),
+                                                    selectedIndex = GlassType.entries.indexOf(glassType),
+                                                    onSelectedIndexChange = { glassType = GlassType.entries[it] },
+                                                )
+                                            }
+                                            Text(
+                                                text = "Sidebar Icon Size",
+                                                style = MacosTheme.typography.caption1,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = MacosTheme.colorScheme.textSecondary,
+                                            )
+                                            val sizeOptions = listOf(ControlSize.Small, ControlSize.Regular, ControlSize.Large)
+                                            ControlSize(ControlSize.Small) {
+                                                SegmentedControl(
+                                                    options = listOf("S", "M", "L"),
+                                                    selectedIndex = sizeOptions.indexOf(sidebarControlSize),
+                                                    onSelectedIndexChange = { sidebarControlSize = sizeOptions[it] },
                                                 )
                                             }
                                         }
-                                        Text(
-                                            text = "Glass Type",
-                                            style = MacosTheme.typography.caption1,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = MacosTheme.colorScheme.textSecondary,
-                                        )
-                                        ControlSize(ControlSize.Small) {
-                                            SegmentedControl(
-                                                options = listOf("Regular", "Tinted"),
-                                                selectedIndex = GlassType.entries.indexOf(glassType),
-                                                onSelectedIndexChange = { glassType = GlassType.entries[it] },
-                                            )
-                                        }
-                                        Text(
-                                            text = "Sidebar Icon Size",
-                                            style = MacosTheme.typography.caption1,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = MacosTheme.colorScheme.textSecondary,
-                                        )
-                                        val sizeOptions = listOf(ControlSize.Small, ControlSize.Regular, ControlSize.Large)
-                                        ControlSize(ControlSize.Small) {
-                                            SegmentedControl(
-                                                options = listOf("S", "M", "L"),
-                                                selectedIndex = sizeOptions.indexOf(sidebarControlSize),
-                                                onSelectedIndexChange = { sidebarControlSize = sizeOptions[it] },
-                                            )
-                                        }
                                     }
                                 }
-                            }
-                            ToolbarSearchField(
-                                value = searchQuery,
-                                onValueChange = { searchQuery = it },
-                                expanded = searchExpanded,
-                                onExpandedChange = { searchExpanded = it },
-                                expandedWidth = 240.dp,
-                                placeholder = "Search components...",
-                                onSearch = { query ->
-                                    val match = sidebarEntryDefs.firstOrNull {
-                                        it.label.lowercase().contains(query.lowercase().trim())
-                                    }
-                                    if (match != null) {
-                                        nav.navigateTo(match.id)
-                                        searchQuery = ""
-                                        searchExpanded = false
-                                    }
-                                },
-                                suggestions = {
-                                    val query = searchQuery.lowercase().trim()
-                                    val matches = sidebarEntryDefs.filter {
-                                        it.label.lowercase().contains(query)
-                                    }
-                                    matches.groupBy { it.group }.entries.forEachIndexed { index, (group, items) ->
-                                        if (index > 0) SearchSuggestionSeparator()
-                                        SearchSuggestionHeader(group)
-                                        items.forEach { def ->
-                                            SearchSuggestionItem(onClick = {
-                                                nav.navigateTo(def.id)
-                                                searchQuery = ""
-                                                searchExpanded = false
-                                            }) {
-                                                Text(def.label)
+                                ToolbarSearchField(
+                                    value = searchQuery,
+                                    onValueChange = { searchQuery = it },
+                                    expanded = searchExpanded,
+                                    onExpandedChange = { searchExpanded = it },
+                                    expandedWidth = 240.dp,
+                                    placeholder = "Search components...",
+                                    onSearch = { query ->
+                                        val match = sidebarEntryDefs.firstOrNull {
+                                            it.label.lowercase().contains(query.lowercase().trim())
+                                        }
+                                        if (match != null) {
+                                            nav.navigateTo(match.id)
+                                            searchQuery = ""
+                                            searchExpanded = false
+                                        }
+                                    },
+                                    suggestions = {
+                                        val query = searchQuery.lowercase().trim()
+                                        val matches = sidebarEntryDefs.filter {
+                                            it.label.lowercase().contains(query)
+                                        }
+                                        matches.groupBy { it.group }.entries.forEachIndexed { index, (group, items) ->
+                                            if (index > 0) SearchSuggestionSeparator()
+                                            SearchSuggestionHeader(group)
+                                            items.forEach { def ->
+                                                SearchSuggestionItem(onClick = {
+                                                    nav.navigateTo(def.id)
+                                                    searchQuery = ""
+                                                    searchExpanded = false
+                                                }) {
+                                                    Text(def.label)
+                                                }
                                             }
                                         }
-                                    }
-                                },
-                            )
-                        },
-                    )
-                },
-            ) { contentPadding ->
-                val currentKey = nav.currentKey
-                when (currentKey) {
-                    is HomeScreen -> {
-                        ScrollablePageContent(contentPadding) {
-                            HomePage(onNavigate = { nav.navigateTo(it) })
+                                    },
+                                )
+                            },
+                        )
+                    },
+                ) { contentPadding ->
+                    when (val currentKey = nav.currentKey) {
+                        is HomeScreen -> {
+                            ScrollablePageContent(contentPadding) {
+                                HomePage(onNavigate = { nav.navigateTo(it) })
+                            }
                         }
-                    }
-                    is PageScreen -> {
-                        ScrollablePageContent(contentPadding) {
-                            PageContent(currentKey.id, toastState)
+                        is PageScreen -> {
+                            ScrollablePageContent(contentPadding) {
+                                PageContent(currentKey.id, toastState)
+                            }
                         }
                     }
                 }
-            }
 
-            ToastHost(state = toastState)
+                if (isCompact) {
+                    Surface(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(16.dp),
+                        shape = MacosTheme.shapes.extraLarge,
+                    ) {
+                        NavigationButtons(
+                            onBack = { nav.goBack() },
+                            onForward = { nav.goForward() },
+                            backEnabled = nav.canGoBack,
+                            forwardEnabled = nav.canGoForward,
+                        )
+                    }
+                }
+
+                ToastHost(state = toastState)
+            }
         }
     }
 }
