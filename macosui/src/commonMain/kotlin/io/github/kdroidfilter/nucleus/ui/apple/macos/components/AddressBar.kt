@@ -49,6 +49,40 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalContentColor
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSurface
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosTween
+import androidx.compose.runtime.Immutable
+
+// ===========================================================================
+// AddressBarColors — public customizable colors
+// ===========================================================================
+
+@Immutable
+class AddressBarColors(
+    val backgroundColor: Color,
+    val textColor: Color,
+    val placeholderColor: Color,
+    val iconColor: Color,
+    val borderColor: Color,
+) {
+    fun copy(
+        backgroundColor: Color = this.backgroundColor,
+        textColor: Color = this.textColor,
+        placeholderColor: Color = this.placeholderColor,
+        iconColor: Color = this.iconColor,
+        borderColor: Color = this.borderColor,
+    ) = AddressBarColors(backgroundColor, textColor, placeholderColor, iconColor, borderColor)
+}
+
+object AddressBarDefaults {
+
+    @Composable
+    fun colors(
+        backgroundColor: Color = Color.Unspecified,
+        textColor: Color = MacosTheme.colorScheme.textPrimary,
+        placeholderColor: Color = MacosTheme.colorScheme.textSecondary,
+        iconColor: Color = MacosTheme.colorScheme.textSecondary,
+        borderColor: Color = Color.Unspecified,
+    ) = AddressBarColors(backgroundColor, textColor, placeholderColor, iconColor, borderColor)
+}
 
 /**
  * macOS Safari-style address bar.
@@ -79,12 +113,13 @@ fun AddressBar(
     onGo: (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     focusRequester: FocusRequester = remember { FocusRequester() },
+    colors: AddressBarColors? = null,
 ) {
     val tfColors = MacosTheme.componentStyling.textField.colors
-    val colors = MacosTheme.colorScheme
+    val scheme = MacosTheme.colorScheme
     val typography = MacosTheme.typography
-    val accent = colors.accent
-    val isDark = colors.isDark
+    val accent = scheme.accent
+    val isDark = scheme.isDark
     val surface = LocalSurface.current
     val isOverGlass = surface == Surface.OverGlass
 
@@ -100,9 +135,11 @@ fun AddressBar(
     val iconSlotSize = fieldHeight - (titleBarStyle.buttonPadding * 2)
     val goIconSize = titleBarStyle.iconSize
 
-    // Background — same logic as SearchField
+    // Background — custom colors take priority
     val bgColor by animateColorAsState(
-        targetValue = when {
+        targetValue = if (colors?.backgroundColor != null && colors.backgroundColor != Color.Unspecified) {
+            colors.backgroundColor
+        } else when {
             !enabled -> if (isOverGlass) tfColors.overGlassDisabledBackground else tfColors.backgroundDisabled
             isFocused && isOverGlass -> tfColors.overGlassFocusedBackground
             isOverGlass -> tfColors.overGlassBackground
@@ -112,9 +149,11 @@ fun AddressBar(
         label = "address_bg",
     )
 
-    // Border — Content Area only; Over-glass has no border
+    // Border — custom colors take priority
     val borderColor by animateColorAsState(
-        targetValue = when {
+        targetValue = if (colors?.borderColor != null && colors.borderColor != Color.Unspecified) {
+            colors.borderColor
+        } else when {
             !enabled -> if (isOverGlass) Color.Transparent else tfColors.borderDisabled
             isOverGlass -> Color.Transparent
             else -> tfColors.border
@@ -123,9 +162,9 @@ fun AddressBar(
         label = "address_border",
     )
 
-    val textColor = colors.textPrimary
-    val placeholderColor = colors.textSecondary
-    val iconColor = colors.textSecondary
+    val textColor = colors?.textColor ?: scheme.textPrimary
+    val placeholderColor = colors?.placeholderColor ?: scheme.textSecondary
+    val iconColor = colors?.iconColor ?: scheme.textSecondary
 
     Row(
         modifier = modifier

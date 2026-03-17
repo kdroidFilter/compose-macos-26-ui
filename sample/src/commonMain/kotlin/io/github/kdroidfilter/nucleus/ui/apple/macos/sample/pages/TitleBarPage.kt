@@ -27,6 +27,8 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SearchSuggestion
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SidebarButton
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TitleBar
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TitleBarButtonColors
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TitleBarButtonDefaults
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TitleBarButtonGroup
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TitleBarGroupButton
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TitleBarStyle
@@ -34,6 +36,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.components.ToolbarSearchFie
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.ToolbarSeparator
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.WindowTitle
 import io.github.kdroidfilter.nucleus.ui.apple.macos.gallery.GalleryExample
+import androidx.compose.ui.graphics.Color
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icon
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideChevronDown
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideCopy
@@ -47,6 +50,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSettings
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideShare2
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideTag
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideUpload
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.ExampleCard
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.GalleryPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.SectionHeader
@@ -330,6 +334,48 @@ fun TitleBarDocumentExample() {
 }
 
 // =====================================================================
+// Custom Button Colors
+// =====================================================================
+
+@GalleryExample("TitleBar", "Custom Button Colors")
+@Composable
+fun TitleBarCustomColorsExample() {
+    val accent = MacosTheme.colorScheme.accent
+    val accentColors = TitleBarButtonDefaults.colors(
+        backgroundColor = accent.copy(alpha = 0.15f),
+        contentColor = accent,
+    )
+    val greenColors = TitleBarButtonDefaults.colors(
+        backgroundColor = Color(0xFF34C759).copy(alpha = 0.15f),
+        contentColor = Color(0xFF34C759),
+    )
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        TitleBarButtonGroup(colors = accentColors) {
+            TitleBarGroupButton(onClick = {}, colors = accentColors) {
+                Icon(LucideDownload, modifier = Modifier.size(14.dp))
+            }
+            TitleBarGroupButton(onClick = {}, colors = accentColors) {
+                Icon(LucideUpload, modifier = Modifier.size(14.dp))
+            }
+        }
+        NavigationButtons(
+            onBack = {},
+            onForward = {},
+            backEnabled = true,
+            forwardEnabled = true,
+            colors = greenColors,
+        )
+        SidebarButton(
+            onClick = {},
+            colors = accentColors,
+        )
+    }
+}
+
+// =====================================================================
 // Page
 // =====================================================================
 
@@ -361,6 +407,13 @@ internal fun TitleBarPage() {
             description = "Vertical separator between button groups, like SwiftUI Divider() in .toolbar",
             sourceCode = GallerySources.TitleBarSeparatorExample,
         ) { TitleBarSeparatorExample() }
+
+        SectionHeader("Custom Button Colors")
+        ExampleCard(
+            title = "Custom Button Colors",
+            description = "Toolbar buttons with custom content colors (accent, green)",
+            sourceCode = GallerySources.TitleBarCustomColorsExample,
+        ) { TitleBarCustomColorsExample() }
 
         SectionHeader("Full Title Bars")
         ExampleCard(

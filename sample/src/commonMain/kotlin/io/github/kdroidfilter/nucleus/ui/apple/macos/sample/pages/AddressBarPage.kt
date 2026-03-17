@@ -16,7 +16,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.AddressBar
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.AddressBarDefaults
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Card
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Scaffold
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.NavigationButtons
@@ -148,6 +150,40 @@ fun AddressBarSurfaceVariantsExample() {
     }
 }
 
+@GalleryExample("AddressBar", "Custom Colors")
+@Composable
+fun AddressBarCustomColorsExample() {
+    var query by remember { mutableStateOf("") }
+    val accent = MacosTheme.colorScheme.accent
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        AddressBar(
+            value = query,
+            onValueChange = { query = it },
+            placeholder = "Accent-tinted address bar",
+            onGo = {},
+            modifier = Modifier.fillMaxWidth(),
+            colors = AddressBarDefaults.colors(
+                backgroundColor = accent.copy(alpha = 0.10f),
+                borderColor = accent.copy(alpha = 0.30f),
+                iconColor = accent,
+            ),
+        )
+        AddressBar(
+            value = "custom background",
+            onValueChange = {},
+            onGo = {},
+            modifier = Modifier.fillMaxWidth(),
+            colors = AddressBarDefaults.colors(
+                backgroundColor = Color(0xFF34C759).copy(alpha = 0.10f),
+                borderColor = Color(0xFF34C759).copy(alpha = 0.30f),
+                textColor = Color(0xFF34C759),
+                iconColor = Color(0xFF34C759),
+            ),
+        )
+    }
+}
+
 @Composable
 internal fun AddressBarPage() {
     GalleryPage("Address Bar", "macOS Safari-style address bar with pill shape.") {
@@ -162,6 +198,13 @@ internal fun AddressBarPage() {
             description = "Address bar used outside of a title bar",
             sourceCode = GallerySources.AddressBarStandaloneExample,
         ) { AddressBarStandaloneExample() }
+
+        SectionHeader("Custom Colors")
+        ExampleCard(
+            title = "Custom Colors",
+            description = "Address bar with custom background, border, text and icon colors",
+            sourceCode = GallerySources.AddressBarCustomColorsExample,
+        ) { AddressBarCustomColorsExample() }
 
         SectionHeader("Surface Variants")
         ExampleCard(

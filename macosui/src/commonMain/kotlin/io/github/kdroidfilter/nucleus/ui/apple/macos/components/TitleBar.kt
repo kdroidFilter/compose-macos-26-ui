@@ -28,6 +28,49 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icons
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icon
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.*
 
+// =============================================================================
+// TitleBarButtonColors — customizable colors for titlebar buttons
+// =============================================================================
+
+@Immutable
+class TitleBarButtonColors(
+    val backgroundColor: Color,
+    val contentColor: Color,
+    val disabledContentColor: Color,
+    val pressedOverlay: Color,
+    val hoveredOverlay: Color,
+) {
+    fun copy(
+        backgroundColor: Color = this.backgroundColor,
+        contentColor: Color = this.contentColor,
+        disabledContentColor: Color = this.disabledContentColor,
+        pressedOverlay: Color = this.pressedOverlay,
+        hoveredOverlay: Color = this.hoveredOverlay,
+    ) = TitleBarButtonColors(backgroundColor, contentColor, disabledContentColor, pressedOverlay, hoveredOverlay)
+}
+
+object TitleBarButtonDefaults {
+
+    @Composable
+    fun colors(
+        backgroundColor: Color = with(MacosTheme.colorScheme) {
+            if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.06f)
+        },
+        contentColor: Color = with(MacosTheme.colorScheme) {
+            if (isDark) Color.White.copy(alpha = 0.85f) else Color(0xFF1A1A1A)
+        },
+        disabledContentColor: Color = with(MacosTheme.colorScheme) {
+            if (isDark) Color.White.copy(alpha = 0.28f) else Color(0xFFBFBFBF)
+        },
+        pressedOverlay: Color = with(MacosTheme.colorScheme) {
+            if (isDark) Color.White.copy(alpha = 0.18f) else Color.Black.copy(alpha = 0.12f)
+        },
+        hoveredOverlay: Color = with(MacosTheme.colorScheme) {
+            if (isDark) Color.White.copy(alpha = 0.12f) else Color.Black.copy(alpha = 0.08f)
+        },
+    ) = TitleBarButtonColors(backgroundColor, contentColor, disabledContentColor, pressedOverlay, hoveredOverlay)
+}
+
 /**
  * macOS-style Title Bar.
  * Matches the style of Safari, Finder, and other macOS system apps.
@@ -265,13 +308,15 @@ internal val LocalTitleBarGroupButtonCount = compositionLocalOf { mutableIntStat
 @Composable
 fun TitleBarButtonGroup(
     modifier: Modifier = Modifier,
+    colors: TitleBarButtonColors? = null,
     content: @Composable RowScope.() -> Unit,
 ) {
     val isDark = MacosTheme.colorScheme.isDark
     val style = LocalTitleBarStyle.current
     val buttonCount = remember { mutableIntStateOf(0) }
 
-    val pillBg = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.06f)
+    val pillBg = colors?.backgroundColor
+        ?: if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.06f)
 
     CompositionLocalProvider(LocalTitleBarGroupButtonCount provides buttonCount) {
         Row(
@@ -299,6 +344,7 @@ fun TitleBarGroupButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     iconScale: Float = 1.2f,
+    colors: TitleBarButtonColors? = null,
     content: @Composable () -> Unit,
 ) {
     val isDark = MacosTheme.colorScheme.isDark
@@ -315,21 +361,24 @@ fun TitleBarGroupButton(
     }
     val circularHighlight = groupButtonCount.intValue > 1
 
+    val defaultPressed = if (isDark) Color.White.copy(alpha = 0.18f) else Color.Black.copy(alpha = 0.12f)
+    val defaultHovered = if (isDark) Color.White.copy(alpha = 0.12f) else Color.Black.copy(alpha = 0.08f)
     val bgOverlay by animateColorAsState(
         targetValue = when {
-            isPressed && enabled -> if (isDark) Color.White.copy(alpha = 0.18f) else Color.Black.copy(alpha = 0.12f)
-            isHovered && enabled -> if (isDark) Color.White.copy(alpha = 0.12f) else Color.Black.copy(alpha = 0.08f)
+            isPressed && enabled -> colors?.pressedOverlay ?: defaultPressed
+            isHovered && enabled -> colors?.hoveredOverlay ?: defaultHovered
             else -> Color.Transparent
         },
         animationSpec = macosTween(MacosDuration.Fast),
         label = "tbar_grp_btn_bg",
     )
-    // Sketch: default #1a1a1a, disabled #bfbfbf (light); dark inverted
+    val defaultContent = if (isDark) Color.White.copy(alpha = 0.85f) else Color(0xFF1A1A1A)
+    val defaultDisabled = if (isDark) Color.White.copy(alpha = 0.28f) else Color(0xFFBFBFBF)
     val contentColor by animateColorAsState(
         targetValue = if (!enabled) {
-            if (isDark) Color.White.copy(alpha = 0.28f) else Color(0xFFBFBFBF)
+            colors?.disabledContentColor ?: defaultDisabled
         } else {
-            if (isDark) Color.White.copy(alpha = 0.85f) else Color(0xFF1A1A1A)
+            colors?.contentColor ?: defaultContent
         },
         animationSpec = macosTween(MacosDuration.Fast),
         label = "tbar_grp_btn_content",
@@ -419,13 +468,15 @@ fun NavigationButtons(
     modifier: Modifier = Modifier,
     backEnabled: Boolean = true,
     forwardEnabled: Boolean = false,
+    colors: TitleBarButtonColors? = null,
 ) {
     val style = LocalTitleBarStyle.current
-    TitleBarButtonGroup(modifier = modifier) {
+    TitleBarButtonGroup(modifier = modifier, colors = colors) {
         TitleBarGroupButton(
             onClick = onBack,
             enabled = backEnabled,
             iconScale = 1f,
+            colors = colors,
         ) {
             Icon(icon = Icons.ChevronLeft, modifier = Modifier.size(style.iconSize + 4.dp))
         }
@@ -434,6 +485,7 @@ fun NavigationButtons(
             onClick = onForward,
             enabled = forwardEnabled,
             iconScale = 1f,
+            colors = colors,
         ) {
             Icon(icon = Icons.ChevronRight, modifier = Modifier.size(style.iconSize + 4.dp))
         }
@@ -464,6 +516,7 @@ fun SidebarButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    colors: TitleBarButtonColors? = null,
     icon: @Composable () -> Unit = {
         val style = LocalTitleBarStyle.current
         Icon(icon = Icons.PanelLeft, modifier = Modifier.size(style.iconSize + 4.dp))
@@ -476,10 +529,12 @@ fun SidebarButton(
     Box {
         TitleBarButtonGroup(
             modifier = modifier.onGloballyPositioned { buttonHeightPx = it.size.height },
+            colors = colors,
         ) {
             TitleBarGroupButton(
                 onClick = onClick,
                 enabled = enabled,
+                colors = colors,
             ) {
                 icon()
             }
@@ -488,6 +543,7 @@ fun SidebarButton(
                 TitleBarGroupButton(
                     onClick = { menuExpanded = true },
                     enabled = enabled,
+                    colors = colors,
                 ) {
                     Icon(icon = Icons.ChevronDown, modifier = Modifier.size(12.dp))
                 }
