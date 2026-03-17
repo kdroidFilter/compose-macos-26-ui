@@ -56,6 +56,8 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.GlassMaterialSize
 import io.github.fletchmckee.liquid.liquefiable
 import io.github.fletchmckee.liquid.rememberLiquidState
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalControlSize
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.GlassType
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalGlassType
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarResize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalTitleBarHeight
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalWindowActive
@@ -243,6 +245,7 @@ fun Sidebar(
     val sidebarMetrics = MacosTheme.componentStyling.sidebar.metrics
     val colors = MacosTheme.colorScheme
     val isDark = colors.isDark
+    val glassType = LocalGlassType.current
 
     // Resolve hide callback: explicit parameter takes precedence, then CompositionLocal
     val scaffoldHide = LocalSidebarHide.current
@@ -297,6 +300,13 @@ fun Sidebar(
         if (isDark) Color(0xFF282828) else Color(0xFFF4F4F4)
     }
 
+    // Tinted glass darkens the entire sidebar content background
+    val tintedOverlay = if (glassType == GlassType.Tinted && isWindowActive) {
+        if (isDark) Color.Black.copy(alpha = 0.25f) else Color.Black.copy(alpha = 0.08f)
+    } else {
+        Color.Transparent
+    }
+
     Box(
         modifier = modifier
             .width(animatedWidth)
@@ -325,7 +335,8 @@ fun Sidebar(
                     modifier = Modifier
                         .fillMaxSize()
                         .liquefiable(sidebarGlassState)
-                        .background(if (isWindowActive) MacosTheme.colorScheme.background else inactiveOverlay),
+                        .background(if (isWindowActive) MacosTheme.colorScheme.background else inactiveOverlay)
+                        .background(tintedOverlay),
                 ) {
                 Column(
                     modifier = Modifier
@@ -460,6 +471,7 @@ fun Sidebar(
                 Column(
                     modifier = Modifier
                         .background(if (isWindowActive) MacosTheme.colorScheme.background else inactiveOverlay)
+                        .background(tintedOverlay)
                         .padding(top = 6.dp, start = 4.dp, end = 4.dp),
                     verticalArrangement = Arrangement.spacedBy(sidebarMetrics.itemSpacingFor(controlSize)),
                 ) {
