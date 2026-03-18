@@ -7,8 +7,6 @@ import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -22,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -40,7 +39,6 @@ import io.github.fletchmckee.liquid.liquefiable
 import io.github.fletchmckee.liquid.liquid
 import io.github.fletchmckee.liquid.rememberLiquidState
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.liquidGlassFade
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosDuration
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SpringPreset
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalLiquidState
@@ -52,9 +50,10 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalToolbarGlassStat
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarHide
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarVisible
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosSpring
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosTween
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.unit.IntOffset
@@ -218,8 +217,29 @@ fun Scaffold(
 
         @Composable
         fun ContentArea(contentModifier: Modifier) {
+            // Animated inspector width — drives ColumnDivider overlay position.
+            val animatedInspectorWidth by animateDpAsState(
+                targetValue = if (inspectorVisible && inspector != null) currentInspectorWidth else 0.dp,
+                animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing),
+            )
+            val separatorColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
+
         Box(
-            modifier = contentModifier,
+            modifier = contentModifier
+                .clipToBounds()
+                .drawWithContent {
+                    drawContent()
+                    // Inspector separator drawn on top of everything (including title bar glass)
+                    if (animatedInspectorWidth > 0.dp) {
+                        val x = size.width - animatedInspectorWidth.toPx()
+                        drawLine(
+                            color = separatorColor,
+                            start = Offset(x, 0f),
+                            end = Offset(x, size.height),
+                            strokeWidth = 1.dp.toPx(),
+                        )
+                    }
+                },
         ) {
             // Content layer captured for title bar glass
             Box(
@@ -323,53 +343,47 @@ fun Scaffold(
                         }
                     }
 
-                    // ---- Inspector (right panel) ----
+                    // ---- Inspector (inside liquefiable so glass captures its background) ----
                     if (inspector != null) {
+                        val inspectorSizeTween = tween<IntSize>(durationMillis = 250, easing = FastOutSlowInEasing)
                         AnimatedVisibility(
                             visible = inspectorVisible,
                             enter = expandHorizontally(
-                                animationSpec = macosSpring(SpringPreset.Snappy),
+                                animationSpec = inspectorSizeTween,
                                 expandFrom = Alignment.End,
                             ),
                             exit = shrinkHorizontally(
-                                animationSpec = macosSpring(SpringPreset.Snappy),
+                                animationSpec = inspectorSizeTween,
                                 shrinkTowards = Alignment.End,
                             ),
                         ) {
-                            Row {
-                                // Inspector divider
-                                if (inspectorWidth is ColumnWidth.Flexible) {
-                                    val flex = inspectorWidth
-                                    ColumnDivider(
-                                        onDrag = { delta ->
-                                            currentInspectorWidth = (currentInspectorWidth - delta)
-                                                .coerceIn(flex.min, flex.max)
-                                        },
-                                        onReset = { currentInspectorWidth = flex.ideal },
-                                    )
-                                }
-
-                                Box(
-                                    modifier = Modifier
-                                        .width(currentInspectorWidth)
-                                        .fillMaxHeight()
-                                        .padding(top = topPadding)
-                                        .background(MacosTheme.colorScheme.surface)
-                                        .drawBehind {
-                                            // Left border
-                                            drawLine(
-                                                color = borderColor,
-                                                start = Offset(0f, 0f),
-                                                end = Offset(0f, size.height),
-                                                strokeWidth = 1.dp.toPx(),
-                                            )
-                                        },
-                                ) {
-                                    inspector()
-                                }
+                            Box(
+                                modifier = Modifier
+                                    .width(currentInspectorWidth)
+                                    .fillMaxHeight(),
+                            ) {
+                                inspector()
                             }
                         }
                     }
+                }
+            }
+
+            // ---- Inspector separator (outside liquefiable — immune to glass refraction) ----
+            if (inspector != null) {
+                if (inspectorWidth is ColumnWidth.Flexible) {
+                    val flex = inspectorWidth
+                    ColumnDivider(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .fillMaxHeight()
+                            .offset { IntOffset(-animatedInspectorWidth.roundToPx(), 0) },
+                        onDrag = { delta ->
+                            currentInspectorWidth = (currentInspectorWidth - delta)
+                                .coerceIn(flex.min, flex.max)
+                        },
+                        onReset = { currentInspectorWidth = flex.ideal },
+                    )
                 }
             }
 
@@ -415,6 +429,7 @@ fun Scaffold(
                     }
                 }
             }
+
         }
         }
 

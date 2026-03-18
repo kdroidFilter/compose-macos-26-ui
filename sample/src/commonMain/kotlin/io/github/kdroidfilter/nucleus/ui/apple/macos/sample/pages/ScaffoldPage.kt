@@ -52,6 +52,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideInfo
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.ExampleCard
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.GalleryPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.SectionHeader
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Inspector
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.generated.GallerySources
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 
@@ -308,37 +309,39 @@ fun ScaffoldInspectorExample() {
     Card(modifier = Modifier.fillMaxWidth().height(400.dp)) {
         Scaffold(
             inspector = {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    Text(
-                        text = "Inspector",
-                        style = MacosTheme.typography.headline,
-                        color = MacosTheme.colorScheme.textPrimary,
-                    )
-                    Text(
-                        text = "Properties and details for the selected item.",
-                        style = MacosTheme.typography.subheadline,
-                        color = MacosTheme.colorScheme.textSecondary,
-                    )
-                    repeat(4) { i ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Text(
-                                "Property ${i + 1}",
-                                style = MacosTheme.typography.caption1,
-                                color = MacosTheme.colorScheme.textTertiary,
-                            )
-                            Text(
-                                "Value ${i + 1}",
-                                style = MacosTheme.typography.caption1,
-                                color = MacosTheme.colorScheme.textPrimary,
-                            )
+                Inspector {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        Text(
+                            text = "Inspector",
+                            style = MacosTheme.typography.headline,
+                            color = MacosTheme.colorScheme.textPrimary,
+                        )
+                        Text(
+                            text = "Properties and details for the selected item.",
+                            style = MacosTheme.typography.subheadline,
+                            color = MacosTheme.colorScheme.textSecondary,
+                        )
+                        repeat(4) { i ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Text(
+                                    "Property ${i + 1}",
+                                    style = MacosTheme.typography.caption1,
+                                    color = MacosTheme.colorScheme.textTertiary,
+                                )
+                                Text(
+                                    "Value ${i + 1}",
+                                    style = MacosTheme.typography.caption1,
+                                    color = MacosTheme.colorScheme.textPrimary,
+                                )
+                            }
                         }
                     }
                 }
