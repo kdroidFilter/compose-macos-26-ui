@@ -93,6 +93,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SearchSuggestion
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SearchSuggestionSeparator
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SegmentedControl
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Sidebar
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SidebarDefaults
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SidebarItem
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Surface
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Switch
@@ -374,7 +375,7 @@ fun App() {
                 Scaffold(
                     columnVisibility = columnVisibility,
                     onColumnVisibilityChange = { columnVisibility = it },
-                    sidebarWidth = ColumnWidth.Fixed(240.dp),
+                    sidebarWidth = ColumnWidth.Flexible(min = 180.dp, ideal = 240.dp, max = 350.dp),
                     pushContent = isCompact,
                     dismissPanelsOnContentTap = isCompact,
                     inspector = {
@@ -382,13 +383,19 @@ fun App() {
                     },
                     inspectorVisible = inspectorVisible,
                     onInspectorVisibleChange = { inspectorVisible = it },
-                    inspectorWidth = ColumnWidth.Fixed(300.dp),
+                    inspectorWidth = ColumnWidth.Flexible(min = 200.dp, ideal = 300.dp, max = 450.dp),
                     sidebar = {
+                        val accentColor = MacosTheme.colorScheme.accent
+                        val customItemColors = SidebarDefaults.itemColors(
+                            activeBackgroundColor = accentColor,
+                            activeContentColor = Color.White,
+                        )
                         ControlSize(sidebarControlSize) {
                             Sidebar(
                                 items = sidebarItems,
                                 activeItem = nav.currentPageId,
                                 showBorder = false,
+                                itemColors = customItemColors,
                             )
                         }
                     },

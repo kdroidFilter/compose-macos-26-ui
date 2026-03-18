@@ -83,7 +83,6 @@ import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
-import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerHoverIcon
@@ -608,7 +607,7 @@ fun Sidebar(
                     .width(8.dp)
                     .fillMaxHeight()
                     .hoverable(dragInteractionSource)
-                    .pointerHoverIcon(PointerIcon.Crosshair) // col-resize cursor
+                    .pointerHoverIcon(pointerIconResizeHorizontal) // col-resize cursor
                     .draggable(
                         orientation = Orientation.Horizontal,
                         state = rememberDraggableState { deltaPx ->

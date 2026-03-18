@@ -62,6 +62,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.zIndex
 
 /**
@@ -231,10 +232,8 @@ fun Scaffold(
         @Composable
         fun ContentArea(contentModifier: Modifier) {
             val showInlineInspector = !pushContent && inspector != null
-            val animatedInspectorWidth by animateDpAsState(
-                targetValue = if (showInlineInspector && inspectorVisible) currentInspectorWidth else 0.dp,
-                animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing),
-            )
+            // Track the actual rendered width of the inspector (follows AnimatedVisibility + drag)
+            var measuredInspectorWidth by remember { mutableStateOf(0) }
             val separatorColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 
         Box(
@@ -243,8 +242,8 @@ fun Scaffold(
                 .drawWithContent {
                     drawContent()
                     // Inspector separator drawn on top of everything (including title bar glass)
-                    if (animatedInspectorWidth > 0.dp) {
-                        val x = size.width - animatedInspectorWidth.toPx()
+                    if (measuredInspectorWidth > 0) {
+                        val x = size.width - measuredInspectorWidth.toFloat()
                         drawLine(
                             color = separatorColor,
                             start = Offset(x, 0f),
@@ -361,6 +360,7 @@ fun Scaffold(
                         val inspectorSizeTween = tween<IntSize>(durationMillis = 250, easing = FastOutSlowInEasing)
                         AnimatedVisibility(
                             visible = inspectorVisible,
+                            modifier = Modifier.onGloballyPositioned { measuredInspectorWidth = it.size.width },
                             enter = expandHorizontally(
                                 animationSpec = inspectorSizeTween,
                                 expandFrom = Alignment.End,
@@ -376,27 +376,24 @@ fun Scaffold(
                                     .fillMaxHeight(),
                             ) {
                                 inspector()
+                                // Resize handle overlaid on the left edge
+                                if (inspectorWidth is ColumnWidth.Flexible) {
+                                    val flex = inspectorWidth
+                                    ColumnDivider(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterStart)
+                                            .fillMaxHeight(),
+                                        onDrag = { delta ->
+                                            currentInspectorWidth = (currentInspectorWidth - delta)
+                                                .coerceIn(flex.min, flex.max)
+                                        },
+                                        onReset = { currentInspectorWidth = flex.ideal },
+                                        showLine = false,
+                                    )
+                                }
                             }
                         }
                     }
-                }
-            }
-
-            // ---- Inspector separator (non-push only, outside liquefiable) ----
-            if (showInlineInspector) {
-                if (inspectorWidth is ColumnWidth.Flexible) {
-                    val flex = inspectorWidth
-                    ColumnDivider(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .fillMaxHeight()
-                            .offset { IntOffset(-animatedInspectorWidth.roundToPx(), 0) },
-                        onDrag = { delta ->
-                            currentInspectorWidth = (currentInspectorWidth - delta)
-                                .coerceIn(flex.min, flex.max)
-                        },
-                        onReset = { currentInspectorWidth = flex.ideal },
-                    )
                 }
             }
 
