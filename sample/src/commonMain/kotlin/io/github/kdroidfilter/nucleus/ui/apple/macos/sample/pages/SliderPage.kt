@@ -184,8 +184,6 @@ fun SliderCustomColorsExample() {
 @Composable
 internal fun SliderPage() {
     GalleryPage("Slider", "An input where the user selects a value from within a given range.") {
-        SectionHeader("Sizes")
-        ExampleCard(title = "All Sizes", sourceCode = GallerySources.SliderSizesExample) { SliderSizesExample() }
         SectionHeader("Surface Appearance")
         ExampleCard(title = "Content Area vs Over Glass", sourceCode = GallerySources.SliderSurfaceExample) { SliderSurfaceExample() }
         SectionHeader("Examples")

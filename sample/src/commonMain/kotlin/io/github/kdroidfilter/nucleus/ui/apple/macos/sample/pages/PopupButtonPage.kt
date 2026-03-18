@@ -316,13 +316,6 @@ internal fun PopupButtonPage() {
     GalleryPage("Pop-up Button", "Selection control for choosing from a list of options.") {
         PreviewContainer { PopupButtonPreview() }
 
-        SectionHeader("Sizes")
-        ExampleCard(
-            title = "All Sizes",
-            description = "PopupButton at each ControlSize — enabled and disabled",
-            sourceCode = GallerySources.PopupButtonSizesExample,
-        ) { PopupButtonSizesExample() }
-
         SectionHeader("States")
         ExampleCard(
             title = "Enabled vs Disabled",

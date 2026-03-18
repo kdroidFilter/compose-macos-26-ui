@@ -247,12 +247,6 @@ IconButton(icon = Icons.Trash2, onClick = {}, role = IconButtonRole.Destructive)
             description = "All styles with destructive role",
             sourceCode = GallerySources.IconButtonDestructiveExample,
         ) { IconButtonDestructiveExample() }
-        ExampleCard(
-            title = "Sizes",
-            description = "Icon button at each ControlSize level",
-            sourceCode = GallerySources.IconButtonSizesExample,
-        ) { IconButtonSizesExample() }
-
         SectionHeader("Custom Colors")
         ExampleCard(
             title = "Custom Colors",

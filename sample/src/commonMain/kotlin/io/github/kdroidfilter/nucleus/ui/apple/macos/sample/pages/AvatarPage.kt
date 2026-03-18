@@ -45,7 +45,6 @@ fun AvatarGroupExample() {
 internal fun AvatarPage() {
     GalleryPage("Avatar", "An image element with a fallback for representing the user.") {
         SectionHeader("Examples")
-        ExampleCard(title = "Sizes", sourceCode = GallerySources.AvatarSizesExample) { AvatarSizesExample() }
         ExampleCard(title = "Avatar Group", sourceCode = GallerySources.AvatarGroupExample) { AvatarGroupExample() }
     }
 }

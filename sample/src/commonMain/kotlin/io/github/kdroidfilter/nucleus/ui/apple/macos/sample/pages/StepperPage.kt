@@ -216,15 +216,6 @@ fun StepperStatesExample() {
 @Composable
 internal fun StepperPage() {
     GalleryPage("Stepper", "A control that increments or decrements a value.") {
-        SectionHeader("No Field")
-        ExampleCard(title = "All Sizes", sourceCode = GallerySources.StepperNoFieldSizesExample) { StepperNoFieldSizesExample() }
-
-        SectionHeader("Outside Field")
-        ExampleCard(title = "All Sizes", sourceCode = GallerySources.StepperOutsideFieldSizesExample) { StepperOutsideFieldSizesExample() }
-
-        SectionHeader("Inside Field")
-        ExampleCard(title = "All Sizes", sourceCode = GallerySources.StepperInsideFieldSizesExample) { StepperInsideFieldSizesExample() }
-
         SectionHeader("Surface Appearance")
         ExampleCard(title = "Content Area vs Over Glass", sourceCode = GallerySources.StepperSurfaceExample) { StepperSurfaceExample() }
 

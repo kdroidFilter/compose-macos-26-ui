@@ -275,11 +275,6 @@ internal fun ColorWellPage() {
             sourceCode = GallerySources.ColorWellExpandedExample,
         ) { ColorWellExpandedExample() }
         ExampleCard(
-            title = "Sizes",
-            description = "All five control sizes: Mini, Small, Regular, Large, Extra Large.",
-            sourceCode = GallerySources.ColorWellSizesExample,
-        ) { ColorWellSizesExample() }
-        ExampleCard(
             title = "Stateful",
             description = "Tap a swatch to select it — the active one gets a darker background.",
             sourceCode = GallerySources.ColorWellStatefulExample,

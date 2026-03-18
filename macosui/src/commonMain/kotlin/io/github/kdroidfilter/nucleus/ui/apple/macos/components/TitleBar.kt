@@ -106,6 +106,7 @@ fun TitleBar(
     forcedColorScheme: ColorScheme? = null,
     navigationActions: @Composable RowScope.() -> Unit = {},
     title: @Composable () -> Unit = {},
+    titleAlignment: Alignment = Alignment.Center,
     actions: @Composable RowScope.() -> Unit = {},
     backgroundColor: Color = MacosTheme.colorScheme.background,
     showBottomBorder: Boolean = false,
@@ -122,6 +123,7 @@ fun TitleBar(
             backgroundStyle = backgroundStyle,
             navigationActions = navigationActions,
             title = title,
+            titleAlignment = titleAlignment,
             actions = actions,
             backgroundColor = backgroundColor,
             showBottomBorder = showBottomBorder,
@@ -149,6 +151,7 @@ private fun TitleBarContent(
     backgroundStyle: TitleBarBackground,
     navigationActions: @Composable RowScope.() -> Unit,
     title: @Composable () -> Unit,
+    titleAlignment: Alignment = Alignment.Center,
     actions: @Composable RowScope.() -> Unit,
     backgroundColor: Color,
     showBottomBorder: Boolean,
@@ -254,18 +257,20 @@ private fun TitleBarContent(
                             .weight(1f)
                             .fillMaxHeight()
                             .graphicsLayer { alpha = if (showsTitle) 1f else 0f },
-                        contentAlignment = Alignment.Center,
+                        contentAlignment = titleAlignment,
                     ) {
                         title()
                     }
                 }
 
-                // Right section (actions): anchored at end, measured to drive push offset
+                // Right section (actions): anchored at end, unbounded so expanding
+                // children (e.g. search field) push the left section instead of compressing
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(style.actionSpacing, Alignment.End),
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
+                        .wrapContentWidth(unbounded = true, align = Alignment.End)
                         .padding(start = 8.dp)
                         .widthIn(min = style.actionsMinWidth)
                         .onGloballyPositioned { actionsWidthPx = it.size.width },
@@ -292,7 +297,7 @@ private fun TitleBarContent(
                         .weight(1f)
                         .fillMaxHeight()
                         .graphicsLayer { alpha = if (showsTitle) 1f else 0f },
-                    contentAlignment = Alignment.Center,
+                    contentAlignment = titleAlignment,
                 ) {
                     title()
                 }

@@ -7,8 +7,6 @@ import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -22,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -40,7 +39,6 @@ import io.github.fletchmckee.liquid.liquefiable
 import io.github.fletchmckee.liquid.liquid
 import io.github.fletchmckee.liquid.rememberLiquidState
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.liquidGlassFade
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosDuration
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SpringPreset
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalLiquidState
@@ -52,13 +50,17 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalToolbarGlassStat
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarHide
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarVisible
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosSpring
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosTween
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.zIndex
 
 /**
  * macOS-style scaffold layout with optional sidebar, content list, inspector,
@@ -89,6 +91,8 @@ import androidx.compose.ui.unit.IntSize
  * @param titleBarHeight Height of the title bar for content inset.
  * @param bottomBar Optional bottom bar composable overlaying the content area.
  * @param bottomBarHeight Height of the bottom bar.
+ * @param dismissPanelsOnContentTap When true (and [pushContent] is enabled), tapping the content
+ *   area dismisses any open sidebar or inspector panel.
  * @param content Main content area. Receives [PaddingValues] for title bar and bottom bar insets.
  */
 @Composable
@@ -113,6 +117,7 @@ fun Scaffold(
     bottomBar: (@Composable () -> Unit)? = null,
     bottomBarHeight: Int = 38,
     pushContent: Boolean = false,
+    dismissPanelsOnContentTap: Boolean = false,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     // --- Resolve effective column visibility ---
@@ -218,8 +223,29 @@ fun Scaffold(
 
         @Composable
         fun ContentArea(contentModifier: Modifier) {
+            val showInlineInspector = !pushContent && inspector != null
+            val animatedInspectorWidth by animateDpAsState(
+                targetValue = if (showInlineInspector && inspectorVisible) currentInspectorWidth else 0.dp,
+                animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing),
+            )
+            val separatorColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
+
         Box(
-            modifier = contentModifier,
+            modifier = contentModifier
+                .clipToBounds()
+                .drawWithContent {
+                    drawContent()
+                    // Inspector separator drawn on top of everything (including title bar glass)
+                    if (animatedInspectorWidth > 0.dp) {
+                        val x = size.width - animatedInspectorWidth.toPx()
+                        drawLine(
+                            color = separatorColor,
+                            start = Offset(x, 0f),
+                            end = Offset(x, size.height),
+                            strokeWidth = 1.dp.toPx(),
+                        )
+                    }
+                },
         ) {
             // Content layer captured for title bar glass
             Box(
@@ -323,53 +349,47 @@ fun Scaffold(
                         }
                     }
 
-                    // ---- Inspector (right panel) ----
-                    if (inspector != null) {
+                    // ---- Inspector (resize mode, non-push only) ----
+                    if (showInlineInspector) {
+                        val inspectorSizeTween = tween<IntSize>(durationMillis = 250, easing = FastOutSlowInEasing)
                         AnimatedVisibility(
                             visible = inspectorVisible,
                             enter = expandHorizontally(
-                                animationSpec = macosSpring(SpringPreset.Snappy),
+                                animationSpec = inspectorSizeTween,
                                 expandFrom = Alignment.End,
                             ),
                             exit = shrinkHorizontally(
-                                animationSpec = macosSpring(SpringPreset.Snappy),
+                                animationSpec = inspectorSizeTween,
                                 shrinkTowards = Alignment.End,
                             ),
                         ) {
-                            Row {
-                                // Inspector divider
-                                if (inspectorWidth is ColumnWidth.Flexible) {
-                                    val flex = inspectorWidth
-                                    ColumnDivider(
-                                        onDrag = { delta ->
-                                            currentInspectorWidth = (currentInspectorWidth - delta)
-                                                .coerceIn(flex.min, flex.max)
-                                        },
-                                        onReset = { currentInspectorWidth = flex.ideal },
-                                    )
-                                }
-
-                                Box(
-                                    modifier = Modifier
-                                        .width(currentInspectorWidth)
-                                        .fillMaxHeight()
-                                        .padding(top = topPadding)
-                                        .background(MacosTheme.colorScheme.surface)
-                                        .drawBehind {
-                                            // Left border
-                                            drawLine(
-                                                color = borderColor,
-                                                start = Offset(0f, 0f),
-                                                end = Offset(0f, size.height),
-                                                strokeWidth = 1.dp.toPx(),
-                                            )
-                                        },
-                                ) {
-                                    inspector()
-                                }
+                            Box(
+                                modifier = Modifier
+                                    .width(currentInspectorWidth)
+                                    .fillMaxHeight(),
+                            ) {
+                                inspector()
                             }
                         }
                     }
+                }
+            }
+
+            // ---- Inspector separator (non-push only, outside liquefiable) ----
+            if (showInlineInspector) {
+                if (inspectorWidth is ColumnWidth.Flexible) {
+                    val flex = inspectorWidth
+                    ColumnDivider(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .fillMaxHeight()
+                            .offset { IntOffset(-animatedInspectorWidth.roundToPx(), 0) },
+                        onDrag = { delta ->
+                            currentInspectorWidth = (currentInspectorWidth - delta)
+                                .coerceIn(flex.min, flex.max)
+                        },
+                        onReset = { currentInspectorWidth = flex.ideal },
+                    )
                 }
             }
 
@@ -415,10 +435,12 @@ fun Scaffold(
                     }
                 }
             }
+
         }
         }
 
         if (pushContent && sidebar != null) {
+            val pushSeparatorColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
             BoxWithConstraints(
                 modifier = modifier.fillMaxSize().background(containerColor).clipToBounds(),
             ) {
@@ -427,13 +449,38 @@ fun Scaffold(
                     targetValue = if (showSidebar) 0.dp else -currentSidebarWidth,
                     animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing),
                 )
-                // Content: full width, pushed right when sidebar is shown
-                ContentArea(
-                    Modifier
+                val inspectorOffset by animateDpAsState(
+                    targetValue = if (inspectorVisible && inspector != null) 0.dp else currentInspectorWidth,
+                    animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing),
+                )
+                // Content: full width, pushed right by sidebar and left by inspector
+                Box(
+                    modifier = Modifier
                         .width(parentWidth)
                         .fillMaxHeight()
-                        .offset { IntOffset((sidebarOffset + currentSidebarWidth).roundToPx(), 0) },
-                )
+                        .offset { IntOffset(
+                            ((sidebarOffset + currentSidebarWidth) - (currentInspectorWidth - inspectorOffset)).roundToPx(),
+                            0,
+                        ) },
+                ) {
+                    ContentArea(Modifier.fillMaxSize())
+
+                    // Dismiss overlay: tap content to close sidebar / inspector
+                    if (dismissPanelsOnContentTap && (showSidebar || (inspectorVisible && inspector != null))) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .zIndex(10f)
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null,
+                                ) {
+                                    if (showSidebar && managedToggle) toggleSidebar()
+                                    if (inspectorVisible) onInspectorVisibleChange?.invoke(false)
+                                },
+                        )
+                    }
+                }
                 // Sidebar: slides in from the left, driven by same sidebarOffset
                 val sidebarResizeCallbacks = if (sidebarWidth is ColumnWidth.Flexible) {
                     SidebarResizeCallbacks(
@@ -459,6 +506,27 @@ fun Scaffold(
                         LocalSidebarVisible provides showSidebar,
                     ) {
                         sidebar()
+                    }
+                }
+                // Inspector: slides in from the right, pushing content left
+                if (inspector != null) {
+                    Box(
+                        modifier = Modifier
+                            .width(currentInspectorWidth)
+                            .fillMaxHeight()
+                            .align(Alignment.TopEnd)
+                            .offset { IntOffset(inspectorOffset.roundToPx(), 0) }
+                            .drawWithContent {
+                                drawContent()
+                                drawLine(
+                                    color = pushSeparatorColor,
+                                    start = Offset(0f, 0f),
+                                    end = Offset(0f, size.height),
+                                    strokeWidth = 1.dp.toPx(),
+                                )
+                            },
+                    ) {
+                        inspector()
                     }
                 }
             }

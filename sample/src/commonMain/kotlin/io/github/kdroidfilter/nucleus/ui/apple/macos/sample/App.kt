@@ -60,6 +60,7 @@ import com.composables.icons.lucide.MousePointerClick
 import com.composables.icons.lucide.PanelTopOpen
 import com.composables.icons.lucide.Scan
 import com.composables.icons.lucide.Search
+import com.composables.icons.lucide.Ruler
 import com.composables.icons.lucide.SlidersHorizontal
 import com.composables.icons.lucide.SquareCheck
 import com.composables.icons.lucide.SquareDashed
@@ -266,6 +267,7 @@ fun App() {
         var searchQuery by remember { mutableStateOf("") }
         var searchExpanded by remember { mutableStateOf(false) }
         var settingsExpanded by remember { mutableStateOf(false) }
+        var inspectorVisible by remember { mutableStateOf(false) }
 
         // Navigation helpers
         val currentPageLabel = sidebarEntryDefs.firstOrNull { it.id == nav.currentPageId }?.label ?: ""
@@ -300,6 +302,13 @@ fun App() {
                     onColumnVisibilityChange = { columnVisibility = it },
                     sidebarWidth = ColumnWidth.Fixed(240.dp),
                     pushContent = isCompact,
+                    dismissPanelsOnContentTap = isCompact,
+                    inspector = {
+                        InspectorSizePreview(pageId = nav.currentPageId)
+                    },
+                    inspectorVisible = inspectorVisible,
+                    onInspectorVisibleChange = { inspectorVisible = it },
+                    inspectorWidth = ColumnWidth.Fixed(300.dp),
                     sidebar = {
                         ControlSize(sidebarControlSize) {
                             Sidebar(
@@ -312,6 +321,7 @@ fun App() {
                     titleBar = {
                         TitleBar(
                             glass = true,
+                            showsTitle = !isCompact,
                             pushActionsOnExpand = isCompact,
                             navigationActionsMinWidth = if (isCompact) 0.dp else 80.dp,
                             navigationActions = if (!isCompact) {
@@ -325,6 +335,7 @@ fun App() {
                                 }
                             } else ({}),
                             title = { Text(currentPageLabel) },
+                            titleAlignment = Alignment.CenterStart,
                             actions = {
                                 val uriHandler = LocalUriHandler.current
                                 TitleBarButtonGroup {
@@ -460,6 +471,11 @@ fun App() {
                                         }
                                     },
                                 )
+                                TitleBarButtonGroup {
+                                    TitleBarGroupButton(onClick = { inspectorVisible = !inspectorVisible }) {
+                                        Icon(Lucide.Ruler, modifier = Modifier.size(14.dp))
+                                    }
+                                }
                             },
                         )
                     },

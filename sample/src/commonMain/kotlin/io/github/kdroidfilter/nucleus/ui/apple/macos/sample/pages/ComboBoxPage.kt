@@ -162,12 +162,6 @@ fun ComboBoxCustomColorsExample() {
 @Composable
 internal fun ComboBoxPage() {
     GalleryPage("Combo Box", "A dropdown combo box for selecting from a list of options.") {
-        SectionHeader("Sizes")
-        ExampleCard(
-            title = "All Sizes",
-            description = "ComboBox at each ControlSize level",
-            sourceCode = GallerySources.ComboBoxSizesExample,
-        ) { ComboBoxSizesExample() }
         SectionHeader("Examples")
         ExampleCard(
             title = "Basic",

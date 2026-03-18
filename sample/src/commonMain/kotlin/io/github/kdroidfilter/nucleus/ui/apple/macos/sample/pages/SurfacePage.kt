@@ -158,11 +158,6 @@ internal fun SurfacePage() {
 
         SectionHeader("Glass")
         ExampleCard(
-            title = "Material Sizes",
-            description = "Small, Medium, and Large glass tiers",
-            sourceCode = GallerySources.SurfaceGlassSizesExample,
-        ) { SurfaceGlassSizesExample() }
-        ExampleCard(
             title = "Tinted Glass",
             description = "Glass with accent color overlay",
             sourceCode = GallerySources.SurfaceTintedExample,

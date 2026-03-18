@@ -526,13 +526,6 @@ internal fun ButtonPage() {
     GalleryPage("Button", "Push buttons — macOS 26 Liquid Glass style.") {
         PreviewContainer { ButtonPreview() }
 
-        SectionHeader("Sizes")
-        ExampleCard(
-            title = "All Sizes",
-            description = "PushButton at each ControlSize level",
-            sourceCode = GallerySources.ButtonSizesExample,
-        ) { ButtonSizesExample() }
-
         SectionHeader("Bordered Default")
         ExampleCard(
             title = "Bordered Default",

@@ -117,13 +117,6 @@ fun PopoverPlacementExample() {
 @Composable
 internal fun PopoverPage() {
     GalleryPage("Popover", "Displays rich content in a portal, triggered by a button.") {
-        SectionHeader("Sizes")
-        ExampleCard(
-            title = "All Sizes",
-            description = "Popover at each ControlSize level",
-            sourceCode = GallerySources.PopoverSizesExample,
-        ) { PopoverSizesExample() }
-
         SectionHeader("Examples")
         ExampleCard(title = "Default (Auto)", sourceCode = GallerySources.PopoverDefaultExample) { PopoverDefaultExample() }
         ExampleCard(title = "Placement", sourceCode = GallerySources.PopoverPlacementExample) { PopoverPlacementExample() }

@@ -200,13 +200,6 @@ internal fun CheckboxPage() {
     GalleryPage("Checkbox", "A control that allows the user to toggle between checked and unchecked.") {
         PreviewContainer { CheckboxPreview() }
 
-        SectionHeader("Sizes")
-        ExampleCard(
-            title = "All Sizes",
-            description = "Checkbox at each ControlSize level",
-            sourceCode = GallerySources.CheckboxSizesExample,
-        ) { CheckboxSizesExample() }
-
         SectionHeader("Surface Appearance")
         ExampleCard(title = "Content Area vs Over Glass", sourceCode = GallerySources.CheckboxSurfaceExample) { CheckboxSurfaceExample() }
 

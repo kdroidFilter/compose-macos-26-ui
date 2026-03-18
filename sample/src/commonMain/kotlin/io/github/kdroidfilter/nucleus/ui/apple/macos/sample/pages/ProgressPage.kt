@@ -120,13 +120,6 @@ LinearProgress(indeterminate = true)
 Spinner()
 Spinner(label = "Loading…")""")
 
-        SectionHeader("Sizes")
-        ExampleCard(
-            title = "All Sizes",
-            description = "LinearProgress and Spinner at each ControlSize level",
-            sourceCode = GallerySources.ProgressSizesExample,
-        ) { ProgressSizesExample() }
-
         SectionHeader("Examples")
         ExampleCard(
             title = "Determinate",

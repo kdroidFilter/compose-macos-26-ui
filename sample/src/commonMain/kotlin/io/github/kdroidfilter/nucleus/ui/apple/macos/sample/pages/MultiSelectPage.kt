@@ -159,12 +159,6 @@ fun MultiSelectCustomColorsExample() {
 @Composable
 internal fun MultiSelectPage() {
     GalleryPage("Multi Select", "Allows selecting multiple options from a list.") {
-        SectionHeader("Sizes")
-        ExampleCard(
-            title = "All Sizes",
-            description = "MultiSelect at each ControlSize level",
-            sourceCode = GallerySources.MultiSelectSizesExample,
-        ) { MultiSelectSizesExample() }
         SectionHeader("Examples")
         ExampleCard(title = "Default", sourceCode = GallerySources.MultiSelectDefaultExample) { MultiSelectDefaultExample() }
         ExampleCard(title = "Pre-selected", sourceCode = GallerySources.MultiSelectPreselectedExample) { MultiSelectPreselectedExample() }

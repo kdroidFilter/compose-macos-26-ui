@@ -221,13 +221,6 @@ fun SearchInputCustomColorsExample() {
 @Composable
 internal fun SearchInputPage() {
     GalleryPage("Search Input", "Text inputs designed for search and URL navigation.") {
-        SectionHeader("Sizes")
-        ExampleCard(
-            title = "All Sizes",
-            description = "SearchField at each ControlSize level",
-            sourceCode = GallerySources.SearchInputSizesExample,
-        ) { SearchInputSizesExample() }
-
         SectionHeader("Search Field")
         ExampleCard(
             title = "Default",

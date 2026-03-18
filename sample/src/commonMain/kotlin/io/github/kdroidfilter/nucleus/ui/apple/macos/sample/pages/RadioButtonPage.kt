@@ -162,13 +162,6 @@ internal fun RadioButtonPage() {
     GalleryPage("RadioButton", "A control that allows the user to select a single option from a set.") {
         PreviewContainer { RadioButtonPreview() }
 
-        SectionHeader("Sizes")
-        ExampleCard(
-            title = "All Sizes",
-            description = "RadioButton at each ControlSize level",
-            sourceCode = GallerySources.RadioButtonSizesExample,
-        ) { RadioButtonSizesExample() }
-
         SectionHeader("Surface Appearance")
         ExampleCard(title = "Content Area vs Over Glass", sourceCode = GallerySources.RadioButtonSurfaceExample) { RadioButtonSurfaceExample() }
 

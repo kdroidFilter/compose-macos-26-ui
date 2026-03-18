@@ -387,13 +387,6 @@ internal fun ScrollbarPage() {
             sourceCode = GallerySources.ScrollbarLazyVerticalExample,
         ) { ScrollbarLazyVerticalExample() }
 
-        SectionHeader("Control Sizes")
-        ExampleCard(
-            title = "All Sizes",
-            description = "Mini, Small, Regular, Large, ExtraLarge side by side",
-            sourceCode = GallerySources.ScrollbarControlSizesExample,
-        ) { ScrollbarControlSizesExample() }
-
         SectionHeader("Track Click Behavior")
         ExampleCard(
             title = "Jump (default)",

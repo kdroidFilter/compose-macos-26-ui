@@ -319,13 +319,6 @@ TextField(
     label = { Text("Label") },
 )""")
 
-        SectionHeader("Sizes")
-        ExampleCard(
-            title = "All Sizes",
-            description = "TextField at each ControlSize level",
-            sourceCode = GallerySources.InputSizesExample,
-        ) { InputSizesExample() }
-
         SectionHeader("Examples")
         ExampleCard(
             title = "With Label",

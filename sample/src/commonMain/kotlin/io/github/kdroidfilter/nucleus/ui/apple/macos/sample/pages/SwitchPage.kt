@@ -210,9 +210,6 @@ internal fun SwitchPage() {
     GalleryPage("Switch", "A control that toggles between on and off states.") {
         PreviewContainer { SwitchPreview() }
 
-        SectionHeader("Sizes")
-        ExampleCard(title = "All Sizes", sourceCode = GallerySources.SwitchSizesExample) { SwitchSizesExample() }
-
         SectionHeader("Surface Appearance")
         ExampleCard(title = "Content Area vs Over Glass", sourceCode = GallerySources.SwitchSurfaceExample) { SwitchSurfaceExample() }
 

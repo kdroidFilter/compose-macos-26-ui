@@ -92,12 +92,6 @@ fun TabsWithIconsExample() {
 @Composable
 internal fun TabsPage() {
     GalleryPage("Tabs", "A set of layered sections of content, known as tab panels.") {
-        SectionHeader("Sizes")
-        ExampleCard(
-            title = "All Sizes",
-            description = "Tabs at each ControlSize level",
-            sourceCode = GallerySources.TabsSizesExample,
-        ) { TabsSizesExample() }
         SectionHeader("With Icons")
         ExampleCard(title = "With Icons", sourceCode = GallerySources.TabsWithIconsExample) { TabsWithIconsExample() }
     }

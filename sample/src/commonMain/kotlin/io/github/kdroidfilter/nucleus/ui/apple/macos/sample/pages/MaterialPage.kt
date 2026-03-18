@@ -219,13 +219,6 @@ internal fun MaterialPage() {
             }
         }
 
-        SectionHeader("Sizes")
-        ExampleCard(
-            title = "Small / Medium / Large",
-            description = "Three material tiers with increasing blur radius",
-            sourceCode = GallerySources.MaterialSizesExample,
-        ) { MaterialSizesExample() }
-
         SectionHeader("Tinted")
         ExampleCard(
             title = "Accent Tinted Materials",

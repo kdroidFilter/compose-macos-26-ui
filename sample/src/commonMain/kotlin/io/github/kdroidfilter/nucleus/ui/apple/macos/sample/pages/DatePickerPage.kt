@@ -317,16 +317,6 @@ internal fun DatePickerPage() {
             DateTimePickerBasicExample()
         }
 
-        SectionHeader("Control Sizes")
-        ExampleCard(title = "Time Button Sizes", sourceCode = GallerySources.TimePickerButtonSizesExample) {
-            TimePickerButtonSizesExample()
-        }
-        ExampleCard(title = "DateTime Buttons Sizes", sourceCode = GallerySources.DateTimePickerButtonSizesExample) {
-            DateTimePickerButtonSizesExample()
-        }
-        ExampleCard(title = "Inline Time Picker Sizes", sourceCode = GallerySources.TimePickerSizesExample) {
-            TimePickerSizesExample()
-        }
         SectionHeader("States")
         ExampleCard(title = "Enabled & Disabled", sourceCode = GallerySources.DatePickerStatesExample) {
             DatePickerStatesExample()

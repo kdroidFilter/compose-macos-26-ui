@@ -65,12 +65,6 @@ fun CircularSliderDisabledExample() {
 @Composable
 internal fun CircularSliderPage() {
     GalleryPage("Circular Slider", "A circular dial slider for value selection.") {
-        SectionHeader("Sizes")
-        ExampleCard(
-            title = "All Sizes",
-            description = "Circular slider at each ControlSize level",
-            sourceCode = GallerySources.CircularSliderSizesExample,
-        ) { CircularSliderSizesExample() }
         ExampleCard(
             title = "Disabled",
             description = "Circular sliders in disabled state",
