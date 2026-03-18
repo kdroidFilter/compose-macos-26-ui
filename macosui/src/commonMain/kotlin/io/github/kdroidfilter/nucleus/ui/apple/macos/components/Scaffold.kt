@@ -56,8 +56,11 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.zIndex
 
 /**
  * macOS-style scaffold layout with optional sidebar, content list, inspector,
@@ -88,6 +91,8 @@ import androidx.compose.ui.unit.IntSize
  * @param titleBarHeight Height of the title bar for content inset.
  * @param bottomBar Optional bottom bar composable overlaying the content area.
  * @param bottomBarHeight Height of the bottom bar.
+ * @param dismissPanelsOnContentTap When true (and [pushContent] is enabled), tapping the content
+ *   area dismisses any open sidebar or inspector panel.
  * @param content Main content area. Receives [PaddingValues] for title bar and bottom bar insets.
  */
 @Composable
@@ -112,6 +117,7 @@ fun Scaffold(
     bottomBar: (@Composable () -> Unit)? = null,
     bottomBarHeight: Int = 38,
     pushContent: Boolean = false,
+    dismissPanelsOnContentTap: Boolean = false,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     // --- Resolve effective column visibility ---
@@ -448,15 +454,33 @@ fun Scaffold(
                     animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing),
                 )
                 // Content: full width, pushed right by sidebar and left by inspector
-                ContentArea(
-                    Modifier
+                Box(
+                    modifier = Modifier
                         .width(parentWidth)
                         .fillMaxHeight()
                         .offset { IntOffset(
                             ((sidebarOffset + currentSidebarWidth) - (currentInspectorWidth - inspectorOffset)).roundToPx(),
                             0,
                         ) },
-                )
+                ) {
+                    ContentArea(Modifier.fillMaxSize())
+
+                    // Dismiss overlay: tap content to close sidebar / inspector
+                    if (dismissPanelsOnContentTap && (showSidebar || (inspectorVisible && inspector != null))) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .zIndex(10f)
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null,
+                                ) {
+                                    if (showSidebar && managedToggle) toggleSidebar()
+                                    if (inspectorVisible) onInspectorVisibleChange?.invoke(false)
+                                },
+                        )
+                    }
+                }
                 // Sidebar: slides in from the left, driven by same sidebarOffset
                 val sidebarResizeCallbacks = if (sidebarWidth is ColumnWidth.Flexible) {
                     SidebarResizeCallbacks(

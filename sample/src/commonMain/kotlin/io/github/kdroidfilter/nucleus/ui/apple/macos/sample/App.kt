@@ -302,6 +302,7 @@ fun App() {
                     onColumnVisibilityChange = { columnVisibility = it },
                     sidebarWidth = ColumnWidth.Fixed(240.dp),
                     pushContent = isCompact,
+                    dismissPanelsOnContentTap = isCompact,
                     inspector = {
                         InspectorSizePreview(pageId = nav.currentPageId)
                     },
