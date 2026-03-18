@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -47,6 +48,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarWidth
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalTitleBarHeight
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SidebarResizeCallbacks
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalToolbarGlassState
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarDisclosureStates
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarHide
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarVisible
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosSpring
@@ -171,6 +173,10 @@ fun Scaffold(
         Color.Transparent
     }
 
+    // Disclosure expanded states — remembered above AnimatedVisibility so they
+    // survive sidebar hide/show cycles.
+    val sidebarDisclosureStates = remember { mutableStateMapOf<String, Boolean>() }
+
     CompositionLocalProvider(LocalTitleBarHeight provides topPadding) {
 
         @Composable
@@ -214,6 +220,7 @@ fun Scaffold(
                         LocalSidebarResize provides sidebarResizeCallbacks,
                         LocalSidebarHide provides hideCallback,
                         LocalSidebarVisible provides showSidebar,
+                        LocalSidebarDisclosureStates provides sidebarDisclosureStates,
                     ) {
                         sidebar()
                     }

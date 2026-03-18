@@ -48,6 +48,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.components.VerticalScrollba
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TrackClickBehavior
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.rememberScrollbarState
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarDisclosureStates
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icons
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideChevronsLeft
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icon
@@ -721,7 +722,16 @@ private fun DisclosureItem(
     itemColors: SidebarItemColors,
     indentLevel: Int = 0,
 ) {
-    var expanded by remember { mutableStateOf(item.initiallyExpanded) }
+    // When inside a Scaffold, use the shared map that survives AnimatedVisibility.
+    // Otherwise, fall back to local state.
+    val sharedStates = LocalSidebarDisclosureStates.current
+    var localExpanded by remember { mutableStateOf(item.initiallyExpanded) }
+    val expanded = sharedStates?.getOrPut(item.id) { item.initiallyExpanded } ?: localExpanded
+    val toggleExpanded = {
+        val newValue = !expanded
+        if (sharedStates != null) sharedStates[item.id] = newValue
+        localExpanded = newValue
+    }
     val chevronRotation by animateFloatAsState(
         targetValue = if (expanded) 90f else 0f,
         animationSpec = sidebarSpring(),
@@ -761,7 +771,7 @@ private fun DisclosureItem(
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
-                ) { expanded = !expanded },
+                ) { toggleExpanded() },
             contentAlignment = Alignment.Center,
         ) {
             Icon(
@@ -777,7 +787,7 @@ private fun DisclosureItem(
             SidebarItemRow(
                 label = item.label,
                 onClick = {
-                    expanded = !expanded
+                    toggleExpanded()
                     item.onClick()
                 },
                 active = activeItem == item.id,

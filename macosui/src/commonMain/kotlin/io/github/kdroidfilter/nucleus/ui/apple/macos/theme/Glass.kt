@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
@@ -73,6 +74,14 @@ val LocalSidebarHide = compositionLocalOf<(() -> Unit)?> { null }
  * Defaults to true.
  */
 val LocalSidebarVisible = compositionLocalOf { true }
+
+/**
+ * Stores the expanded/collapsed state of sidebar disclosure items by their ID.
+ * Provided by [Scaffold][io.github.kdroidfilter.nucleus.ui.apple.macos.components.Scaffold]
+ * above [AnimatedVisibility] so the state survives sidebar hide/show cycles.
+ * Null when no scaffold is providing state (disclosure items fall back to local remember).
+ */
+val LocalSidebarDisclosureStates = compositionLocalOf<SnapshotStateMap<String, Boolean>?> { null }
 
 /**
  * The two glass appearance variants matching macOS 26.
