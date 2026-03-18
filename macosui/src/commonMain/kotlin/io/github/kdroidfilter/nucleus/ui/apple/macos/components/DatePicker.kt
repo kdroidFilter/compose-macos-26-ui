@@ -52,6 +52,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import io.github.kdroidfilter.nucleus.ui.apple.macos.util.localizedMonthNames
+import io.github.kdroidfilter.nucleus.ui.apple.macos.util.localizedMonthShortNames
+import io.github.kdroidfilter.nucleus.ui.apple.macos.util.localizedWeekdayShortNames
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icon
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icons
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosGlass
@@ -647,7 +650,7 @@ private fun DayOfWeekHeaders(
     controlSize: ControlSize,
 ) {
     val headerColor = MacosTheme.colorScheme.textTertiary
-    val dayLabels = listOf("SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT")
+    val dayLabels = localizedWeekdayShortNames().map { it.uppercase() }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -1636,10 +1639,10 @@ private fun PickerPopover(
 // ===========================================================================
 
 private fun monthFullName(month: Month): String =
-    month.name.lowercase().replaceFirstChar { it.uppercase() }
+    localizedMonthNames()[month.ordinal]
 
 private fun monthShortName(month: Month): String =
-    month.name.take(3)
+    localizedMonthShortNames()[month.ordinal]
 
 private fun formatTime(time: LocalTime, is24Hour: Boolean): String {
     return if (is24Hour) {
