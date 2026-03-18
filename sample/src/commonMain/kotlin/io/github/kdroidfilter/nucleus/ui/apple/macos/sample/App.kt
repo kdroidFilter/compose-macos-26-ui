@@ -312,7 +312,7 @@ fun App() {
                     inspector = {
                         InspectorSizePreview(pageId = nav.currentPageId)
                     },
-                    inspectorVisible = inspectorVisible && !isCompact,
+                    inspectorVisible = inspectorVisible,
                     onInspectorVisibleChange = { inspectorVisible = it },
                     inspectorWidth = ColumnWidth.Fixed(300.dp),
                     sidebar = {

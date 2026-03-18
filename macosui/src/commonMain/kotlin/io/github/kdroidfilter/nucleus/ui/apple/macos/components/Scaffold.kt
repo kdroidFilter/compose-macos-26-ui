@@ -217,9 +217,9 @@ fun Scaffold(
 
         @Composable
         fun ContentArea(contentModifier: Modifier) {
-            // Animated inspector width — drives ColumnDivider overlay position.
+            val showInlineInspector = !pushContent && inspector != null
             val animatedInspectorWidth by animateDpAsState(
-                targetValue = if (inspectorVisible && inspector != null) currentInspectorWidth else 0.dp,
+                targetValue = if (showInlineInspector && inspectorVisible) currentInspectorWidth else 0.dp,
                 animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing),
             )
             val separatorColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
@@ -343,8 +343,8 @@ fun Scaffold(
                         }
                     }
 
-                    // ---- Inspector (inside liquefiable so glass captures its background) ----
-                    if (inspector != null) {
+                    // ---- Inspector (resize mode, non-push only) ----
+                    if (showInlineInspector) {
                         val inspectorSizeTween = tween<IntSize>(durationMillis = 250, easing = FastOutSlowInEasing)
                         AnimatedVisibility(
                             visible = inspectorVisible,
@@ -369,8 +369,8 @@ fun Scaffold(
                 }
             }
 
-            // ---- Inspector separator (outside liquefiable — immune to glass refraction) ----
-            if (inspector != null) {
+            // ---- Inspector separator (non-push only, outside liquefiable) ----
+            if (showInlineInspector) {
                 if (inspectorWidth is ColumnWidth.Flexible) {
                     val flex = inspectorWidth
                     ColumnDivider(
@@ -434,6 +434,7 @@ fun Scaffold(
         }
 
         if (pushContent && sidebar != null) {
+            val pushSeparatorColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
             BoxWithConstraints(
                 modifier = modifier.fillMaxSize().background(containerColor).clipToBounds(),
             ) {
@@ -442,12 +443,19 @@ fun Scaffold(
                     targetValue = if (showSidebar) 0.dp else -currentSidebarWidth,
                     animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing),
                 )
-                // Content: full width, pushed right when sidebar is shown
+                val inspectorOffset by animateDpAsState(
+                    targetValue = if (inspectorVisible && inspector != null) 0.dp else currentInspectorWidth,
+                    animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing),
+                )
+                // Content: full width, pushed right by sidebar and left by inspector
                 ContentArea(
                     Modifier
                         .width(parentWidth)
                         .fillMaxHeight()
-                        .offset { IntOffset((sidebarOffset + currentSidebarWidth).roundToPx(), 0) },
+                        .offset { IntOffset(
+                            ((sidebarOffset + currentSidebarWidth) - (currentInspectorWidth - inspectorOffset)).roundToPx(),
+                            0,
+                        ) },
                 )
                 // Sidebar: slides in from the left, driven by same sidebarOffset
                 val sidebarResizeCallbacks = if (sidebarWidth is ColumnWidth.Flexible) {
@@ -474,6 +482,27 @@ fun Scaffold(
                         LocalSidebarVisible provides showSidebar,
                     ) {
                         sidebar()
+                    }
+                }
+                // Inspector: slides in from the right, pushing content left
+                if (inspector != null) {
+                    Box(
+                        modifier = Modifier
+                            .width(currentInspectorWidth)
+                            .fillMaxHeight()
+                            .align(Alignment.TopEnd)
+                            .offset { IntOffset(inspectorOffset.roundToPx(), 0) }
+                            .drawWithContent {
+                                drawContent()
+                                drawLine(
+                                    color = pushSeparatorColor,
+                                    start = Offset(0f, 0f),
+                                    end = Offset(0f, size.height),
+                                    strokeWidth = 1.dp.toPx(),
+                                )
+                            },
+                    ) {
+                        inspector()
                     }
                 }
             }
