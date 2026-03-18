@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,7 +35,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 fun TextAreaDefaultExample() {
     val maxChars = 200
     var text by remember { mutableStateOf("") }
-    Column(modifier = Modifier.fillMaxWidth(0.5f)) {
+    Column(modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth()) {
         TextArea(
             value = text,
             onValueChange = { if (it.length <= maxChars) text = it },
@@ -61,7 +62,7 @@ fun TextAreaWithLabelExample() {
         placeholder = { Text("Describe the issue...") },
         label = { Text("Description") },
         supportingText = { Text("Provide as much detail as possible.") },
-        modifier = Modifier.fillMaxWidth(0.5f),
+        modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth(),
     )
 }
 
@@ -78,14 +79,14 @@ fun TextAreaErrorExample() {
         supportingText = { Text("This field is required") },
         minLines = 2,
         maxLines = 4,
-        modifier = Modifier.fillMaxWidth(0.5f),
+        modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth(),
     )
 }
 
 @GalleryExample("TextArea", "Disabled")
 @Composable
 fun TextAreaDisabledExample() {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth()) {
         TextArea(
             value = "",
             onValueChange = {},
@@ -93,6 +94,7 @@ fun TextAreaDisabledExample() {
             enabled = false,
             minLines = 2,
             maxLines = 2,
+            modifier = Modifier.fillMaxWidth(),
         )
         TextArea(
             value = "This content cannot be edited.",
@@ -100,6 +102,7 @@ fun TextAreaDisabledExample() {
             enabled = false,
             minLines = 2,
             maxLines = 2,
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
@@ -181,7 +184,7 @@ fun TextAreaSurfaceVariantsExample() {
 @Composable
 fun TextAreaCustomColorsExample() {
     val accent = MacosTheme.colorScheme.accent
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth()) {
         var t1 by remember { mutableStateOf("") }
         TextArea(
             value = t1,
@@ -190,6 +193,7 @@ fun TextAreaCustomColorsExample() {
             label = { Text("Accent") },
             minLines = 2,
             maxLines = 4,
+            modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.colors(
                 backgroundColor = accent.copy(alpha = 0.10f),
                 borderColor = accent.copy(alpha = 0.30f),
@@ -205,6 +209,7 @@ fun TextAreaCustomColorsExample() {
             label = { Text("Green") },
             minLines = 2,
             maxLines = 4,
+            modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.colors(
                 backgroundColor = Color(0xFF34C759).copy(alpha = 0.10f),
                 borderColor = Color(0xFF34C759).copy(alpha = 0.30f),
@@ -219,7 +224,7 @@ fun TextAreaCustomColorsExample() {
 @GalleryExample("TextArea", "Custom Font")
 @Composable
 fun TextAreaCustomFontExample() {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth()) {
         var bold by remember { mutableStateOf("Bold text area") }
         TextArea(
             value = bold,
@@ -228,6 +233,7 @@ fun TextAreaCustomFontExample() {
             textStyle = TextStyle(fontWeight = FontWeight.Bold),
             minLines = 2,
             maxLines = 3,
+            modifier = Modifier.fillMaxWidth(),
         )
         var large by remember { mutableStateOf("Larger font") }
         TextArea(
@@ -237,6 +243,7 @@ fun TextAreaCustomFontExample() {
             textStyle = TextStyle(fontSize = 18.sp),
             minLines = 2,
             maxLines = 3,
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }

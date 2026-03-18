@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -77,12 +78,12 @@ fun ControlSizeCascadeExample() {
                         value = sliderVal,
                         onValueChange = { sliderVal = it },
                         valueRange = 0f..100f,
-                        modifier = Modifier.fillMaxWidth(0.5f),
+                        modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth(),
                     )
                     LinearProgress(
                         value = 65f,
                         max = 100f,
-                        modifier = Modifier.fillMaxWidth(0.5f),
+                        modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth(),
                     )
                     var seg by remember { mutableStateOf(0) }
                     SegmentedControl(
