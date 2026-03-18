@@ -132,7 +132,7 @@ fun ComboBoxPlacementExample() {
 @GalleryExample("ComboBox", "Custom Colors")
 @Composable
 fun ComboBoxCustomColorsExample() {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth()) {
         var s1 by remember { mutableStateOf<Int?>(null) }
         ComboBox(
             items = listOf("Apple", "Banana", "Cherry"),

@@ -41,7 +41,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.generated.Ga
 
 @Composable
 private fun InputPreview() {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth()) {
         var text by remember { mutableStateOf("") }
         var errorText by remember { mutableStateOf("") }
         TextField(value = text, onValueChange = { text = it }, placeholder = { Text("Type something...") })
@@ -58,7 +58,7 @@ fun InputSizesExample() {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth(0.6f),
+                    modifier = Modifier.widthIn(max = 480.dp).fillMaxWidth(),
                 ) {
                     Text(
                         text = size.name,
@@ -88,7 +88,7 @@ fun InputDefaultExample() {
         onValueChange = { text = it },
         placeholder = { Text("Enter your name...") },
         label = { Text("Name") },
-        modifier = Modifier.fillMaxWidth(0.5f),
+        modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth(),
     )
 }
 
@@ -103,7 +103,7 @@ fun InputErrorExample() {
         label = { Text("Email") },
         isError = true,
         supportingText = { Text("This field is required") },
-        modifier = Modifier.fillMaxWidth(0.5f),
+        modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth(),
     )
 }
 
@@ -117,7 +117,7 @@ fun InputWithLabelExample() {
         placeholder = { Text("you@example.com") },
         label = { Text("Email address") },
         supportingText = { Text("We'll never share your email.") },
-        modifier = Modifier.fillMaxWidth(0.5f),
+        modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth(),
     )
 }
 
@@ -131,14 +131,14 @@ fun InputPasswordExample() {
         placeholder = { Text("Password") },
         label = { Text("Password") },
         visualTransformation = PasswordVisualTransformation(),
-        modifier = Modifier.fillMaxWidth(0.5f),
+        modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth(),
     )
 }
 
 @GalleryExample("Input", "With Icons")
 @Composable
 fun InputWithIconsExample() {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth()) {
         var search by remember { mutableStateOf("") }
         TextField(
             value = search,
@@ -168,7 +168,7 @@ fun InputWithIconsExample() {
 @GalleryExample("Input", "Disabled")
 @Composable
 fun InputDisabledExample() {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth()) {
         TextField(
             value = "",
             onValueChange = {},
@@ -246,7 +246,7 @@ fun InputSurfaceVariantsExample() {
 @Composable
 fun InputCustomColorsExample() {
     val accent = MacosTheme.colorScheme.accent
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth()) {
         var q1 by remember { mutableStateOf("") }
         TextField(
             value = q1,
@@ -280,7 +280,7 @@ fun InputCustomColorsExample() {
 @GalleryExample("Input", "Custom Font")
 @Composable
 fun InputCustomFontExample() {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth()) {
         var bold by remember { mutableStateOf("Bold text") }
         TextField(
             value = bold,

@@ -66,7 +66,7 @@ fun MultiSelectDefaultExample() {
         onSelectionChange = { selected = it },
         header = "Technologies",
         placeholder = "Pick frameworks",
-        modifier = Modifier.fillMaxWidth(0.5f),
+        modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth(),
     )
 }
 
@@ -80,7 +80,7 @@ fun MultiSelectPreselectedExample() {
         selectedIndices = selected,
         onSelectionChange = { selected = it },
         header = "Favorites",
-        modifier = Modifier.fillMaxWidth(0.5f),
+        modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth(),
     )
 }
 
@@ -127,7 +127,7 @@ fun MultiSelectPlacementExample() {
 @GalleryExample("MultiSelectComboBox", "Custom Colors")
 @Composable
 fun MultiSelectCustomColorsExample() {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth()) {
         var sel1 by remember { mutableStateOf(listOf(0)) }
         MultiSelectComboBox(
             items = listOf("Red", "Green", "Blue"),

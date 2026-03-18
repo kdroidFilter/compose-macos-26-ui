@@ -43,7 +43,7 @@ fun SearchInputSizesExample() {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth(0.6f),
+                    modifier = Modifier.widthIn(max = 480.dp).fillMaxWidth(),
                 ) {
                     Text(
                         text = size.name,
@@ -68,7 +68,7 @@ fun SearchInputSizesExample() {
 @Composable
 fun SearchInputDefaultExample() {
     var query by remember { mutableStateOf("") }
-    SearchField(value = query, onValueChange = { query = it }, placeholder = "Search...", modifier = Modifier.fillMaxWidth(0.5f))
+    SearchField(value = query, onValueChange = { query = it }, placeholder = "Search...", modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth())
 }
 
 @GalleryExample("SearchInput", "Address Bar")
@@ -79,7 +79,7 @@ fun SearchInputAddressBarExample() {
         value = url,
         onValueChange = { url = it },
         onGo = {},
-        modifier = Modifier.fillMaxWidth(0.7f),
+        modifier = Modifier.widthIn(max = 560.dp).fillMaxWidth(),
     )
 }
 
@@ -93,7 +93,7 @@ fun SearchInputAddressBarWithIconExample() {
         placeholder = "Search or enter website name",
         onGo = {},
         leadingIcon = { Icon(LucideSearch, modifier = Modifier.size(13.dp)) },
-        modifier = Modifier.fillMaxWidth(0.7f),
+        modifier = Modifier.widthIn(max = 560.dp).fillMaxWidth(),
     )
 }
 
@@ -195,7 +195,7 @@ fun SearchInputCustomColorsExample() {
             value = q1,
             onValueChange = { q1 = it },
             placeholder = "Accent-tinted search",
-            modifier = Modifier.fillMaxWidth(0.5f),
+            modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth(),
             colors = SearchFieldDefaults.colors(
                 backgroundColor = accent.copy(alpha = 0.10f),
                 borderColor = accent.copy(alpha = 0.30f),
@@ -207,7 +207,7 @@ fun SearchInputCustomColorsExample() {
             value = q2,
             onValueChange = { q2 = it },
             placeholder = "Green search",
-            modifier = Modifier.fillMaxWidth(0.5f),
+            modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth(),
             colors = SearchFieldDefaults.colors(
                 backgroundColor = Color(0xFF34C759).copy(alpha = 0.10f),
                 borderColor = Color(0xFF34C759).copy(alpha = 0.30f),

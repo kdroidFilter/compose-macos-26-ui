@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -25,6 +26,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icons
@@ -109,6 +111,8 @@ fun TitleBar(
     showBottomBorder: Boolean = false,
     glass: Boolean = false,
     height: Int = style.height,
+    navigationActionsMinWidth: Dp = style.navMinWidth,
+    pushActionsOnExpand: Boolean = false,
 ) {
     val content = @Composable {
         TitleBarContent(
@@ -123,6 +127,8 @@ fun TitleBar(
             showBottomBorder = showBottomBorder,
             glass = glass,
             height = height,
+            navigationActionsMinWidth = navigationActionsMinWidth,
+            pushActionsOnExpand = pushActionsOnExpand,
         )
     }
 
@@ -148,6 +154,8 @@ private fun TitleBarContent(
     showBottomBorder: Boolean,
     glass: Boolean,
     height: Int,
+    navigationActionsMinWidth: Dp = style.navMinWidth,
+    pushActionsOnExpand: Boolean = false,
 ) {
     val isDark = MacosTheme.colorScheme.isDark
     val borderColor = if (isDark) Color.Black.copy(alpha = 0.5f) else Color.Black.copy(alpha = 0.1f)
@@ -172,83 +180,131 @@ private fun TitleBarContent(
 
     val onTitleBarDoubleClick = LocalTitleBarDoubleClick.current
 
+    val outerModifier = modifier
+        .fillMaxWidth()
+        .height(height.dp)
+        .then(
+            if (onTitleBarDoubleClick != null) {
+                Modifier.pointerInput(onTitleBarDoubleClick) {
+                    awaitPointerEventScope {
+                        var lastPressTime = 0L
+                        while (true) {
+                            val event = awaitPointerEvent(PointerEventPass.Final)
+                            if (event.type == PointerEventType.Press &&
+                                event.changes.none { it.isConsumed }
+                            ) {
+                                val now = event.changes.first().uptimeMillis
+                                if (now - lastPressTime < viewConfiguration.doubleTapTimeoutMillis) {
+                                    onTitleBarDoubleClick()
+                                    lastPressTime = 0L
+                                } else {
+                                    lastPressTime = now
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                Modifier
+            },
+        )
+        .then(bgModifier)
+        .then(
+            if (showBorder) {
+                Modifier.drawBehind {
+                    drawLine(
+                        color = borderColor,
+                        start = Offset(0f, size.height),
+                        end = Offset(size.width, size.height),
+                        strokeWidth = 0.5.dp.toPx(),
+                    )
+                }
+            } else {
+                Modifier
+            },
+        )
+
     CompositionLocalProvider(
         LocalTitleBarStyle provides style,
         LocalTextStyle provides titleTextStyle,
     ) {
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .height(height.dp)
-                .then(
-                    if (onTitleBarDoubleClick != null) {
-                        Modifier.pointerInput(onTitleBarDoubleClick) {
-                            awaitPointerEventScope {
-                                var lastPressTime = 0L
-                                while (true) {
-                                    val event = awaitPointerEvent(PointerEventPass.Final)
-                                    if (event.type == PointerEventType.Press &&
-                                        event.changes.none { it.isConsumed }
-                                    ) {
-                                        val now = event.changes.first().uptimeMillis
-                                        if (now - lastPressTime < viewConfiguration.doubleTapTimeoutMillis) {
-                                            onTitleBarDoubleClick()
-                                            lastPressTime = 0L
-                                        } else {
-                                            lastPressTime = now
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        Modifier
-                    },
-                )
-                .then(bgModifier)
-                .then(
-                    if (showBorder) {
-                        Modifier.drawBehind {
-                            drawLine(
-                                color = borderColor,
-                                start = Offset(0f, size.height),
-                                end = Offset(size.width, size.height),
-                                strokeWidth = 0.5.dp.toPx(),
-                            )
-                        }
-                    } else {
-                        Modifier
-                    },
-                )
-                .padding(horizontal = style.horizontalPadding),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            // Left section: Nav Actions
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(end = 8.dp).widthIn(min = style.navMinWidth),
-            ) {
-                navigationActions()
-            }
+        if (pushActionsOnExpand) {
+            val density = LocalDensity.current
+            var actionsWidthPx by remember { mutableStateOf(0) }
+            val actionsMinWidthPx = remember(style, density) { with(density) { style.actionsMinWidth.roundToPx() } }
+            val pushOffsetPx = (actionsWidthPx - actionsMinWidthPx).coerceAtLeast(0)
 
-            // Center section: Title or Search
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .graphicsLayer { alpha = if (showsTitle) 1f else 0f },
-                contentAlignment = Alignment.Center,
-            ) {
-                title()
-            }
+            Box(modifier = outerModifier.clipToBounds().padding(horizontal = style.horizontalPadding)) {
+                // Left section (nav + title): fills full width, pushed left as actions expand
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .offset { IntOffset(-pushOffsetPx, 0) },
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(end = 8.dp).widthIn(min = navigationActionsMinWidth),
+                    ) {
+                        navigationActions()
+                    }
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .graphicsLayer { alpha = if (showsTitle) 1f else 0f },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        title()
+                    }
+                }
 
-            // Right section: Actions
+                // Right section (actions): anchored at end, measured to drive push offset
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(style.actionSpacing, Alignment.End),
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(start = 8.dp)
+                        .widthIn(min = style.actionsMinWidth)
+                        .onGloballyPositioned { actionsWidthPx = it.size.width },
+                ) {
+                    actions()
+                }
+            }
+        } else {
             Row(
+                modifier = outerModifier.padding(horizontal = style.horizontalPadding),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(style.actionSpacing, Alignment.End),
-                modifier = Modifier.padding(start = 8.dp).widthIn(min = style.actionsMinWidth),
             ) {
-                actions()
+                // Left section: Nav Actions
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(end = 8.dp).widthIn(min = navigationActionsMinWidth),
+                ) {
+                    navigationActions()
+                }
+
+                // Center section: Title
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .graphicsLayer { alpha = if (showsTitle) 1f else 0f },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    title()
+                }
+
+                // Right section: Actions
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(style.actionSpacing, Alignment.End),
+                    modifier = Modifier.padding(start = 8.dp).widthIn(min = style.actionsMinWidth),
+                ) {
+                    actions()
+                }
             }
         }
     }

@@ -33,7 +33,7 @@ fun SliderSizesExample() {
         for (size in ControlSize.entries) {
             ControlSize(size) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(0.6f),
+                    modifier = Modifier.widthIn(max = 480.dp).fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -60,7 +60,7 @@ fun SliderSizesExample() {
 @Composable
 fun SliderVolumeExample() {
     var value by remember { mutableStateOf(50f) }
-    Column(modifier = Modifier.fillMaxWidth(0.5f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -85,7 +85,7 @@ fun SliderVolumeExample() {
 @Composable
 fun SliderWithValueExample() {
     var value by remember { mutableStateOf(50f) }
-    Column(modifier = Modifier.fillMaxWidth(0.5f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = "With value display",
             style = MacosTheme.typography.caption1,
@@ -153,7 +153,7 @@ fun SliderSurfaceExample() {
 @GalleryExample("Slider", "Custom Colors")
 @Composable
 fun SliderCustomColorsExample() {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.widthIn(max = 400.dp).fillMaxWidth()) {
         var v1 by remember { mutableStateOf(50f) }
         Text("Green track", style = MacosTheme.typography.caption1, color = MacosTheme.colorScheme.textSecondary)
         Slider(
