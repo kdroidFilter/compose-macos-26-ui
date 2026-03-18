@@ -263,12 +263,14 @@ private fun TitleBarContent(
                     }
                 }
 
-                // Right section (actions): anchored at end, measured to drive push offset
+                // Right section (actions): anchored at end, unbounded so expanding
+                // children (e.g. search field) push the left section instead of compressing
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(style.actionSpacing, Alignment.End),
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
+                        .wrapContentWidth(unbounded = true, align = Alignment.End)
                         .padding(start = 8.dp)
                         .widthIn(min = style.actionsMinWidth)
                         .onGloballyPositioned { actionsWidthPx = it.size.width },

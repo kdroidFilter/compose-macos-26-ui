@@ -320,6 +320,7 @@ fun App() {
                     titleBar = {
                         TitleBar(
                             glass = true,
+                            showsTitle = !isCompact,
                             pushActionsOnExpand = isCompact,
                             navigationActionsMinWidth = if (isCompact) 0.dp else 80.dp,
                             navigationActions = if (!isCompact) {
@@ -432,11 +433,6 @@ fun App() {
                                         }
                                     }
                                 }
-                                TitleBarButtonGroup {
-                                    TitleBarGroupButton(onClick = { inspectorVisible = !inspectorVisible }) {
-                                        Icon(Lucide.Ruler, modifier = Modifier.size(14.dp))
-                                    }
-                                }
                                 ToolbarSearchField(
                                     value = searchQuery,
                                     onValueChange = { searchQuery = it },
@@ -474,6 +470,11 @@ fun App() {
                                         }
                                     },
                                 )
+                                TitleBarButtonGroup {
+                                    TitleBarGroupButton(onClick = { inspectorVisible = !inspectorVisible }) {
+                                        Icon(Lucide.Ruler, modifier = Modifier.size(14.dp))
+                                    }
+                                }
                             },
                         )
                     },
