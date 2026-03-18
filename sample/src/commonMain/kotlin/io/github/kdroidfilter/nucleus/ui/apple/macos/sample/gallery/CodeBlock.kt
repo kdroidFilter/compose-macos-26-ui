@@ -50,6 +50,7 @@ import kotlinx.coroutines.delay
 @Suppress("DEPRECATION")
 @Composable
 fun CodeBlock(code: String) {
+    val jetBrainsMono = JetBrainsMonoFontFamily()
     val clipboardManager = LocalClipboardManager.current
     var copied by remember { mutableStateOf(false) }
     val isDark = MacosTheme.colorScheme.isDark
@@ -174,7 +175,7 @@ fun CodeBlock(code: String) {
                 text = highlightedCode,
                 style =
                     TextStyle(
-                        fontFamily = FontFamily.Monospace,
+                        fontFamily = jetBrainsMono,
                         fontSize = MacosTheme.typography.caption1.fontSize,
                         color = MacosTheme.colorScheme.textSecondary,
                     ),

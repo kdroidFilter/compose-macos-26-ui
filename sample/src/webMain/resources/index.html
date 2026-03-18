@@ -5,16 +5,200 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compose Mac OS 26 UI</title>
     <link type="text/css" rel="stylesheet" href="styles.css">
+    <style>
+        #boot-screen {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 80px;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.7s ease;
+        }
+        #boot-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .boot-progress-wrap {
+            width: 180px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .boot-progress-bar {
+            height: 100%;
+            background: #fff;
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.2s ease-out;
+        }
+    </style>
 </head>
-<body style="text-align: center; align-content: center">
-<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 50 50" role="presentation">
-    <circle cx="25" cy="25" r="20" stroke="#ccc" stroke-width="4" fill="none"/>
-    <circle cx="25" cy="25" r="20" stroke="#333" stroke-width="4" fill="none" stroke-linecap="round"
-            stroke-dasharray="90 125">
-        <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s"
-                          repeatCount="indefinite"/>
-    </circle>
-</svg>
+<body>
+<div id="boot-screen">
+    <div class="boot-progress-wrap">
+        <div class="boot-progress-bar" id="boot-bar"></div>
+    </div>
+</div>
+
+<script>(function () {
+    'use strict';
+
+    var bar = document.getElementById('boot-bar');
+    var screen = document.getElementById('boot-screen');
+    var wasmProgress = {}; // url -> { loaded, total }
+    var dismissed = false;
+    var barPct = 0;
+
+    function setBar(pct) {
+        barPct = Math.max(barPct, Math.min(100, pct));
+        bar.style.width = barPct + '%';
+    }
+
+    function dismiss() {
+        if (dismissed) return;
+        dismissed = true;
+        screen.classList.add('fade-out');
+        setTimeout(function () { if (screen.parentNode) screen.parentNode.removeChild(screen); }, 750);
+    }
+
+    // Rough expected total for Kotlin/WASM builds (2 files: ~4 MB + ~9 MB).
+    // Used only when the server omits Content-Length.
+    var WASM_ESTIMATED_BYTES = 14 * 1024 * 1024;
+
+    function recalc() {
+        var urls = Object.keys(wasmProgress);
+        if (urls.length === 0) return;
+
+        var knownTotal  = 0;
+        var loadedBytes = 0;
+        var allDone     = true;
+        var hasTotal    = true;
+
+        urls.forEach(function (u) {
+            var entry = wasmProgress[u];
+            if (!entry.total)  hasTotal  = false;
+            if (!entry.done)   allDone   = false;
+            knownTotal  += entry.total  || 0;
+            loadedBytes += entry.loaded || 0;
+        });
+
+        var pct;
+        if (hasTotal && knownTotal > 0) {
+            // Exact progress from Content-Length
+            pct = (loadedBytes / knownTotal) * 100;
+        } else {
+            // Estimate: map received bytes against expected total, cap at 95% until done
+            pct = Math.min(95, (loadedBytes / WASM_ESTIMATED_BYTES) * 100);
+        }
+
+        setBar(pct);
+
+        if (allDone) {
+            setBar(100);
+            setTimeout(dismiss, 350);
+        }
+    }
+
+    // Patch fetch to intercept WASM downloads and track progress via ReadableStream
+    var _fetch = window.fetch;
+    window.fetch = function (input, init) {
+        var url = typeof input === 'string' ? input
+                : (input && input.url)     ? input.url
+                : String(input);
+
+        if (!/\.wasm(\?|$)/.test(url)) return _fetch.apply(this, arguments);
+
+        return _fetch.apply(this, arguments).then(function (response) {
+            var cl = response.headers.get('Content-Length');
+            wasmProgress[url] = { loaded: 0, total: cl ? parseInt(cl, 10) : 0 };
+
+            if (!response.body) {
+                // No streaming support — mark as complete immediately
+                wasmProgress[url].total  = 1;
+                wasmProgress[url].loaded = 1;
+                wasmProgress[url].done   = true;
+                recalc();
+                return response;
+            }
+
+            var reader = response.body.getReader();
+            var stream = new ReadableStream({
+                start: function (ctrl) {
+                    (function pump() {
+                        reader.read().then(function (chunk) {
+                            if (chunk.done) {
+                                wasmProgress[url].done  = true;
+                                if (!wasmProgress[url].total) {
+                                    wasmProgress[url].total = wasmProgress[url].loaded;
+                                }
+                                recalc();
+                                ctrl.close();
+                                return;
+                            }
+                            wasmProgress[url].loaded += chunk.value.byteLength;
+                            recalc();
+                            ctrl.enqueue(chunk.value);
+                            pump();
+                        }).catch(function (e) { ctrl.error(e); });
+                    }());
+                }
+            });
+
+            return new Response(stream, {
+                headers:    response.headers,
+                status:     response.status,
+                statusText: response.statusText
+            });
+        });
+    };
+
+    // Fallback for the pure-JS build (no WASM): animate the bar with easing,
+    // then watch for the Compose <canvas> to appear as the final signal.
+    var fallbackHandle  = null;
+    var fallbackStarted = false;
+
+    function startFallback() {
+        if (fallbackStarted) return;
+        fallbackStarted = true;
+        var start = Date.now();
+        fallbackHandle = setInterval(function () {
+            var t = Math.min(1, (Date.now() - start) / 9000);
+            // Ease-out cubic, capped at 90% until canvas appears
+            setBar((1 - Math.pow(1 - t, 3)) * 90);
+        }, 60);
+    }
+
+    // Watch for the Compose canvas — signals that the app has rendered
+    var canvasMo = new MutationObserver(function () {
+        if (!document.querySelector('canvas')) return;
+        canvasMo.disconnect();
+        clearInterval(fallbackHandle);
+        if (!dismissed) {
+            setBar(100);
+            setTimeout(dismiss, 350);
+        }
+    });
+    canvasMo.observe(document.body, { childList: true, subtree: true });
+
+    // If no WASM fetch is detected within 1 s, assume JS-only target
+    setTimeout(function () {
+        if (Object.keys(wasmProgress).length === 0) startFallback();
+    }, 1000);
+
+    // Absolute safety net — never leave the boot screen up forever
+    setTimeout(function () {
+        clearInterval(fallbackHandle);
+        setBar(100);
+        setTimeout(dismiss, 350);
+    }, 45000);
+}());
+</script>
+
 <script type="application/javascript" src="sample.js"></script>
 </body>
 </html>
