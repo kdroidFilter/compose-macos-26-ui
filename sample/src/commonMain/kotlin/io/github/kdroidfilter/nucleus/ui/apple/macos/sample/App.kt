@@ -113,6 +113,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideMoon
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSettings
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSun
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.SystemIcon
+import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.ShowcasePage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AccordionPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AddressBarPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AlertPage
@@ -176,6 +177,7 @@ internal data class SidebarEntryDef(val id: String, val label: String, val group
 internal val sidebarEntryDefs = listOf(
     // General
     SidebarEntryDef("home", "Home", "GENERAL", Icons.Home),
+    SidebarEntryDef("showcase", "Showcase", "GENERAL", SystemIcon("sparkles", Lucide.Star)),
     SidebarEntryDef("getting-started", "Getting Started", "GENERAL", SystemIcon("list.bullet.rectangle", Lucide.LayoutList)),
     SidebarEntryDef("license", "License", "GENERAL", Icons.Tag),
 
@@ -259,6 +261,7 @@ private fun buildSidebarItems(onNavigate: (String) -> Unit): List<SidebarItem> {
 
     return listOf(
         leaf("home"),
+        leaf("showcase"),
         leaf("getting-started"),
         leaf("license"),
 
@@ -632,6 +635,7 @@ private fun PageContent(
     toastState: io.github.kdroidfilter.nucleus.ui.apple.macos.components.ToastState,
 ) {
     when (pageId) {
+        "showcase" -> ShowcasePage()
         "getting-started" -> GettingStartedPage()
         "license" -> LicensePage()
         "button" -> ButtonPage()
